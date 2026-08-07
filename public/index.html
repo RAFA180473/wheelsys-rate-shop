@@ -242,6 +242,13 @@
   .rs-scroll thead th{top:0;}
   .rs-note{font-size:10.5px;color:var(--steel-500);line-height:1.45;margin-top:9px;}
   @media(max-width:1000px){.rs-controls{grid-template-columns:repeat(2,1fr);}}
+
+/* source-version badge injected by build */
+.rate-source-meta{display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--mist-100);font-size:11px;line-height:1.35;color:var(--navy-700)}
+.rate-source-dot{width:9px;height:9px;border-radius:50%;background:var(--up);margin-top:3px;flex:0 0 9px;box-shadow:0 0 0 3px rgba(0,168,136,.10)}
+.rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}
+.rate-source-sub{color:var(--steel-500)}
+#rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}
 </style>
 </head>
 <body>
@@ -260,6 +267,11 @@
         <option value="BK">RateGroup BK (CDW)</option>
         <option value="FCI">RateGroup BK FCI (CDW + FCI)</option>
       </select>
+<div id="rateSourceMeta" class="rate-source-meta" aria-live="polite">
+  <span id="rateSourceDot" class="rate-source-dot"></span>
+  <span><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
+  <span class="rate-source-sub"><b>Data detetada:</b> <span id="rateSourceDate"></span></span></span>
+</div>
     </div>
     <div>
       <label>Localizações a visualizar <span style="font-weight:400;text-transform:none;letter-spacing:0;">(uma ou várias)</span></label>
@@ -1336,6 +1348,34 @@ populateRsFilters();
 document.getElementById('rsSipp').addEventListener('input',renderRateShop);
 renderRateShop();
 
+</script>
+
+<script>
+// Source metadata injected automatically from selection_manifest.json
+const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx","date":"06/08/2026","method":"filename_date","status":"ok"},"FCI":{"filename":"RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx","date":"06/08/2026","method":"filename_date","status":"ok"}};
+(function(){
+  const sel = document.getElementById('fileFilterSel');
+  const box = document.getElementById('rateSourceMeta');
+  const fileEl = document.getElementById('rateSourceFile');
+  const dateEl = document.getElementById('rateSourceDate');
+  if(!sel || !box || !fileEl || !dateEl) return;
+  const baseLabels = {BK:'RateGroup BK (CDW)', FCI:'RateGroup BK FCI (CDW + FCI)'};
+  Array.from(sel.options).forEach(opt=>{
+    const m = RATE_SOURCE_META[opt.value];
+    opt.textContent = baseLabels[opt.value] || opt.textContent;
+    if(m && m.status === 'ok' && m.date) opt.textContent += ' — ficheiro ' + m.date;
+  });
+  function refreshSourceVersion(){
+    const m = RATE_SOURCE_META[sel.value] || {status:'missing',filename:'',date:''};
+    const ok = m.status === 'ok';
+    box.classList.toggle('missing', !ok);
+    fileEl.textContent = ok ? m.filename : 'ficheiro não identificado';
+    dateEl.textContent = ok ? m.date : 'não disponível';
+    box.title = ok && m.method ? 'Seleção: ' + m.method : '';
+  }
+  sel.addEventListener('change', refreshSourceVersion);
+  refreshSourceVersion();
+})();
 </script>
 </body>
 </html>

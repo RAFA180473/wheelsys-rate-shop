@@ -1,0 +1,54 @@
+name: Atualizar tarifas Wheelsys
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "data/incoming/**"
+      - "public/index.template.html"
+      - "scripts/**"
+      - "requirements.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wheelsys-rate-update
+  cancel-in-progress: false
+
+jobs:
+  build-rates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obter repositorio
+        uses: actions/checkout@v6
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements.txt
+
+      - name: Gerar tarifas e HTML
+        run: python scripts/build_all.py
+
+      - name: Guardar ficheiros gerados
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add public/index.html public/data/rates.json
+
+          if git diff --cached --quiet; then
+            echo "Sem alteracoes nos ficheiros gerados."
+          else
+            git commit -m "Atualizar tarifas automaticamente"
+            git push
+          fi

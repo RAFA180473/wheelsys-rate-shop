@@ -10,11 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 RATES = ROOT / "public" / "data" / "rates.json"
 HTML = ROOT / "public" / "index.html"
 BUILD_MANIFEST = ROOT / "build_manifest.json"
-PATTERN = re.compile(r"const\s+RATES\s*=\s*\{.*?\};", re.DOTALL)
+
+DECL = re.compile(r"\b(?:const|let|var)\s+RATES\s*=\s*\{")
 
 
 def main() -> int:
     errors: list[str] = []
+
     if not RATES.exists():
         errors.append("public/data/rates.json não existe")
     else:
@@ -26,6 +28,7 @@ def main() -> int:
             total = sum(len(data[tariff].get(loc, [])) for loc in ("Lisboa", "Porto", "Faro"))
             if total == 0:
                 errors.append(f"Tarifário {tariff} não tem linhas")
+
         for tariff in ("BK", "FCI"):
             for loc in ("Lisboa", "Porto", "Faro"):
                 if tariff in data and loc not in data[tariff]:
@@ -33,9 +36,10 @@ def main() -> int:
 
     if HTML.exists():
         html = HTML.read_text(encoding="utf-8")
-        count = len(PATTERN.findall(html))
+        count = len(DECL.findall(html))
         if count != 1:
-            errors.append(f"public/index.html tem {count} definições RATES (esperado: 1)")
+            errors.append(f"public/index.html tem {count} declarações RATES (esperado: 1)")
+
         for marker in ("Painel de Ajuste de Tarifas", "btnExport", "XLSX"):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")
@@ -52,6 +56,7 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
+
     print("VALIDAÇÃO OK: BK + FCI presentes, Lisboa/Porto/Faro estruturados e HTML íntegro.")
     return 0
 

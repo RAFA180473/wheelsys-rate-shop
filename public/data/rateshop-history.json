@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-08T14:31:41.443948+00:00",
-  "description": "Arquivo Rate Shop: targets das tarifas e pesquisas de concorrência guardadas.",
+  "generatedAt": "2026-08-08T14:56:00+01:00",
+  "description": "Arquivo Rate Shop. Targets gerados a partir dos intervalos BK/FCI. Os preços de concorrência só são preenchidos quando existe uma recolha/importação real para a localização e datas indicadas.",
   "targets": [
     {
       "id": "BK|Lisboa|2026-08-01|2026-08-08",
@@ -21872,8 +21872,128 @@
       "source": "DiscoverCars",
       "sourceType": "user_verified_snapshot",
       "status": "collected",
-      "notes": "Pesquisa apresentada pelo utilizador: Lisbon Airport, AutoUnion, 20/08/2026 a 27/08/2026.",
+      "notes": "AutoUnion: valores verificados pelo utilizador para Lisboa 20/08/2026-27/08/2026. Restantes concorrentes: snapshot DiscoverCars previamente embutido no HTML; são apresentados como referência histórica e não como cotação verificada para este período.",
       "offers": [
+        {
+          "car": "Fiat 500",
+          "supplier": "Sicily By Car",
+          "transmission": "manual",
+          "total": 65.27,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-Z9WA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=33802",
+          "bucket": "small",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Opel Corsa Hatchback",
+          "supplier": "Specific Rent",
+          "transmission": "manual",
+          "total": 68.05,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-UVH8?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=87945",
+          "bucket": "small",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Audi A1",
+          "supplier": "Drive on Holidays",
+          "transmission": "manual",
+          "total": 82.04,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-4NEA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470",
+          "bucket": "medium",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Opel Astra",
+          "supplier": "Drive on Holidays",
+          "transmission": "automatic",
+          "total": 85.52,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-DEXQ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470",
+          "bucket": "medium",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Peugeot 308",
+          "supplier": "CRC Car Rental Company",
+          "transmission": "manual",
+          "total": 87.5,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-S3W6?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161",
+          "bucket": "medium",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Audi A3",
+          "supplier": "CRC Car Rental Company",
+          "transmission": "manual",
+          "total": 97.8,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-HRLN?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161",
+          "bucket": "large",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Mercedes-Benz A-Class",
+          "supplier": "H-Lead Hospitality",
+          "transmission": "automatic",
+          "total": 121.3,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-B7WJ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=104010",
+          "bucket": "large",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Renault Captur",
+          "supplier": "Drive on Holidays",
+          "transmission": "manual",
+          "total": 71.86,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-SNMF?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470",
+          "bucket": "suv",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "SEAT Arona",
+          "supplier": "Drive4Move",
+          "transmission": "manual",
+          "total": 78.44,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-U2VY?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29574",
+          "bucket": "suv",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
+        {
+          "car": "Nissan Qashqai",
+          "supplier": "Drive on Holidays",
+          "transmission": "manual",
+          "total": 85.37,
+          "days": 3,
+          "link": "https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-XPL9?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470",
+          "bucket": "suv",
+          "source": "DiscoverCars",
+          "sourceType": "embedded_snapshot_prior",
+          "snapshotDateMatch": false
+        },
         {
           "group": "A",
           "sipp": "MDMR",
@@ -21885,7 +22005,10 @@
           "days": 7,
           "daily": 22.0471,
           "currency": "EUR",
-          "link": ""
+          "link": "",
+          "source": "DiscoverCars",
+          "sourceType": "user_verified_snapshot",
+          "snapshotDateMatch": true
         },
         {
           "group": "B",
@@ -21898,7 +22021,10 @@
           "days": 7,
           "daily": 21.7271,
           "currency": "EUR",
-          "link": ""
+          "link": "",
+          "source": "DiscoverCars",
+          "sourceType": "user_verified_snapshot",
+          "snapshotDateMatch": true
         }
       ]
     }

@@ -682,10 +682,18 @@ function groupLabel(g){
   model = model.replace(/\s+/g,' ').trim();
   return model ? `${g} — ${model}` : g;
 }
+let activeGroup = null;
 function primaryGroup(){
   const groups = groupsOf(currentFile);
-  for(const g of groups){ if(gridGroupFilter.has(g)) return g; }
-  return groups[0];
+  if(activeGroup && gridGroupFilter.has(activeGroup) && groups.includes(activeGroup)) return activeGroup;
+  for(const g of groups){
+    if(gridGroupFilter.has(g)){
+      activeGroup = g;
+      return g;
+    }
+  }
+  activeGroup = groups[0] || null;
+  return activeGroup;
 }
 function getSelectedGroupsList(){
   return groupsOf(currentFile).filter(g=>gridGroupFilter.has(g));
@@ -841,6 +849,7 @@ function renderGrid(){
       const f = td.dataset.field;
       const loc = td.dataset.loc;
       gridGroupFilter = new Set([g]);
+      activeGroup = g;
       syncGridGroupFilterCheckboxes();
       document.getElementById('cbSel').value = f;
       document.getElementById('simDias').value = CB_DAYS_DEFAULT[f];
@@ -868,7 +877,7 @@ function refreshAll(){ refreshPriceBox(); renderGrid(); refreshChangeCount(); }
 
 document.getElementById('perSel').addEventListener('change', ()=>{
   refreshAll();
-  if(typeof renderRateShop==='function') renderRateShop();
+  syncRateShopDatesFromPeriod();
 });
 document.getElementById('cbSel').addEventListener('change', e=>{
   document.getElementById('simDias').value = CB_DAYS_DEFAULT[e.target.value];
@@ -879,7 +888,10 @@ document.getElementById('cbSel').addEventListener('change', e=>{
 const _rsFileSel=document.getElementById('fileFilterSel');
 if(_rsFileSel){
   _rsFileSel.addEventListener('change', ()=>{
-    setTimeout(()=>{ if(typeof renderRateShop==='function') renderRateShop(); },0);
+    setTimeout(()=>{
+      syncRateShopDatesFromPeriod(); // tariff-sync
+      if(typeof renderRateShop==='function') renderRateShop();
+    },0);
   });
 }
 
@@ -985,6 +997,7 @@ function populateGridGroupFilter(){
   box.innerHTML = '';
   const groups = groupsOfFiltered(currentFile);
   gridGroupFilter = new Set(groups.length ? [groups[0]] : []);
+  activeGroup = groups.length ? groups[0] : null;
   groups.forEach((g,i)=>{
     const lab = document.createElement('label');
     if(i===0) lab.className = 'checked';
@@ -993,21 +1006,36 @@ function populateGridGroupFilter(){
     const cb = lab.querySelector('input');
     cb.addEventListener('change', ()=>{
       lab.classList.toggle('checked', cb.checked);
-      if(cb.checked) gridGroupFilter.add(g); else gridGroupFilter.delete(g);
-      updateGroupDesc(primaryGroup());
-      renderGrid();
+      if(cb.checked){
+        gridGroupFilter.add(g);
+        activeGroup = g; // o último grupo selecionado fica ativo no painel
+      } else {
+        gridGroupFilter.delete(g);
+        if(activeGroup === g) activeGroup = null;
+      }
+      const pg = primaryGroup();
+      if(pg){
+        updateGroupDesc(pg);
+        populatePeriodSelect(pg);
+      }
+      refreshAll();
+      if(typeof renderRateShop==='function') renderRateShop();
     });
   });
 }
 document.getElementById('gridGroupFilterAll').addEventListener('click', ()=>{
   document.querySelectorAll('#gridGroupFilter input').forEach(cb=>{ cb.checked=true; cb.parentElement.classList.add('checked'); gridGroupFilter.add(cb.value); });
-  updateGroupDesc(primaryGroup());
-  renderGrid();
+  activeGroup = groupsOf(currentFile).find(g=>gridGroupFilter.has(g)) || null;
+  const pg = primaryGroup();
+  if(pg){ updateGroupDesc(pg); populatePeriodSelect(pg); }
+  refreshAll();
+  if(typeof renderRateShop==='function') renderRateShop();
 });
 document.getElementById('gridGroupFilterNone').addEventListener('click', ()=>{
   document.querySelectorAll('#gridGroupFilter input').forEach(cb=>{ cb.checked=false; cb.parentElement.classList.remove('checked'); });
   gridGroupFilter.clear();
-  renderGrid();
+  activeGroup = null;
+  refreshAll();
 });
 function onFilterChange(){
   populateGridGroupFilter();
@@ -1297,8 +1325,33 @@ document.getElementById('openAurumcars').addEventListener('click', ()=>window.op
 document.getElementById('openDiscoverCars').addEventListener('click', ()=>window.open('https://www.discovercars.com/', '_blank'));
 document.getElementById('openBooking').addEventListener('click', ()=>window.open('https://www.booking.com/cars/index.html', '_blank'));
 
+function ptDateToInputValue(s){
+  const m=String(s||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  return m?`${m[3]}-${m[2]}-${m[1]}`:'';
+}
+
 function parsePtDateUTC(s){ if(!s) return null; const [d,m,y]=s.split('/').map(Number); return new Date(Date.UTC(y,m-1,d)); }
 function rateFieldForDays(days){ if(days<=1)return 'p1'; if(days===2)return 'p2'; if(days===3)return 'p3'; if(days<=6)return 'p46'; if(days===7)return 'p7'; if(days<=13)return 'p813'; if(days<=29)return 'p1429'; return 'p30'; }
+function syncRateShopDatesFromPeriod(){
+  const perSel=document.getElementById('perSel');
+  const pickup=document.getElementById('rsPickupDate');
+  const dropoff=document.getElementById('rsDropoffDate');
+  if(!perSel || !pickup || !dropoff || !perSel.value) return;
+
+  const parts=perSel.value.split('|');
+  if(parts.length<2) return;
+
+  const start=ptDateToInputValue(parts[0]);
+  const end=ptDateToInputValue(parts[1]);
+
+  if(start) pickup.value=start;
+  if(end) dropoff.value=end;
+
+  if(typeof updateRsDays==='function') updateRsDays();
+  applyRateShopHistory();
+  if(typeof renderRateShop==='function') renderRateShop();
+}
+
 function ourBasePriceFor(group, loc){
   loc=loc||primaryLocation();
   const rows=WORK[currentFile][loc]||[];
@@ -1369,10 +1422,15 @@ function applyRateShopHistory(){
   RS_LIVE=buckets;
   return true;
 }
+function refreshRateShopFromHistory(){
+  applyRateShopHistory();
+  renderRateShop();
+}
+
 function rsHistoryStatusText(){
   const s=currentRateShopSearch();
   if(!s) return 'Sem pesquisa guardada para estas datas';
-  return `Pesquisa guardada: ${s.collectedAt||'data desconhecida'}`;
+  return `Pesquisa guardada: ${s.collectedAt||'data desconhecida'} · ${s.source||'fonte desconhecida'}`;
 }
 function rsTransmissionFromSipp(sipp){ const c=(sipp||'')[2]; return c==='A'?'automatic':(c==='M'?'manual':''); }
 function rsBucket(group){
@@ -1390,9 +1448,15 @@ function rsBestOffer(group){
   const trans=rsTransmissionFromSipp(info.sipp);
   const candidates=RS_LIVE[bucket].filter(o=>{
     const supplier=(o.supplier||'').toLowerCase().replace(/\s+/g,'');
-    return supplier.includes('autounion') && (!trans || o.transmission===trans);
+    if(!supplier.includes('autounion')) return false;
+    if(trans && o.transmission!==trans) return false;
+    if(o.group && o.group!==group) return false;
+    if(o.sipp && info.sipp && o.sipp!==info.sipp) return false;
+    return true;
   });
-  return candidates.length?candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]:null;
+  return candidates.length
+    ? candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]
+    : null;
 }
 
 function rsBestCompetitor(group){
@@ -1400,7 +1464,12 @@ function rsBestCompetitor(group){
   const bucket=rsBucket(group);
   if(!bucket||!RS_LIVE[bucket]) return null;
   const trans=rsTransmissionFromSipp(info.sipp);
-  const candidates=RS_LIVE[bucket].filter(o=>!trans || o.transmission===trans);
+  const candidates=RS_LIVE[bucket].filter(o=>{
+    if(trans && o.transmission!==trans) return false;
+    if(o.group && o.group!==group) return false;
+    if(o.sipp && info.sipp && o.sipp!==info.sipp) return false;
+    return true;
+  });
   return candidates.length
     ? candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]
     : null;
@@ -1566,6 +1635,21 @@ const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_Lisboa_Porto_Far
   sel.addEventListener('change', refreshSourceVersion);
   refreshSourceVersion();
 })();
+
+document.getElementById('rsPickupDate')?.addEventListener('change', ()=>{
+  applyRateShopHistory();
+  if(typeof updateRsDays==='function') updateRsDays();
+  renderRateShop();
+});
+document.getElementById('rsDropoffDate')?.addEventListener('change', ()=>{
+  applyRateShopHistory();
+  if(typeof updateRsDays==='function') updateRsDays();
+  renderRateShop();
+});
+document.getElementById('rsLocation')?.addEventListener('change', ()=>{
+  applyRateShopHistory();
+  renderRateShop();
+});
 </script>
 
 <script>

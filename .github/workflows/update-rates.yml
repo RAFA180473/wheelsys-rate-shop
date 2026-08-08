@@ -1,4 +1,4 @@
-name: Atualizar tarifas Wheelsys
+name: Atualizar e publicar Wheelsys Rate Shop
 
 on:
   workflow_dispatch:
@@ -14,13 +14,19 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
-  group: wheelsys-rate-update
+  group: wheelsys-rate-shop
   cancel-in-progress: false
 
 jobs:
-  build-rates:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -53,9 +59,25 @@ jobs:
             echo "Sem alteracoes nos ficheiros gerados."
           else
             git commit -m "Atualizar tarifas automaticamente"
-
             git fetch origin main
             git rebase origin/main
-
             git push origin HEAD:main
           fi
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Verificar ficheiros do site
+        shell: bash
+        run: |
+          test -f public/index.html
+          test -f public/data/rates.json
+
+      - name: Carregar site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

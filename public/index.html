@@ -1393,33 +1393,81 @@ const RS_GROUP_SEGMENT = {
   O:'Luxury',OEV:'Electric premium',P:'Luxury SUV',Q:'Luxury',R:'Cabrio premium',
   VANL:'Cargo van',VANM:'Cargo van',VANS:'Cargo van',VCXL:'Cargo van'
 };
-let RS_HISTORY={schemaVersion:1,targets:[],searches:[]};
+const RS_HISTORY_FALLBACK=[{"id":"verified-user-snapshot|Lisboa|2026-08-20|2026-08-27","location":"Lisboa","checkout":"2026-08-20","checkin":"2026-08-27","days":7,"collectedAt":"2026-08-08T14:56:00+01:00","source":"DiscoverCars","sourceType":"user_verified_snapshot","status":"collected","notes":"AutoUnion: valores verificados pelo utilizador para Lisboa 20/08/2026-27/08/2026. Restantes concorrentes: snapshot DiscoverCars previamente embutido no HTML; são apresentados como referência histórica e não como cotação verificada para este período.","offers":[{"car":"Fiat 500","supplier":"Sicily By Car","transmission":"manual","total":65.27,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-Z9WA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=33802","bucket":"small","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Opel Corsa Hatchback","supplier":"Specific Rent","transmission":"manual","total":68.05,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-UVH8?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=87945","bucket":"small","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Audi A1","supplier":"Drive on Holidays","transmission":"manual","total":82.04,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-4NEA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Opel Astra","supplier":"Drive on Holidays","transmission":"automatic","total":85.52,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-DEXQ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Peugeot 308","supplier":"CRC Car Rental Company","transmission":"manual","total":87.5,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-S3W6?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Audi A3","supplier":"CRC Car Rental Company","transmission":"manual","total":97.8,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-HRLN?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161","bucket":"large","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Mercedes-Benz A-Class","supplier":"H-Lead Hospitality","transmission":"automatic","total":121.3,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-B7WJ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=104010","bucket":"large","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Renault Captur","supplier":"Drive on Holidays","transmission":"manual","total":71.86,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-SNMF?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"SEAT Arona","supplier":"Drive4Move","transmission":"manual","total":78.44,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-U2VY?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29574","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Nissan Qashqai","supplier":"Drive on Holidays","transmission":"manual","total":85.37,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-XPL9?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"group":"A","sipp":"MDMR","bucket":"small","car":"Kia Picanto","supplier":"AutoUnion","transmission":"manual","total":154.33,"days":7,"daily":22.0471,"currency":"EUR","link":"","source":"DiscoverCars","sourceType":"user_verified_snapshot","snapshotDateMatch":true},{"group":"B","sipp":"MBMR","bucket":"small","car":"Fiat 500","supplier":"AutoUnion","transmission":"manual","total":152.09,"days":7,"daily":21.7271,"currency":"EUR","link":"","source":"DiscoverCars","sourceType":"user_verified_snapshot","snapshotDateMatch":true}]}];
+let RS_HISTORY={schemaVersion:1,targets:[],searches:[...RS_HISTORY_FALLBACK]};
 const RS_SEED={"small":[{"car":"Fiat 500","supplier":"Sicily By Car","transmission":"manual","total":65.27,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-Z9WA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=33802"},{"car":"Opel Corsa Hatchback","supplier":"Specific Rent","transmission":"manual","total":68.05,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-UVH8?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=87945"}],"medium":[{"car":"Audi A1","supplier":"Drive on Holidays","transmission":"manual","total":82.04,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-4NEA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"Opel Astra","supplier":"Drive on Holidays","transmission":"automatic","total":85.52,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-DEXQ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"Peugeot 308","supplier":"CRC Car Rental Company","transmission":"manual","total":87.5,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-S3W6?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161"}],"large":[{"car":"Audi A3","supplier":"CRC Car Rental Company","transmission":"manual","total":97.8,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-HRLN?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161"},{"car":"Mercedes-Benz A-Class","supplier":"H-Lead Hospitality","transmission":"automatic","total":121.3,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-B7WJ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=104010"}],"suv":[{"car":"Renault Captur","supplier":"Drive on Holidays","transmission":"manual","total":71.86,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-SNMF?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"SEAT Arona","supplier":"Drive4Move","transmission":"manual","total":78.44,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-U2VY?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29574"},{"car":"Nissan Qashqai","supplier":"Drive on Holidays","transmission":"manual","total":85.37,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-XPL9?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"}]};
 let RS_LIVE=JSON.parse(JSON.stringify(RS_SEED));
 let RS_HISTORY_LOADED=false;
 async function loadRateShopHistory(){
+  const status=document.getElementById('rsStatus');
   try{
     const r=await fetch('data/rateshop-history.json?ts='+Date.now(),{cache:'no-store'});
     if(!r.ok) throw new Error('HTTP '+r.status);
-    RS_HISTORY=await r.json();
+    const external=await r.json();
+
+    const merged=[...(external.searches||[])];
+    RS_HISTORY_FALLBACK.forEach(seed=>{
+      if(!merged.some(s=>s.id===seed.id)) merged.push(seed);
+    });
+
+    RS_HISTORY={
+      ...external,
+      searches:merged
+    };
     RS_HISTORY_LOADED=true;
     applyRateShopHistory();
+
+    if(status){
+      status.innerHTML='<span class="rs-badge live">Histórico carregado</span> '+rsHistoryStatusText();
+    }
+    return true;
   }catch(err){
-    console.warn('Rate Shop history não disponível; a usar snapshot embutido.',err);
+    RS_HISTORY={schemaVersion:1,targets:[],searches:[...RS_HISTORY_FALLBACK]};
+    RS_HISTORY_LOADED=false;
+    applyRateShopHistory();
+
+    if(status){
+      status.innerHTML='<span class="rs-badge nomatch">Fallback embutido</span> '+rsHistoryStatusText();
+    }
+    console.warn('Rate Shop history externo não disponível; a usar fallback embutido.',err);
+    return false;
   }
 }
 function currentRateShopSearch(){
-  const loc=document.getElementById('rsLocation')?.value||primaryLocation();
-  const checkout=document.getElementById('rsPickupDate')?.value||'';
-  const checkin=document.getElementById('rsDropoffDate')?.value||'';
-  return (RS_HISTORY.searches||[]).filter(s=>s.location===loc&&s.checkout===checkout&&s.checkin===checkin).sort((a,b)=>(b.collectedAt||'').localeCompare(a.collectedAt||''))[0]||null;
+  const loc=(document.getElementById('rsLocation')?.value||primaryLocation()||'').trim().toLowerCase();
+  const checkout=(document.getElementById('rsPickupDate')?.value||'').trim();
+  const checkin=(document.getElementById('rsDropoffDate')?.value||'').trim();
+
+  return (RS_HISTORY.searches||[])
+    .filter(s=>
+      String(s.location||'').trim().toLowerCase()===loc &&
+      String(s.checkout||'').trim()===checkout &&
+      String(s.checkin||'').trim()===checkin
+    )
+    .sort((a,b)=>(b.collectedAt||'').localeCompare(a.collectedAt||''))[0]||null;
 }
 function applyRateShopHistory(){
   const s=currentRateShopSearch();
-  if(!s||!Array.isArray(s.offers)){ RS_LIVE=JSON.parse(JSON.stringify(RS_SEED)); return false; }
+  const status=document.getElementById('rsStatus');
+
+  if(!s||!Array.isArray(s.offers)){
+    RS_LIVE=JSON.parse(JSON.stringify(RS_SEED));
+    if(status){
+      status.innerHTML='<span class="rs-badge nomatch">Sem pesquisa guardada</span> '+rsHistoryStatusText();
+    }
+    return false;
+  }
+
   const buckets={small:[],medium:[],large:[],suv:[]};
-  s.offers.forEach(o=>{if(o.bucket&&buckets[o.bucket]) buckets[o.bucket].push(o);});
+  s.offers.forEach(o=>{
+    if(o.bucket&&buckets[o.bucket]) buckets[o.bucket].push(o);
+  });
   RS_LIVE=buckets;
+
+  if(status){
+    const src=RS_HISTORY_LOADED?'Histórico JSON':'Fallback embutido';
+    status.innerHTML=`<span class="rs-badge live">${src}</span> ${rsHistoryStatusText()} · ${s.offers.length} ofertas`;
+  }
   return true;
 }
 function refreshRateShopFromHistory(){
@@ -1503,7 +1551,9 @@ function renderRateShop(){
     const diffClass=diff===null?'':(diff>0?'rs-high':(diff<0?'rs-low':''));
 
     const auLink=autoUnionOffer
-      ? `<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`
+      ? (autoUnionOffer.link
+          ? `<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`
+          : autoUnionOffer.car)
       : '—';
 
     tr.innerHTML=`<td>${sg}</td>
@@ -1512,7 +1562,9 @@ function renderRateShop(){
       <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
       <td class="mono">${bestDaily!==null?bestDaily.toFixed(2)+' €':'—'}</td>
-      <td>${bestCompetitor?(bestCompetitor.supplier||'—'):'—'}</td>
+      <td>${bestCompetitor
+        ? `${bestCompetitor.supplier||'—'}${bestCompetitor.snapshotDateMatch===false?' *':''}`
+        : '—'}</td>
       <td class="mono">${auDaily!==null?auDaily.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diff!==null?(diff>=0?'+':'')+diff.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diffPct!==null?(diffPct>=0?'+':'')+diffPct.toFixed(1)+'%':'—'}</td>
@@ -1588,7 +1640,8 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
 
   window.setTimeout(()=>{
     const hasSaved=applyRateShopHistory();
-    renderRateShop();
+    applyRateShopHistory();
+  renderRateShop();
     const rows=[...document.querySelectorAll('#rsBody tr')];
     const found=rows.filter(r=>r.querySelector('.rs-badge.live')).length;
     if(status){

@@ -866,12 +866,23 @@ function updateSimDiasSuffix(){
 }
 function refreshAll(){ refreshPriceBox(); renderGrid(); refreshChangeCount(); }
 
-document.getElementById('perSel').addEventListener('change', refreshAll);
+document.getElementById('perSel').addEventListener('change', ()=>{
+  refreshAll();
+  if(typeof renderRateShop==='function') renderRateShop();
+});
 document.getElementById('cbSel').addEventListener('change', e=>{
   document.getElementById('simDias').value = CB_DAYS_DEFAULT[e.target.value];
   updateSimDiasSuffix();
   refreshAll();
 });
+// rateShopTariffSync: garante que a tabela Rate Shop relê os preços quando muda a tarifa.
+const _rsFileSel=document.getElementById('fileFilterSel');
+if(_rsFileSel){
+  _rsFileSel.addEventListener('change', ()=>{
+    setTimeout(()=>{ if(typeof renderRateShop==='function') renderRateShop(); },0);
+  });
+}
+
 document.getElementById('adjType').addEventListener('input', refreshPriceBox);
 document.getElementById('adjValue').addEventListener('input', e=>{
   const v = e.target.value;
@@ -1291,16 +1302,32 @@ function rateFieldForDays(days){ if(days<=1)return 'p1'; if(days===2)return 'p2'
 function ourBasePriceFor(group, loc){
   loc=loc||primaryLocation();
   const rows=WORK[currentFile][loc]||[];
+
+  // O número de dias determina o cost break.
   const checkout=rsDateToUTC(document.getElementById('rsPickupDate')?.value||'');
   const checkin=rsDateToUTC(document.getElementById('rsDropoffDate')?.value||'');
   const days=(checkout&&checkin)?Math.max(1,Math.round((checkin-checkout)/86400000)):7;
   const field=rateFieldForDays(days);
+
+  // REGRA PRINCIPAL:
+  // usar sempre o período selecionado no painel de tarifas.
   let row=null;
-  if(checkout){
-    row=rows.find(r=>{const a=parsePtDateUTC(r.pickupStart),b=parsePtDateUTC(r.pickupEnd);return r.group===group&&a&&b&&checkout>=a&&checkout<=b;});
+  const perSel=document.getElementById('perSel');
+  if(perSel && perSel.value){
+    const [pStart,pEnd]=perSel.value.split('|');
+    row=rows.find(r=>r.group===group && r.pickupStart===pStart && r.pickupEnd===pEnd);
   }
-  row=row||rows.find(r=>r.group===group);
-  return row&&Number.isFinite(Number(row[field]))?Number(row[field]):null;
+
+  // Apenas se não houver seleção válida, procurar pela data de check-out.
+  if(!row && checkout){
+    row=rows.find(r=>{
+      const a=parsePtDateUTC(r.pickupStart), b=parsePtDateUTC(r.pickupEnd);
+      return r.group===group && a && b && checkout>=a && checkout<=b;
+    });
+  }
+
+  // Não usar preços de outro período como fallback.
+  return row && Number.isFinite(Number(row[field])) ? Number(row[field]) : null;
 }
 
 // ---- DiscoverCars rate shop by ICONIQ group / SIPP reference ----

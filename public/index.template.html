@@ -574,9 +574,11 @@
                 <th>SIPP ref.</th>
                 <th>Viatura ICONIQ</th>
                 <th>Preço ICONIQ /dia</th>
+                <th>Melhor concorrência (DiscoverCars) /dia</th>
+                <th>Fornecedor</th>
                 <th>AutoUnion (DiscoverCars) /dia</th>
-                <th>Dif. €</th>
-                <th>Dif. %</th>
+                <th>Dif. AutoUnion vs ICONIQ €</th>
+                <th>Dif. AutoUnion vs ICONIQ %</th>
                 <th>Oferta AutoUnion</th>
                 <th>Estado</th>
               </tr>
@@ -586,7 +588,9 @@
         </div>
 
         <div class="rs-note">
-          A comparação é feita apenas contra AutoUnion. Se não existir um preço AutoUnion carregado para o período/localização selecionados, o painel indica isso explicitamente e não utiliza preços de outros fornecedores.
+          “Melhor concorrência” mostra a oferta mais barata disponível no conjunto DiscoverCars atualmente carregado.
+          “AutoUnion” fica sempre numa coluna própria. As diferenças €/% são calculadas exclusivamente como
+          <b>AutoUnion − ICONIQ</b>. Para pesquisar preços novos para qualquer período é necessária a Search API oficial da DiscoverCars.
         </div>
       </div>
     </div>
@@ -1328,6 +1332,17 @@ function rsBestOffer(group){
   });
   return candidates.length?candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]:null;
 }
+
+function rsBestCompetitor(group){
+  const info=VGROUPS[group]||{};
+  const bucket=rsBucket(group);
+  if(!bucket||!RS_LIVE[bucket]) return null;
+  const trans=rsTransmissionFromSipp(info.sipp);
+  const candidates=RS_LIVE[bucket].filter(o=>!trans || o.transmission===trans);
+  return candidates.length
+    ? candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]
+    : null;
+}
 function populateRsFilters(){
   const seg=document.getElementById('rsSegment'), grp=document.getElementById('rsGroup');
   [...new Set(Object.values(RS_GROUP_SEGMENT))].sort().forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;seg.appendChild(o);});
@@ -1343,18 +1358,30 @@ function renderRateShop(){
     if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!offer||match==='none'&&offer)return;
     const tr=document.createElement('tr');
     const selectedLoc=document.getElementById('rsLocation')?.value || primaryLocation();
+    const bestCompetitor=rsBestCompetitor(g);
     const autoUnionOffer=rsBestOffer(g);
     const ours=ourBasePriceFor(g, selectedLoc);
+    const bestDaily=bestCompetitor?(bestCompetitor.total/bestCompetitor.days):null;
     const auDaily=autoUnionOffer?(autoUnionOffer.total/autoUnionOffer.days):null;
-    const diff=(ours!==null && auDaily!==null)?(ours-auDaily):null;
-    const diffPct=(diff!==null && auDaily)?(diff/auDaily*100):null;
+
+    // Requested comparison: AutoUnion versus ICONIQ.
+    // Positive => AutoUnion is more expensive than ICONIQ.
+    // Negative => AutoUnion is cheaper than ICONIQ.
+    const diff=(ours!==null && auDaily!==null)?(auDaily-ours):null;
+    const diffPct=(diff!==null && ours)?(diff/ours*100):null;
     const diffClass=diff===null?'':(diff>0?'rs-high':(diff<0?'rs-low':''));
-    const auLink=autoUnionOffer?`<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`:'—';
+
+    const auLink=autoUnionOffer
+      ? `<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`
+      : '—';
+
     tr.innerHTML=`<td>${sg}</td>
       <td><b>${g}</b></td>
       <td class="mono">${v.sipp||'—'}</td>
       <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
+      <td class="mono">${bestDaily!==null?bestDaily.toFixed(2)+' €':'—'}</td>
+      <td>${bestCompetitor?(bestCompetitor.supplier||'—'):'—'}</td>
       <td class="mono">${auDaily!==null?auDaily.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diff!==null?(diff>=0?'+':'')+diff.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diffPct!==null?(diffPct>=0?'+':'')+diffPct.toFixed(1)+'%':'—'}</td>
@@ -1434,7 +1461,7 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
     if(status){
       status.innerHTML=found>0
         ? `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge live">Concluído</span> ${found} grupos com preço AutoUnion.`
-        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem preços AutoUnion carregados para este período</span>`;
+        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem AutoUnion no conjunto carregado</span> · a melhor concorrência disponível continua visível na tabela.`;
     }
     if(progress) progress.classList.remove('active');
     if(button){button.disabled=false;button.textContent='Fazer Rate Shop';}

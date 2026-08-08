@@ -287,6 +287,27 @@
   .rs-progress.active{display:flex;}
   .rs-spinner{width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--teal-500);border-radius:50%;animation:rs-spin .7s linear infinite;}
   @keyframes rs-spin{to{transform:rotate(360deg);}}
+
+  .rs-shop-controls-clean{
+    grid-template-columns:minmax(150px,1.1fr) minmax(145px,1fr) minmax(145px,1fr) 90px minmax(155px,auto);
+    align-items:end;
+  }
+  .rs-days-field{min-width:80px;}
+  .rs-days-card{
+    height:39px;display:flex;align-items:center;justify-content:center;gap:5px;
+    border:1px solid var(--line);border-radius:5px;background:var(--navy-950);
+    color:#fff;font-family:'IBM Plex Mono',monospace;
+  }
+  .rs-days-card b{font-size:15px;color:var(--teal-400);}
+  .rs-days-card span{font-size:11px;color:var(--mist-100);}
+  .rs-shop-action{display:flex;flex-direction:column;justify-content:flex-end;}
+  .rs-shop-action .btn{height:39px;}
+  @media(max-width:1100px){
+    .rs-shop-controls-clean{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .rs-days-field{min-width:0;}
+    .rs-shop-action{grid-column:1/-1;}
+  }
+
 </style>
 </head>
 <body>
@@ -497,9 +518,9 @@
       </div>
 
       <div class="rateshop-box">
-        <div class="rateshop-head">Rate Shop — comparação ICONIQ / DiscoverCars</div>
+        <div class="rateshop-head">Rate Shop — ICONIQ vs AutoUnion (DiscoverCars)</div>
 
-        <div class="rs-shop-controls">
+        <div class="rs-shop-controls rs-shop-controls-clean">
           <div>
             <label for="rsLocation">Localização</label>
             <select id="rsLocation">
@@ -508,55 +529,65 @@
               <option value="Faro">Faro</option>
             </select>
           </div>
+
           <div>
             <label for="rsPickupDate">Check-out</label>
             <input id="rsPickupDate" type="date">
           </div>
+
           <div>
             <label for="rsDropoffDate">Check-in</label>
             <input id="rsDropoffDate" type="date">
-            <div class="rs-days-badge"><span id="rsDays">7</span> dias</div>
           </div>
-          <div>
-            <label for="rsCompetitor">Concorrente</label>
-            <select id="rsCompetitor">
-              <option value="AutoUnion" selected>AutoUnion</option>
-              <option value="Sicily By Car">Sicily By Car</option>
-              <option value="Drive on Holidays">Drive on Holidays</option>
-              <option value="Specific Rent">Specific Rent</option>
-              <option value="CRC">CRC</option>
-            </select>
+
+          <div class="rs-days-field">
+            <label>Duração</label>
+            <div class="rs-days-card"><b id="rsDays">7</b><span>dias</span></div>
           </div>
+
           <div class="rs-shop-action">
             <button type="button" class="btn primary" id="btnRunRateShop">Fazer Rate Shop</button>
-            <div id="rsProgress" class="rs-progress"><span class="rs-spinner"></span><span>A processar Rate Shop…</span></div>
+            <div id="rsProgress" class="rs-progress">
+              <span class="rs-spinner"></span><span>A processar Rate Shop…</span>
+            </div>
           </div>
         </div>
 
-        <div class="rs-status" id="rsStatus">Seleciona o período e o concorrente e clica em <b>Fazer Rate Shop</b>.</div>
+        <div class="rs-status" id="rsStatus">
+          Seleciona o período e clica em <b>Fazer Rate Shop</b>.
+        </div>
 
         <div class="rs-controls">
           <div><label>Segmento</label><select id="rsSegment"><option value="">Todos</option></select></div>
           <div><label>Grupo ICONIQ</label><select id="rsGroup"><option value="">Todos</option></select></div>
           <div><label>SIPP / ACRISS</label><input id="rsSipp" type="text" placeholder="ex.: EDMR"></div>
           <div><label>Transmissão</label><select id="rsTransmission"><option value="">Todas</option><option value="manual">Manual</option><option value="automatic">Automática</option></select></div>
-          <div><label>Correspondência</label><select id="rsMatch"><option value="">Todas</option><option value="live">Com oferta</option><option value="none">Sem oferta</option></select></div>
+          <div><label>Correspondência</label><select id="rsMatch"><option value="">Todas</option><option value="live">Com AutoUnion</option><option value="none">Sem AutoUnion</option></select></div>
         </div>
 
         <div class="rs-scroll">
           <table class="comp-table">
-            <thead><tr>
-              <th>Segmento</th><th>Grupo</th><th>SIPP ref.</th><th>Viatura ICONIQ</th>
-              <th>Preço ICONIQ /dia</th>
-              <th id="rsCompetitorHead">Concorrente /dia</th>
-              <th>AutoUnion (DiscoverCars) /dia</th>
-              <th>Dif. €</th><th>Dif. %</th>
-              <th>Oferta concorrente</th><th>Oferta AutoUnion</th><th>Estado</th>
-            </tr></thead>
+            <thead>
+              <tr>
+                <th>Segmento</th>
+                <th>Grupo</th>
+                <th>SIPP ref.</th>
+                <th>Viatura ICONIQ</th>
+                <th>Preço ICONIQ /dia</th>
+                <th>AutoUnion (DiscoverCars) /dia</th>
+                <th>Dif. €</th>
+                <th>Dif. %</th>
+                <th>Oferta AutoUnion</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
             <tbody id="rsBody"></tbody>
           </table>
         </div>
-        <div class="rs-note">O concorrente selecionado e a AutoUnion são mostrados em colunas separadas. Se não existir uma oferta compatível nos dados DiscoverCars disponíveis, aparece “—”.</div>
+
+        <div class="rs-note">
+          A comparação é feita apenas contra AutoUnion. Se não existir um preço AutoUnion carregado para o período/localização selecionados, o painel indica isso explicitamente e não utiliza preços de outros fornecedores.
+        </div>
       </div>
     </div>
     </div>
@@ -1286,22 +1317,16 @@ function rsBucket(group){
   if(/SUV/.test(seg)||['D','DA','F','FA','G','I','IA','JA','K','P'].includes(group)) return 'suv';
   return null;
 }
-function rsBestOfferFor(group, supplierName){
+function rsBestOffer(group){
   const info=VGROUPS[group]||{};
   const bucket=rsBucket(group);
   if(!bucket||!RS_LIVE[bucket]) return null;
   const trans=rsTransmissionFromSipp(info.sipp);
-  const wanted=(supplierName||'').toLowerCase().replace(/\s+/g,'');
   const candidates=RS_LIVE[bucket].filter(o=>{
     const supplier=(o.supplier||'').toLowerCase().replace(/\s+/g,'');
-    return supplier.includes(wanted) && (!trans || o.transmission===trans);
+    return supplier.includes('autounion') && (!trans || o.transmission===trans);
   });
   return candidates.length?candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]:null;
-}
-
-function rsBestOffer(group){
-  const selected=document.getElementById('rsCompetitor')?.value||'AutoUnion';
-  return rsBestOfferFor(group, selected);
 }
 function populateRsFilters(){
   const seg=document.getElementById('rsSegment'), grp=document.getElementById('rsGroup');
@@ -1318,37 +1343,29 @@ function renderRateShop(){
     if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!offer||match==='none'&&offer)return;
     const tr=document.createElement('tr');
     const selectedLoc=document.getElementById('rsLocation')?.value || primaryLocation();
-    const selectedSupplier=document.getElementById('rsCompetitor')?.value || 'AutoUnion';
-    const competitorOffer=rsBestOfferFor(g, selectedSupplier);
-    const autoUnionOffer=rsBestOfferFor(g, 'AutoUnion');
+    const autoUnionOffer=rsBestOffer(g);
     const ours=ourBasePriceFor(g, selectedLoc);
-    const competitorDaily=competitorOffer?(competitorOffer.total/competitorOffer.days):null;
     const auDaily=autoUnionOffer?(autoUnionOffer.total/autoUnionOffer.days):null;
-    const diff=(ours!==null && competitorDaily!==null)?(ours-competitorDaily):null;
-    const diffPct=(diff!==null && competitorDaily)?(diff/competitorDaily*100):null;
+    const diff=(ours!==null && auDaily!==null)?(ours-auDaily):null;
+    const diffPct=(diff!==null && auDaily)?(diff/auDaily*100):null;
     const diffClass=diff===null?'':(diff>0?'rs-high':(diff<0?'rs-low':''));
-    const competitorLink=competitorOffer?`<a class="rs-link" target="_blank" rel="noopener" href="${competitorOffer.link}">${competitorOffer.car} ↗</a>`:'—';
     const auLink=autoUnionOffer?`<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`:'—';
-    tr.innerHTML=`<td>${sg}</td><td><b>${g}</b></td><td class="mono">${v.sipp||'—'}</td><td>${v.desc||'—'}</td>
+    tr.innerHTML=`<td>${sg}</td>
+      <td><b>${g}</b></td>
+      <td class="mono">${v.sipp||'—'}</td>
+      <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
-      <td class="mono">${competitorDaily!==null?competitorDaily.toFixed(2)+' €':'—'}</td>
       <td class="mono">${auDaily!==null?auDaily.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diff!==null?(diff>=0?'+':'')+diff.toFixed(2)+' €':'—'}</td>
       <td class="mono ${diffClass}">${diffPct!==null?(diffPct>=0?'+':'')+diffPct.toFixed(1)+'%':'—'}</td>
-      <td>${competitorLink}</td><td>${auLink}</td>
-      <td>${competitorOffer?'<span class="rs-badge live">compatível</span>':'<span class="rs-badge nomatch">sem oferta</span>'}</td>`;
+      <td>${auLink}</td>
+      <td>${autoUnionOffer?'<span class="rs-badge live">AutoUnion</span>':'<span class="rs-badge nomatch">sem AutoUnion</span>'}</td>`;
     body.appendChild(tr);
   });
 }
 populateRsFilters();
 ['rsSegment','rsGroup','rsTransmission','rsMatch'].forEach(id=>document.getElementById(id).addEventListener('change',renderRateShop));
 document.getElementById('rsSipp').addEventListener('input',renderRateShop);
-
-function updateRateShopHeader(){
-  const competitor=document.getElementById('rsCompetitor')?.value || 'AutoUnion';
-  const head=document.getElementById('rsCompetitorHead');
-  if(head) head.textContent=`${competitor} (DiscoverCars) /dia`;
-}
 
 function rsDateToUTC(value){
   if(!value) return null;
@@ -1357,7 +1374,9 @@ function rsDateToUTC(value){
 }
 
 function rsFormatDateUTC(date){
-  const y=date.getUTCFullYear(), m=String(date.getUTCMonth()+1).padStart(2,'0'), d=String(date.getUTCDate()).padStart(2,'0');
+  const y=date.getUTCFullYear();
+  const m=String(date.getUTCMonth()+1).padStart(2,'0');
+  const d=String(date.getUTCDate()).padStart(2,'0');
   return `${y}-${m}-${d}`;
 }
 
@@ -1381,24 +1400,22 @@ function updateRateShopDays(autoSetCheckIn=false){
 
 document.getElementById('rsPickupDate')?.addEventListener('change',()=>updateRateShopDays(true));
 document.getElementById('rsDropoffDate')?.addEventListener('change',()=>updateRateShopDays(false));
-document.getElementById('rsCompetitor')?.addEventListener('change',updateRateShopHeader);
 
 document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
   const loc=document.getElementById('rsLocation')?.value||'Lisboa';
   const checkout=document.getElementById('rsPickupDate')?.value;
   const checkin=document.getElementById('rsDropoffDate')?.value;
-  const competitor=document.getElementById('rsCompetitor')?.value||'AutoUnion';
   const status=document.getElementById('rsStatus');
   const progress=document.getElementById('rsProgress');
   const button=document.getElementById('btnRunRateShop');
 
-  updateRateShopHeader();
   updateRateShopDays(false);
 
   if(!checkout||!checkin){
     if(status) status.innerHTML='<span class="rs-badge nomatch">Falta período</span> Seleciona o Check-out e o Check-in.';
     return;
   }
+
   const a=rsDateToUTC(checkout), b=rsDateToUTC(checkin);
   const days=Math.round((b-a)/86400000);
   if(days<=0){
@@ -1408,12 +1425,17 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
 
   if(button){button.disabled=true;button.textContent='A processar…';}
   if(progress) progress.classList.add('active');
-  if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · ${competitor} · a processar…`;
+  if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · a procurar AutoUnion…`;
 
   window.setTimeout(()=>{
     renderRateShop();
-    const count=document.querySelectorAll('#rsBody tr').length;
-    if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · ${competitor} · <span class="rs-badge live">Concluído</span> ${count} grupos analisados.`;
+    const rows=[...document.querySelectorAll('#rsBody tr')];
+    const found=rows.filter(r=>r.querySelector('.rs-badge.live')).length;
+    if(status){
+      status.innerHTML=found>0
+        ? `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge live">Concluído</span> ${found} grupos com preço AutoUnion.`
+        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem preços AutoUnion carregados para este período</span>`;
+    }
     if(progress) progress.classList.remove('active');
     if(button){button.disabled=false;button.textContent='Fazer Rate Shop';}
   },650);
@@ -1423,7 +1445,6 @@ const _rsPick=document.getElementById('rsPickupDate');
 const _rsDrop=document.getElementById('rsDropoffDate');
 if(_rsPick && !_rsPick.value) _rsPick.value='2026-08-20';
 if(_rsPick && _rsDrop && !_rsDrop.value) updateRateShopDays(true);
-updateRateShopHeader();
 renderRateShop();
 
 </script>

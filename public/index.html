@@ -249,6 +249,45 @@
 .rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}
 .rate-source-sub{color:var(--steel-500)}
 #rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}
+
+  .rs-shop-controls{
+    display:grid;
+    grid-template-columns:1.1fr 1fr 1fr 1.2fr auto;
+    gap:10px;
+    align-items:end;
+    margin:12px 0 12px;
+  }
+  .rs-shop-controls label{
+    margin:0 0 4px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    color:var(--steel-500);
+  }
+  .rs-shop-controls select,
+  .rs-shop-controls input{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:5px;
+    font-size:13px;
+    background:#fff;
+    color:var(--navy-900);
+  }
+  .rs-shop-action .btn{min-width:150px;margin:0;}
+  @media(max-width:1100px){
+    .rs-shop-controls{grid-template-columns:repeat(2,1fr);}
+    .rs-shop-action{grid-column:1/-1;}
+    .rs-shop-action .btn{width:100%;}
+  }
+
+
+/* source-version badge injected by build */
+.rate-source-meta{display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--mist-100);font-size:11px;line-height:1.35;color:var(--navy-700)}
+.rate-source-dot{width:9px;height:9px;border-radius:50%;background:var(--up);margin-top:3px;flex:0 0 9px;box-shadow:0 0 0 3px rgba(0,168,136,.10)}
+.rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}
+.rate-source-sub{color:var(--steel-500)}
+#rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}
 </style>
 </head>
 <body>
@@ -267,6 +306,11 @@
         <option value="BK">RateGroup BK (CDW)</option>
         <option value="FCI">RateGroup BK FCI (CDW + FCI)</option>
       </select>
+<div id="rateSourceMeta" class="rate-source-meta" aria-live="polite">
+  <span id="rateSourceDot" class="rate-source-dot"></span>
+  <span><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
+  <span class="rate-source-sub"><b>Data detetada:</b> <span id="rateSourceDate"></span></span></span>
+</div>
 <div id="rateSourceMeta" class="rate-source-meta" aria-live="polite">
   <span id="rateSourceDot" class="rate-source-dot"></span>
   <span><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
@@ -449,7 +493,7 @@
 
     <div class="panel comp-panel">
       <div class="comp-head">
-        <h2 style="margin:0;">Preços da concorrência</h2>
+        <h2 style="margin:0;">Rate Shop concorrência</h2>
         <div class="comp-links">
           <button type="button" id="openAutoRentals">Portugal Auto Rentals ↗</button>
           <button type="button" id="openAurumcars">Aurumcars ↗</button>
@@ -458,42 +502,49 @@
         </div>
       </div>
 
-      <div class="comp-form">
-        <div>
-          <label>Localização</label>
-          <select id="compLoc"><option>Porto</option><option>Lisboa</option><option>Faro</option></select>
-        </div>
-        <div>
-          <label>Fonte</label>
-          <select id="compSource"><option>Portugal Auto Rentals</option><option>Aurumcars</option><option>DiscoverCars</option><option>Booking.com Cars</option></select>
-        </div>
-        <div>
-          <label>Grupo (nosso)</label>
-          <select id="compGroup"></select>
-        </div>
-        <div>
-          <label>Datas (recolha-devolução)</label>
-          <input type="text" id="compDates" placeholder="ex: 15/08 - 22/08">
-        </div>
-        <div>
-          <label>Preço concorrente /dia (€)</label>
-          <input type="number" id="compPrice" step="0.01" min="0" placeholder="0.00">
-        </div>
-        <div>
-          <button type="button" id="btnCompAdd">Adicionar</button>
-        </div>
-      </div>
-
-      <table class="comp-table">
-        <thead>
-          <tr><th>Localização</th><th>Fonte</th><th>Grupo</th><th>Datas</th><th>Concorrente/dia</th><th>Nosso (7d base)/dia</th><th>Diferença</th><th></th></tr>
-        </thead>
-        <tbody id="compBody"></tbody>
-      </table>
-      <div class="comp-empty" id="compEmpty">Ainda não há preços da concorrência registados.</div>
-
       <div class="rateshop-box">
-        <div class="rateshop-head">Rate Shop DiscoverCars — grupos ICONIQ / SIPP</div>
+        <div class="rateshop-head">Rate Shop — comparação ICONIQ / DiscoverCars</div>
+
+        <div class="rs-shop-controls">
+          <div>
+            <label for="rsLocation">Localização</label>
+            <select id="rsLocation">
+              <option value="Lisboa">Lisboa</option>
+              <option value="Porto">Porto</option>
+              <option value="Faro">Faro</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="rsPickupDate">Recolha</label>
+            <input id="rsPickupDate" type="date">
+          </div>
+
+          <div>
+            <label for="rsDropoffDate">Devolução</label>
+            <input id="rsDropoffDate" type="date">
+          </div>
+
+          <div>
+            <label for="rsCompetitor">Concorrente</label>
+            <select id="rsCompetitor">
+              <option value="AutoUnion" selected>AutoUnion</option>
+              <option value="Sicily By Car">Sicily By Car</option>
+              <option value="Drive on Holidays">Drive on Holidays</option>
+              <option value="Specific Rent">Specific Rent</option>
+              <option value="CRC">CRC</option>
+            </select>
+          </div>
+
+          <div class="rs-shop-action">
+            <button type="button" class="btn primary" id="btnRunRateShop">Fazer Rate Shop</button>
+          </div>
+        </div>
+
+        <div class="rs-status" id="rsStatus">
+          Seleciona o período e o concorrente e clica em <b>Fazer Rate Shop</b>.
+        </div>
+
         <div class="rs-controls">
           <div><label>Segmento</label><select id="rsSegment"><option value="">Todos</option></select></div>
           <div><label>Grupo ICONIQ</label><select id="rsGroup"><option value="">Todos</option></select></div>
@@ -501,15 +552,32 @@
           <div><label>Transmissão</label><select id="rsTransmission"><option value="">Todas</option><option value="manual">Manual</option><option value="automatic">Automática</option></select></div>
           <div><label>Correspondência</label><select id="rsMatch"><option value="">Todas</option><option value="live">Com oferta</option><option value="none">Sem oferta</option></select></div>
         </div>
-        <div class="rs-status"><b>LIS</b> · 08/08/2026 09:00 → 11/08/2026 09:00 · 35 anos · residência PT · EUR. <span class="rs-badge live">Dados DiscoverCars</span></div>
+
         <div class="rs-scroll">
           <table class="comp-table">
-            <thead><tr><th>Segmento</th><th>Grupo</th><th>SIPP ref.</th><th>Viatura ICONIQ</th><th>Oferta DiscoverCars</th><th>Fornecedor</th><th>Trans.</th><th>Total</th><th>€/dia</th><th>Depósito</th><th>Franquia</th><th>Estado</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Segmento</th>
+                <th>Grupo</th>
+                <th>SIPP ref.</th>
+                <th>Viatura ICONIQ</th>
+                <th>Preço ICONIQ /dia</th>
+                <th id="rsCompetitorHead">AutoUnion (DiscoverCars) /dia</th>
+                <th>Dif. €</th>
+                <th>Dif. %</th>
+                <th>Oferta</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
             <tbody id="rsBody"></tbody>
           </table>
         </div>
-        <div class="rs-note">O conector DiscoverCars não fornece código SIPP/ACRISS. A coluna “SIPP ref.” corresponde ao catálogo ICONIQ. A associação às ofertas é feita por segmento, modelo, transmissão, lugares, portas e bagagem; quando não é segura, o painel mostra “sem oferta compatível” em vez de inventar um código.</div>
+
+        <div class="rs-note">
+          O preço do concorrente só é apresentado quando existe uma oferta compatível desse fornecedor nos dados DiscoverCars disponíveis no painel. Não são usados preços de outros fornecedores para preencher a coluna AutoUnion.
+        </div>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -1000,14 +1068,6 @@ document.getElementById('btnExport').addEventListener('click', ()=>{
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Base Rates');
-  if(COMPETITOR_ROWS.length){
-    const compAoa = [['Localização','Fonte','Grupo','Datas','Preço concorrente/dia (€)','Nosso preço 7d base (€)']];
-    COMPETITOR_ROWS.forEach(r=>{
-      compAoa.push([r.loc, r.source, r.group, r.dates, r.price, ourBasePriceFor(r.group, r.loc)]);
-    });
-    const wsComp = XLSX.utils.aoa_to_sheet(compAoa);
-    XLSX.utils.book_append_sheet(wb, wsComp, 'Concorrência');
-  }
   const fname = `RateGroup_Export_${currentFile==='BK'?'BK':'BK_FCI'}_Lisboa_Porto_Faro_ajustado_${todayDDMMYY()}.xlsx`;
   XLSX.writeFile(wb, fname);
 });
@@ -1192,92 +1252,19 @@ populatePeriodSelect(initGroup);
 updateSimDiasSuffix();
 refreshAll();
 
-// ---- Concorrência ----
-let COMPETITOR_ROWS = [];
-
-document.getElementById('openAutoRentals').addEventListener('click', ()=>{
-  window.open('https://www.portugal-auto-rentals.com/', '_blank');
-});
-document.getElementById('openAurumcars').addEventListener('click', ()=>{
-  window.open('https://www.aurumcars.com/', '_blank');
-});
-document.getElementById('openDiscoverCars').addEventListener('click', ()=>{
-  window.open('https://www.discovercars.com/', '_blank');
-});
-document.getElementById('openBooking').addEventListener('click', ()=>{
-  window.open('https://www.booking.com/cars/index.html', '_blank');
-});
-
-function populateCompGroupSelect(){
-  const sel = document.getElementById('compGroup');
-  const cur = sel.value;
-  sel.innerHTML = '';
-  groupsOf(currentFile).forEach(g=>{
-    const o = document.createElement('option'); o.value=g; o.textContent=groupLabel(g);
-    sel.appendChild(o);
-  });
-  if(cur) sel.value = cur;
-}
-populateCompGroupSelect();
+// ---- Pesquisa de concorrência: atalhos ----
+document.getElementById('openAutoRentals').addEventListener('click', ()=>window.open('https://www.portugal-auto-rentals.com/', '_blank'));
+document.getElementById('openAurumcars').addEventListener('click', ()=>window.open('https://www.aurumcars.com/', '_blank'));
+document.getElementById('openDiscoverCars').addEventListener('click', ()=>window.open('https://www.discovercars.com/', '_blank'));
+document.getElementById('openBooking').addEventListener('click', ()=>window.open('https://www.booking.com/cars/index.html', '_blank'));
 
 function ourBasePriceFor(group, loc){
   loc = loc || primaryLocation();
-  // Use the currently selected period's 7-day base price as reference (simplest, most-used cost break)
   const {pStart, pEnd} = currentSelection();
-  const rows = WORK[currentFile][loc];
+  const rows = WORK[currentFile][loc] || [];
   const row = rows.find(r=>r.group===group && r.pickupStart===pStart && r.pickupEnd===pEnd) || rows.find(r=>r.group===group);
   return row ? row.p7 : null;
 }
-
-function renderCompetitorTable(){
-  const tbody = document.getElementById('compBody');
-  tbody.innerHTML = '';
-  document.getElementById('compEmpty').style.display = COMPETITOR_ROWS.length ? 'none' : '';
-  COMPETITOR_ROWS.forEach((row, idx)=>{
-    const ours = ourBasePriceFor(row.group, row.loc);
-    const diff = (ours!==null) ? (row.price - ours) : null;
-    const diffTxt = (diff===null) ? '—' : ((diff>=0?'+':'') + diff.toFixed(2) + ' €');
-    const diffCls = diff===null ? '' : (diff>0 ? 'up' : (diff<0 ? 'down' : ''));
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${row.loc}</td><td>${row.source}</td><td>${row.group}</td><td>${row.dates}</td>
-      <td class="mono">${row.price.toFixed(2)} €</td>
-      <td class="mono">${ours!==null ? ours.toFixed(2)+' €' : '—'}</td>
-      <td class="mono comp-diff ${diffCls}">${diffTxt}</td>
-      <td><button class="comp-del" data-idx="${idx}">✕</button></td>`;
-    tbody.appendChild(tr);
-  });
-  tbody.querySelectorAll('.comp-del').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      COMPETITOR_ROWS.splice(Number(btn.dataset.idx), 1);
-      renderCompetitorTable();
-    });
-  });
-}
-
-document.getElementById('btnCompAdd').addEventListener('click', ()=>{
-  const loc = document.getElementById('compLoc').value;
-  const source = document.getElementById('compSource').value;
-  const group = document.getElementById('compGroup').value;
-  const dates = document.getElementById('compDates').value.trim();
-  const price = parseFloat(document.getElementById('compPrice').value);
-  if(!dates || isNaN(price) || price<=0){
-    alert('Preenche as datas e um preço válido antes de adicionar.');
-    return;
-  }
-  COMPETITOR_ROWS.push({loc, source, group, dates, price});
-  document.getElementById('compPrice').value = '';
-  document.getElementById('compDates').value = '';
-  renderCompetitorTable();
-});
-
-// keep comp group list and comparisons in sync with file/selection changes
-const _origRefreshAll = refreshAll;
-refreshAll = function(){
-  _origRefreshAll();
-  renderCompetitorTable();
-};
-
-renderCompetitorTable();
 
 // ---- DiscoverCars rate shop by ICONIQ group / SIPP reference ----
 const RS_GROUP_SEGMENT = {
@@ -1319,10 +1306,16 @@ function rsBucket(group){
   return null;
 }
 function rsBestOffer(group){
-  const info=VGROUPS[group]||{}; const bucket=rsBucket(group); if(!bucket||!RS_LIVE[bucket]) return null;
+  const info=VGROUPS[group]||{};
+  const bucket=rsBucket(group);
+  if(!bucket||!RS_LIVE[bucket]) return null;
   const trans=rsTransmissionFromSipp(info.sipp);
-  const candidates=RS_LIVE[bucket].filter(o=>!trans||o.transmission===trans);
-  return candidates.length?candidates.slice().sort((a,b)=>a.total-b.total)[0]:null;
+  const selected=(document.getElementById('rsCompetitor')?.value||'AutoUnion').toLowerCase().replace(/\s+/g,'');
+  const candidates=RS_LIVE[bucket].filter(o=>{
+    const supplier=(o.supplier||'').toLowerCase().replace(/\s+/g,'');
+    return supplier.includes(selected) && (!trans || o.transmission===trans);
+  });
+  return candidates.length?candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]:null;
 }
 function populateRsFilters(){
   const seg=document.getElementById('rsSegment'), grp=document.getElementById('rsGroup');
@@ -1338,16 +1331,98 @@ function renderRateShop(){
     const v=VGROUPS[g], sg=RS_GROUP_SEGMENT[g]||'Outro', offer=rsBestOffer(g), gt=rsTransmissionFromSipp(v.sipp);
     if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!offer||match==='none'&&offer)return;
     const tr=document.createElement('tr');
+    const selectedLoc=document.getElementById('rsLocation')?.value || primaryLocation();
+    const ours=ourBasePriceFor(g, selectedLoc);
+    const compDaily=offer?(offer.total/offer.days):null;
+    const diff=(ours!==null && compDaily!==null)?(ours-compDaily):null;
+    const diffPct=(diff!==null && compDaily)?(diff/compDaily*100):null;
+    const diffClass=diff===null?'':(diff>0?'rs-high':(diff<0?'rs-low':''));
     const offerHtml=offer?`<a class="rs-link" target="_blank" rel="noopener" href="${offer.link}">${offer.car} ↗</a>`:'—';
-    tr.innerHTML=`<td>${sg}</td><td><b>${g}</b></td><td class="mono">${v.sipp||'—'}</td><td>${v.desc||'—'}</td><td>${offerHtml}</td><td>${offer?offer.supplier:'—'}</td><td>${offer?offer.transmission:gt||'—'}</td><td class="mono">${offer?offer.total.toFixed(2)+' €':'—'}</td><td class="mono">${offer?(offer.total/offer.days).toFixed(2)+' €':'—'}</td><td class="mono">${offer?offer.deposit.toFixed(2)+' €':'—'}</td><td class="mono">${offer?offer.deductible.toFixed(2)+' €':'—'}</td><td>${offer?'<span class="rs-badge live">compatível</span>':'<span class="rs-badge nomatch">sem oferta</span>'}</td>`;
+    tr.innerHTML=`<td>${sg}</td>
+      <td><b>${g}</b></td>
+      <td class="mono">${v.sipp||'—'}</td>
+      <td>${v.desc||'—'}</td>
+      <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
+      <td class="mono">${compDaily!==null?compDaily.toFixed(2)+' €':'—'}</td>
+      <td class="mono ${diffClass}">${diff!==null?(diff>=0?'+':'')+diff.toFixed(2)+' €':'—'}</td>
+      <td class="mono ${diffClass}">${diffPct!==null?(diffPct>=0?'+':'')+diffPct.toFixed(1)+'%':'—'}</td>
+      <td>${offerHtml}</td>
+      <td>${offer?'<span class="rs-badge live">compatível</span>':'<span class="rs-badge nomatch">sem oferta</span>'}</td>`;
     body.appendChild(tr);
   });
 }
 populateRsFilters();
 ['rsSegment','rsGroup','rsTransmission','rsMatch'].forEach(id=>document.getElementById(id).addEventListener('change',renderRateShop));
 document.getElementById('rsSipp').addEventListener('input',renderRateShop);
+
+function updateRateShopHeader(){
+  const competitor=document.getElementById('rsCompetitor')?.value || 'AutoUnion';
+  const head=document.getElementById('rsCompetitorHead');
+  if(head) head.textContent=`${competitor} (DiscoverCars) /dia`;
+}
+
+document.getElementById('rsCompetitor')?.addEventListener('change', ()=>{
+  updateRateShopHeader();
+});
+
+document.getElementById('btnRunRateShop')?.addEventListener('click', ()=>{
+  const loc=document.getElementById('rsLocation')?.value || 'Lisboa';
+  const pickup=document.getElementById('rsPickupDate')?.value;
+  const dropoff=document.getElementById('rsDropoffDate')?.value;
+  const competitor=document.getElementById('rsCompetitor')?.value || 'AutoUnion';
+  const status=document.getElementById('rsStatus');
+
+  updateRateShopHeader();
+
+  if(!pickup || !dropoff){
+    if(status) status.innerHTML='<span class="rs-badge nomatch">Falta período</span> Seleciona a data de recolha e a data de devolução.';
+    return;
+  }
+  if(dropoff <= pickup){
+    if(status) status.innerHTML='<span class="rs-badge nomatch">Datas inválidas</span> A devolução tem de ser posterior à recolha.';
+    return;
+  }
+
+  if(status) status.innerHTML=`<b>${loc}</b> · ${pickup} → ${dropoff} · Concorrente: <b>${competitor}</b> · <span class="rs-badge live">Rate Shop aplicado</span>`;
+  renderRateShop();
+});
+
+
+const _rsPick=document.getElementById('rsPickupDate');
+const _rsDrop=document.getElementById('rsDropoffDate');
+if(_rsPick && !_rsPick.value) _rsPick.value='2026-08-20';
+if(_rsDrop && !_rsDrop.value) _rsDrop.value='2026-08-27';
+updateRateShopHeader();
 renderRateShop();
 
+</script>
+
+<script>
+// Source metadata injected automatically from selection_manifest.json
+const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx","date":"06/08/2026","method":"filename_date","status":"ok"},"FCI":{"filename":"RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx","date":"06/08/2026","method":"filename_date","status":"ok"}};
+(function(){
+  const sel = document.getElementById('fileFilterSel');
+  const box = document.getElementById('rateSourceMeta');
+  const fileEl = document.getElementById('rateSourceFile');
+  const dateEl = document.getElementById('rateSourceDate');
+  if(!sel || !box || !fileEl || !dateEl) return;
+  const baseLabels = {BK:'RateGroup BK (CDW)', FCI:'RateGroup BK FCI (CDW + FCI)'};
+  Array.from(sel.options).forEach(opt=>{
+    const m = RATE_SOURCE_META[opt.value];
+    opt.textContent = baseLabels[opt.value] || opt.textContent;
+    if(m && m.status === 'ok' && m.date) opt.textContent += ' — ficheiro ' + m.date;
+  });
+  function refreshSourceVersion(){
+    const m = RATE_SOURCE_META[sel.value] || {status:'missing',filename:'',date:''};
+    const ok = m.status === 'ok';
+    box.classList.toggle('missing', !ok);
+    fileEl.textContent = ok ? m.filename : 'ficheiro não identificado';
+    dateEl.textContent = ok ? m.date : 'não disponível';
+    box.title = ok && m.method ? 'Seleção: ' + m.method : '';
+  }
+  sel.addEventListener('change', refreshSourceVersion);
+  refreshSourceVersion();
+})();
 </script>
 
 <script>

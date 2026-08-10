@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-08-10T09:52:39+01:00",
+  "output": "public/data/rates.json",
+  "sources": [
+    {
+      "file": "RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "tariff": "FCI",
+      "rows": 7770
+    },
+    {
+      "file": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "tariff": "BK",
+      "rows": 7770
+    }
+  ],
+  "warnings": []
+}

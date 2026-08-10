@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-08-10T09:52:38+01:00",
+  "rule": "latest file per family; filename date first, modified time fallback",
+  "selected": [
+    {
+      "family": "rategroup_export_bk_fci_lisboa_porto_faro_ajustado.xlsx",
+      "source": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "effective_date": "2026-08-06T00:00:00",
+      "selection_method": "filename_date"
+    },
+    {
+      "family": "rategroup_export_bk_lisboa_porto_faro_ajustado.xlsx",
+      "source": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx",
+      "effective_date": "2026-08-06T00:00:00",
+      "selection_method": "filename_date"
+    }
+  ]
+}

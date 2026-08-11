@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RATES = ROOT / "public" / "data" / "rates.json"
 HTML = ROOT / "public" / "index.html"
+RATE_SHOP_PAGE = ROOT / "public" / "rate-shop.html"
 BUILD_MANIFEST = ROOT / "build_manifest.json"
 SELECTION_MANIFEST = ROOT / "selection_manifest.json"
 
@@ -98,6 +99,8 @@ def main() -> int:
             "A tarifa Commercial VAN não utiliza cascata",
             "syncBulkPeriodFromPickup",
             "Intervalo ligado automaticamente ao Período (pickup)",
+            'href="rate-shop.html"',
+            'class="panel comp-panel" hidden',
         ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")
@@ -109,6 +112,21 @@ def main() -> int:
             errors.append("Opção VAN não encontrada no seletor de tarifa")
     else:
         errors.append("public/index.html não existe")
+
+    if RATE_SHOP_PAGE.exists():
+        rate_shop_html = RATE_SHOP_PAGE.read_text(encoding="utf-8")
+        for marker in (
+            "Rate Shop Concorrência",
+            'href="index.html"',
+            'class="rate-shop-page"',
+            'id="btnRunRateShop"',
+            'id="rsBody"',
+            '<div class="panel comp-panel">',
+        ):
+            if marker not in rate_shop_html:
+                errors.append(f"Marcador ausente em public/rate-shop.html: {marker}")
+    else:
+        errors.append("public/rate-shop.html não existe")
 
     if SELECTION_MANIFEST.exists():
         selection = json.loads(SELECTION_MANIFEST.read_text(encoding="utf-8"))

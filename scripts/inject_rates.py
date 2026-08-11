@@ -12,6 +12,7 @@ TEMPLATE = ROOT / "public" / "index.template.html"
 RATES_JSON = ROOT / "public" / "data" / "rates.json"
 MANIFEST = ROOT / "selection_manifest.json"
 OUTPUT = ROOT / "public" / "index.html"
+RATE_SHOP_OUTPUT = ROOT / "public" / "rate-shop.html"
 
 DECL = re.compile(r"\b(const|let|var)\s+RATES\s*=\s*")
 SELECT_RE = re.compile(r'(<select\s+id=["\']fileFilterSel["\'][^>]*>.*?</select>)', re.I | re.S)
@@ -145,6 +146,22 @@ def ensure_adjustment_panel_updates(html: str) -> str:
         "Estações a visualizar <span",
         1,
     )
+    html = html.replace(
+        '<div class="panel comp-panel">',
+        '<div class="panel comp-panel" hidden aria-hidden="true">',
+        1,
+    )
+    html = html.replace(
+        '<span class="tag">ICONIQ &middot; Broker Rates &middot; Wheelsys export</span>',
+        '<span class="tag">ICONIQ &middot; Broker Rates &middot; Wheelsys export</span>\n  <a class="page-nav" href="rate-shop.html">Rate Shop Concorrência →</a>',
+        1,
+    )
+    navigation_css = """
+.page-nav{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.28);border-radius:6px;background:var(--teal-500);color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
+.page-nav:hover{background:var(--teal-400);color:var(--navy-950);}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
+"""
+    html = html.replace("</style>", navigation_css + "</style>", 1)
     html = html.replace(
         '<label for="bulkFrom">Período de</label>',
         '<label for="bulkFrom">Período pickup de</label>',
@@ -380,6 +397,40 @@ document.getElementById('segFilterSel').addEventListener('change', e=>{
     return html
 
 
+def build_rate_shop_page(html: str) -> str:
+    """Derive the standalone Rate Shop page while preserving its existing logic."""
+    page = html.replace("<body>", '<body class="rate-shop-page">', 1)
+    page = page.replace(
+        "<title>Painel de Ajuste de Tarifas</title>",
+        "<title>Rate Shop Concorrência</title>",
+        1,
+    )
+    page = page.replace(
+        "<h1>Painel de Ajuste de Tarifas</h1>",
+        "<h1>Rate Shop Concorrência</h1>",
+        1,
+    )
+    page = page.replace(
+        '<a class="page-nav" href="rate-shop.html">Rate Shop Concorrência →</a>',
+        '<a class="page-nav" href="index.html">← Painel de Ajuste de Tarifas</a>',
+        1,
+    )
+    page = page.replace(
+        '<div class="panel comp-panel" hidden aria-hidden="true">',
+        '<div class="panel comp-panel">',
+        1,
+    )
+    standalone_css = """
+.rate-shop-page .filterbox{display:none!important;}
+.rate-shop-page .layout{display:block;}
+.rate-shop-page .layout>div:first-child{display:none!important;}
+.rate-shop-page .layout>div:nth-child(2)>.grid-wrap{display:none!important;}
+.rate-shop-page .layout>div:nth-child(2)>.comp-panel{display:block!important;margin-top:0;}
+"""
+    page = page.replace("</style>", standalone_css + "</style>", 1)
+    return page
+
+
 def inject_source_ui(html: str, meta: dict[str, dict[str, str]]) -> str:
     if not SELECT_RE.search(html):
         print("AVISO: seletor #fileFilterSel não encontrado; metadados de versão não foram mostrados.")
@@ -424,8 +475,10 @@ def main() -> int:
     updated = html[:start] + replacement + html[end:]
     updated = inject_source_ui(updated, source_metadata())
     OUTPUT.write_text(updated, encoding="utf-8")
+    RATE_SHOP_OUTPUT.write_text(build_rate_shop_page(updated), encoding="utf-8")
 
     print(f"HTML gerado: {OUTPUT}")
+    print(f"Rate Shop gerado: {RATE_SHOP_OUTPUT}")
     print(f"Declaração RATES substituída com sucesso ({keyword}).")
     print("Versão dos ficheiros BK/FCI/VAN adicionada ao seletor de tarifa.")
     return 0

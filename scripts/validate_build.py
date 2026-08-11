@@ -101,6 +101,7 @@ def main() -> int:
             "SEGMENT_TONE_INDEX",
             "segmentToneClass",
             "segment-tone-12",
+            "group-segment-column",
             "groupsOf(currentFile).map(g=>SEGMENTS[g])",
             "A tarifa Commercial VAN não utiliza cascata",
             "syncBulkPeriodFromPickup",

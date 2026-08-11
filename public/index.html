@@ -434,16 +434,16 @@
 
       <div class="daterow">
         <div>
-          <label for="bulkFrom">Período de</label>
-          <input type="date" id="bulkFrom">
+          <label for="bulkFrom">Período pickup de</label>
+          <input type="date" id="bulkFrom" readonly aria-readonly="true">
         </div>
         <div>
           <label for="bulkTo">até</label>
-          <input type="date" id="bulkTo">
+          <input type="date" id="bulkTo" readonly aria-readonly="true">
         </div>
       </div>
-      <div class="desc" id="bulkPeriodsDesc">Só são afetados os períodos já existentes que estejam totalmente dentro deste intervalo — os restantes mantêm o preço atual.</div>
-      <div class="quickrange">
+      <div class="desc" id="bulkPeriodsDesc">Intervalo ligado automaticamente ao Período (pickup) selecionado no topo.</div>
+      <div class="quickrange" style="display:none;" aria-hidden="true">
         <button type="button" data-from="2026-08-01" data-to="2026-10-31">1 Ago – 31 Out</button>
         <button type="button" data-from="2026-06-01" data-to="2026-09-30">Verão (Jun–Set)</button>
       </div>
@@ -893,6 +893,7 @@ function refreshAll(){ refreshPriceBox(); renderGrid(); refreshChangeCount(); }
 
 document.getElementById('perSel').addEventListener('change', ()=>{
   refreshAll();
+  syncBulkPeriodFromPickup();
   syncRateShopDatesFromPeriod();
 });
 document.getElementById('cbSel').addEventListener('change', e=>{
@@ -1062,6 +1063,7 @@ function onFilterChange(){
   if(document.getElementById('modeBulk').style.display !== 'none'){
     populateBulkGroups();
     populateBulkCostbreaks();
+    syncBulkPeriodFromPickup();
     refreshBulkPreview();
   }
 }
@@ -1175,6 +1177,18 @@ document.getElementById('btnExport').addEventListener('click', ()=>{
 const CB_LABELS = {p1:'1 dia',p2:'2 dias',p3:'3 dias',p46:'4-6 dias',p7:'7 dias',p813:'8-13 dias',p1429:'14-29 dias',p30:'30+ dias'};
 let bulkDirection = 1;
 
+function syncBulkPeriodFromPickup(){
+  const periodSelect = document.getElementById('perSel');
+  const bulkFrom = document.getElementById('bulkFrom');
+  const bulkTo = document.getElementById('bulkTo');
+  if(!periodSelect || !bulkFrom || !bulkTo || !periodSelect.value) return;
+  const [pickupStart, pickupEnd] = periodSelect.value.split('|');
+  if(!pickupStart || !pickupEnd) return;
+  bulkFrom.value = toISO(pickupStart);
+  bulkTo.value = toISO(pickupEnd);
+  if(typeof refreshBulkPreview === 'function') refreshBulkPreview();
+}
+
 // ---- mode tabs ----
 document.getElementById('tabIndividual').addEventListener('click', ()=>{
   document.getElementById('tabIndividual').classList.add('active');
@@ -1189,6 +1203,7 @@ document.getElementById('tabBulk').addEventListener('click', ()=>{
   document.getElementById('modeIndividual').style.display = 'none';
   populateBulkGroups();
   populateBulkCostbreaks();
+  syncBulkPeriodFromPickup();
   refreshBulkPreview();
 });
 

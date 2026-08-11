@@ -274,7 +274,12 @@ function segmentToneClass(segment){
     const segment = SEGMENTS[g];
     if(segment && !order.includes(segment)) order.push(segment);
   });
-  return order;
+  const cabrioOrder = ['Cabrio','Cabrio Elite'];
+  const ordered = order.filter(segment=>!cabrioOrder.includes(segment));
+  cabrioOrder.forEach(segment=>{
+    if(order.includes(segment)) ordered.push(segment);
+  });
+  return ordered;
 }
 function populateSegFilterSel(){
   const box = document.getElementById('segFilterSel');

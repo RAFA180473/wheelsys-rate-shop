@@ -196,7 +196,10 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
         1,
     )
     html = html.replace(
-        "document.getElementById('segFilterSel').addEventListener('change', e=>{",
+        """document.getElementById('segFilterSel').addEventListener('change', e=>{
+  segFilter = e.target.value;
+  onFilterChange();
+});""",
         """function syncAdjustLocCheckboxes(){
   document.querySelectorAll('#adjustLocChecklist label').forEach(lab=>{
     const cb = lab.querySelector('input');
@@ -205,7 +208,16 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
     lab.classList.toggle('checked', on);
   });
 }
-document.getElementById('segFilterSel').addEventListener('change', e=>{""",
+document.getElementById('segFilterSel').addEventListener('change', e=>{
+  segFilter = e.target.value;
+  if(segFilter === 'Veículos comerciais' && currentFile !== 'VAN'){
+    const tariffSelect = document.getElementById('fileFilterSel');
+    tariffSelect.value = 'VAN';
+    tariffSelect.dispatchEvent(new Event('change'));
+    return;
+  }
+  onFilterChange();
+});""",
         1,
     )
     html = html.replace(

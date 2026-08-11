@@ -82,7 +82,18 @@ def main() -> int:
         except Exception as exc:
             errors.append(str(exc))
 
-        for marker in ("Painel de Ajuste de Tarifas", "btnExport", "XLSX"):
+        for marker in (
+            "Painel de Ajuste de Tarifas",
+            "btnExport",
+            "XLSX",
+            "Estações a visualizar",
+            "Veículos comerciais",
+            "VW Caddy Cargo",
+            "VW Transporter Cargo",
+            "VW Crafter Cargo 9900 L",
+            "syncAdjustLocCheckboxes",
+            "RateGroup Commercial VAN",
+        ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")
 

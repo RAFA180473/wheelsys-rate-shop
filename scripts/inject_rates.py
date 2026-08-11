@@ -192,6 +192,13 @@ tbody tr[class*="segment-tone-"] td.group-cell{border-left:4px solid var(--seg-a
 tbody tr[class*="segment-tone-"] td.selected-cell{background:var(--teal-400)!important;}
 tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-500)!important;}
 .group-segment-label[class*="segment-tone-"]{background:var(--seg-strong);border-left-color:var(--seg-accent);}
+.grid-wrap table{border:1px solid #aebdc8;border-collapse:separate;border-spacing:0;}
+.grid-wrap thead th{border-right:1px solid #5e7180;border-bottom:2px solid #536674;}
+.grid-wrap thead th:last-child{border-right:0;}
+.grid-wrap tbody td{border-right:1px solid #bdc9d2;border-bottom:1px solid #aebdc8;}
+.grid-wrap tbody td:last-child{border-right:0;}
+.grid-wrap tbody tr:last-child td{border-bottom:0;}
+.grid-wrap td.selected-cell{border-radius:0;box-shadow:inset 0 0 0 2px var(--teal-500);}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
 """
     html = html.replace("</style>", navigation_css + "</style>", 1)

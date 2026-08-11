@@ -1117,6 +1117,12 @@ function syncAdjustLocCheckboxes(){
 }
 document.getElementById('segFilterSel').addEventListener('change', e=>{
   segFilter = e.target.value;
+  if(segFilter === 'Veículos comerciais' && currentFile !== 'VAN'){
+    const tariffSelect = document.getElementById('fileFilterSel');
+    tariffSelect.value = 'VAN';
+    tariffSelect.dispatchEvent(new Event('change'));
+    return;
+  }
   onFilterChange();
 });
 populateLocFilterChecklist();

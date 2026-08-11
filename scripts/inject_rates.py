@@ -168,6 +168,23 @@ def ensure_adjustment_panel_updates(html: str) -> str:
 .gridfilter .checklist,#bulkGroups{gap:3px;padding:5px;border-radius:7px;background:#fbfcfd;}
 .gridfilter .checklist label,#bulkGroups label,.segment-filter-checklist label{padding:3px 6px;font-size:10.5px;border:1px solid transparent;border-radius:5px;line-height:1.2;}
 .gridfilter .checklist label.checked,#bulkGroups label.checked,.segment-filter-checklist label.checked{border-color:rgba(31,163,148,.3);}
+.segment-tone-0{--seg-soft:#f2fbf8;--seg-strong:#d9f2eb;--seg-accent:#2f9e87;}
+.segment-tone-1{--seg-soft:#fff6f7;--seg-strong:#f9e1e5;--seg-accent:#c96b7d;}
+.segment-tone-2{--seg-soft:#fff9ed;--seg-strong:#f8ebc9;--seg-accent:#c99425;}
+.segment-tone-3{--seg-soft:#f3f8ff;--seg-strong:#dceafb;--seg-accent:#4f83bd;}
+.segment-tone-4{--seg-soft:#f7f4ff;--seg-strong:#e8def9;--seg-accent:#8063b5;}
+.segment-tone-5{--seg-soft:#f0fafc;--seg-strong:#d8eef3;--seg-accent:#3d94a5;}
+.segment-tone-6{--seg-soft:#f4faef;--seg-strong:#e1efd5;--seg-accent:#6f9d49;}
+.segment-tone-7{--seg-soft:#fff7ef;--seg-strong:#f7e4d0;--seg-accent:#bf7a35;}
+.segment-tone-8{--seg-soft:#faf8f2;--seg-strong:#eee7d7;--seg-accent:#9a7b3f;}
+.segment-tone-9{--seg-soft:#f3f5ff;--seg-strong:#dfe4f8;--seg-accent:#6074b3;}
+.segment-tone-10{--seg-soft:#fff4fb;--seg-strong:#f4deec;--seg-accent:#ae6495;}
+.segment-tone-11{--seg-soft:#f8f3fb;--seg-strong:#e9dcf0;--seg-accent:#8d63a4;}
+.segment-tone-12{--seg-soft:#f5f7f8;--seg-strong:#e1e7ea;--seg-accent:#607681;}
+tbody tr[class*="segment-tone-"]{background:var(--seg-soft);}
+tbody tr[class*="segment-tone-"] td.group-cell,tbody tr[class*="segment-tone-"] td.segment-cell{background:var(--seg-strong)!important;}
+tbody tr[class*="segment-tone-"] td.group-cell{border-left:4px solid var(--seg-accent);}
+.group-segment-label[class*="segment-tone-"]{background:var(--seg-strong);border-left-color:var(--seg-accent);}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
 """
     html = html.replace("</style>", navigation_css + "</style>", 1)
@@ -217,6 +234,17 @@ Object.assign(SEGMENTS, {
 });
 const TARIFF_LABELS = {BK:'RateGroup BK', FCI:'RateGroup BK FCI', VAN:'RateGroup Commercial VAN'};
 const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
+const SEGMENT_TONE_INDEX = {
+  'Economy':0,'Cabrio':1,'Economy SUV':2,'Compact':3,'Intermediate':4,
+  'SUV Inter.':5,'SUV Compact':6,'Passenger Van':7,'Luxury':8,
+  'SUV Premium':9,'Special':10,'Cabrio Elite':11,'Veículos comerciais':12
+};
+function segmentToneClass(segment){
+  const index = Object.prototype.hasOwnProperty.call(SEGMENT_TONE_INDEX, segment)
+    ? SEGMENT_TONE_INDEX[segment]
+    : 12;
+  return `segment-tone-${index}`;
+}
 """
     html = re.sub(
         r"(const SEGMENTS = \{.*?\};)",
@@ -312,7 +340,7 @@ function populateSegFilterSel(){
     const segment = SEGMENTS[g] || 'Outro';
     if(segment !== previousSegment){
       const heading = document.createElement('div');
-      heading.className = 'group-segment-label';
+      heading.className = `group-segment-label ${segmentToneClass(segment)}`;
       heading.textContent = segment;
       box.appendChild(heading);
       previousSegment = segment;
@@ -508,6 +536,11 @@ document.getElementById('bulkGroupsNone').addEventListener('click', ()=>{
     html = html.replace(
         "const groups = groupsOf(currentFile).filter(g=>gridGroupFilter.has(g));",
         "const groups = groupsOfFiltered(currentFile).filter(g=>gridGroupFilter.has(g));",
+        1,
+    )
+    html = html.replace(
+        "if(isSelRow) tr.className='selected-row';",
+        "tr.className = `${isSelRow ? 'selected-row ' : ''}${segmentToneClass(SEGMENTS[g] || 'Outro')}`;",
         1,
     )
     html = html.replace(

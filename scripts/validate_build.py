@@ -101,6 +101,8 @@ def main() -> int:
             "SEGMENT_TONE_INDEX",
             "segmentToneClass",
             "segment-tone-12",
+            'td.selected-cell{background:var(--teal-400)!important;}',
+            "group-segment-column",
             "groupsOf(currentFile).map(g=>SEGMENTS[g])",
             "A tarifa Commercial VAN não utiliza cascata",
             "syncBulkPeriodFromPickup",

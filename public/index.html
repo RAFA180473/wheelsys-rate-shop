@@ -308,12 +308,6 @@
 .rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}
 .rate-source-sub{color:var(--steel-500)}
 #rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}
-
-/* Rate Shop navigation injected by build */
-.rate-shop-open-btn{position:fixed;right:18px;bottom:18px;z-index:99999;padding:10px 15px;border-radius:9px;background:#0b365d;color:#fff;text-decoration:none;font-weight:700;box-shadow:0 5px 18px rgba(0,0,0,.22)}
-.rate-shop-open-btn:hover{filter:brightness(1.08)}
-.rate-shop-standalone-back{position:fixed;left:16px;top:12px;z-index:100000;padding:8px 12px;border-radius:8px;background:#0b365d;color:#fff;text-decoration:none;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.rate-shop-standalone-back:hover{filter:brightness(1.08)}
 </style>
 </head>
 <body>
@@ -1668,7 +1662,11 @@ const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_080826_311226.xl
   const fileEl = document.getElementById('rateSourceFile');
   const dateEl = document.getElementById('rateSourceDate');
   if(!sel || !box || !fileEl || !dateEl) return;
-  const baseLabels = {BK:'RateGroup BK (CDW)',FCI:'RateGroup BK FCI (CDW + FCI)',VAN:'RateGroup Commercial VAN'};
+  const baseLabels = {
+    BK:'RateGroup BK (CDW)',
+    FCI:'RateGroup BK FCI (CDW + FCI)',
+    VAN:'RateGroup Commercial VAN'
+  };
   Array.from(sel.options).forEach(opt=>{
     const m = RATE_SOURCE_META[opt.value];
     opt.textContent = baseLabels[opt.value] || opt.textContent;
@@ -1684,137 +1682,6 @@ const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_080826_311226.xl
   }
   sel.addEventListener('change', refreshSourceVersion);
   refreshSourceVersion();
-})();
-</script>
-
-<script>
-// Wheelsys location/station sync and Rate Shop page mode
-(function(){
-  const norm=s=>(s||'').toString().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-  const LOCS={
-    lisboa:['lisboa','lis','lxa'],
-    porto:['porto','opo','opt'],
-    faro:['faro','fao']
-  };
-  const locFromText=s=>{
-    const t=norm(s);
-    for(const [loc,hints] of Object.entries(LOCS)) if(hints.some(h=>t===h||t.includes(h))) return loc;
-    return '';
-  };
-
-  function findLocationSelect(){
-    const sels=[...document.querySelectorAll('select')].filter(s=>s.id!=='fileFilterSel');
-    let best=null,bestScore=0;
-    for(const s of sels){
-      const key=norm((s.id||'')+' '+(s.name||'')+' '+[...s.options].map(o=>o.textContent).join(' '));
-      let score=0;
-      if(key.includes('local')) score+=4;
-      if(key.includes('location')) score+=4;
-      if(key.includes('lisboa')) score+=2;
-      if(key.includes('porto')) score+=2;
-      if(key.includes('faro')) score+=2;
-      if(score>bestScore){best=s;bestScore=score;}
-    }
-    return bestScore>=4?best:null;
-  }
-
-  function stationArea(){
-    const nodes=[...document.querySelectorAll('label,legend,h1,h2,h3,h4,h5,div,span')];
-    const title=nodes.find(n=>{const t=norm(n.textContent);return t==='estacoes a ajustar'||t.includes('estacoes a ajustar');});
-    if(!title) return null;
-    return title.closest('fieldset,.card,.panel,.control-group,.form-group,section,div') || title.parentElement;
-  }
-
-  function itemLocation(el){
-    let text='';
-    if(el.tagName==='OPTION') text=(el.textContent||'')+' '+(el.value||'');
-    else {
-      const id=el.id;
-      const label=id?document.querySelector('label[for="'+CSS.escape(id)+'"]'):null;
-      text=(label?label.textContent:'')+' '+(el.value||'')+' '+(el.getAttribute('data-location')||'');
-      if(!label && el.parentElement) text+=' '+el.parentElement.textContent;
-    }
-    return locFromText(text);
-  }
-
-  function applyStationLocation(loc){
-    if(!loc) return;
-    const area=stationArea();
-    if(!area) return;
-    const controls=[...area.querySelectorAll('option,input[type="checkbox"],input[type="radio"]')];
-    controls.forEach(el=>{
-      const own=itemLocation(el);
-      if(!own) return; // do not touch generic/all-station controls
-      const match=own===loc;
-      if(el.tagName==='OPTION'){
-        el.hidden=!match;
-        el.disabled=!match;
-        if(!match && el.selected) el.selected=false;
-      }else{
-        el.disabled=!match;
-        if(!match && el.checked) el.checked=false;
-        const label=el.id?document.querySelector('label[for="'+CSS.escape(el.id)+'"]'):null;
-        const wrap=label||el.closest('label')||el.parentElement;
-        if(wrap) wrap.style.display=match?'':'none';
-      }
-    });
-    area.setAttribute('data-synced-location',loc);
-  }
-
-  function syncFromLocationControl(){
-    const s=findLocationSelect();
-    if(!s) return;
-    const opt=s.options[s.selectedIndex];
-    applyStationLocation(locFromText((opt?opt.textContent:'')+' '+s.value));
-  }
-
-  document.addEventListener('change',e=>{
-    const s=findLocationSelect();
-    if(s && e.target===s) setTimeout(syncFromLocationControl,0);
-  });
-  document.addEventListener('click',e=>{
-    const b=e.target.closest('button,[data-location],a');
-    if(!b) return;
-    const loc=locFromText((b.getAttribute('data-location')||'')+' '+b.textContent);
-    if(loc) setTimeout(()=>applyStationLocation(loc),0);
-  });
-  setTimeout(syncFromLocationControl,100);
-
-  const params=new URLSearchParams(location.search);
-  const standalone=params.get('rateshop')==='1';
-  if(!standalone){
-    if(!document.getElementById('openRateShopPage')){
-      const a=document.createElement('a');
-      a.id='openRateShopPage'; a.className='rate-shop-open-btn'; a.href='rate-shop.html'; a.textContent='Rate Shop';
-      document.body.appendChild(a);
-    }
-    return;
-  }
-
-  function isolateRateShop(){
-    const headings=[...document.querySelectorAll('h1,h2,h3,h4,h5,[role="heading"]')];
-    let h=headings.find(x=>norm(x.textContent)==='rate shop') || headings.find(x=>norm(x.textContent).includes('rate shop'));
-    if(!h){
-      const all=[...document.querySelectorAll('div,section,article')];
-      h=all.find(x=>norm(x.textContent).startsWith('rate shop'));
-    }
-    if(!h) return;
-    let target=h.closest('section,article,[id*="rate" i],[class*="rate-shop" i],[class*="rateshop" i],.card,.panel') || h.parentElement;
-    if(!target) return;
-    let node=target;
-    while(node && node!==document.body){
-      const parent=node.parentElement;
-      if(!parent) break;
-      [...parent.children].forEach(ch=>{if(ch!==node && ch.tagName!=='SCRIPT' && ch.tagName!=='STYLE') ch.style.display='none';});
-      node=parent;
-    }
-    document.body.style.paddingTop='52px';
-    const back=document.createElement('a');
-    back.className='rate-shop-standalone-back'; back.href='index.html'; back.textContent='← Página principal';
-    document.body.appendChild(back);
-    target.scrollIntoView({block:'start'});
-  }
-  setTimeout(isolateRateShop,250);
 })();
 </script>
 </body>

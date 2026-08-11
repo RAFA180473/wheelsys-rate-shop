@@ -159,8 +159,15 @@ def ensure_adjustment_panel_updates(html: str) -> str:
     navigation_css = """
 .page-nav{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.28);border-radius:6px;background:var(--teal-500);color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
 .page-nav:hover{background:var(--teal-400);color:var(--navy-950);}
-.group-segment-label{flex-basis:100%;margin-top:6px;padding:6px 8px;border-left:3px solid var(--teal-500);background:var(--mist-100);color:var(--navy-700);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;}
-.segment-cell{min-width:125px;background:#e9f2f4!important;color:var(--navy-700);font-weight:800;text-transform:uppercase;font-size:10px;letter-spacing:.35px;}
+.group-segment-label{flex-basis:100%;margin-top:4px;padding:4px 6px;border-left:3px solid var(--teal-500);background:var(--mist-100);color:var(--navy-700);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.35px;}
+.segment-cell{min-width:105px;background:#e9f2f4!important;color:var(--navy-700);font-weight:750;text-transform:uppercase;font-size:9.5px;letter-spacing:.25px;}
+.segment-filter-card{border:1px solid var(--line);border-radius:6px;background:#fff;padding:5px;}
+.segment-filter-checklist{border:0!important;max-height:94px!important;padding:0!important;gap:3px!important;}
+.segment-filter-actions{display:flex;gap:4px;margin-top:5px;}
+.segment-filter-actions button{border:1px solid var(--line);border-radius:10px;background:var(--mist-100);color:var(--steel-500);font-size:9.5px;padding:2px 7px;cursor:pointer;}
+.gridfilter .checklist,#bulkGroups{gap:3px;padding:5px;border-radius:7px;background:#fbfcfd;}
+.gridfilter .checklist label,#bulkGroups label,.segment-filter-checklist label{padding:3px 6px;font-size:10.5px;border:1px solid transparent;border-radius:5px;line-height:1.2;}
+.gridfilter .checklist label.checked,#bulkGroups label.checked,.segment-filter-checklist label.checked{border-color:rgba(31,163,148,.3);}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
 """
     html = html.replace("</style>", navigation_css + "</style>", 1)
@@ -169,6 +176,12 @@ def ensure_adjustment_panel_updates(html: str) -> str:
         '<label for="bulkFrom">Período pickup de</label>',
         1,
     )
+    html = html.replace(
+        '<label for="segFilterSel">Segmento</label>\n      <select id="segFilterSel"></select>',
+        '<label>Segmentos a visualizar <span style="font-weight:400;text-transform:none;letter-spacing:0;">(um ou vários)</span></label>\n      <div class="segment-filter-card">\n        <div class="checklist segment-filter-checklist" id="segFilterSel"></div>\n        <div class="segment-filter-actions"><button type="button" id="segFilterAll">Todos</button><button type="button" id="segFilterNone">Nenhum</button></div>\n      </div>',
+        1,
+    )
+    html = html.replace("let segFilter = 'Todos';", "let segFilter = new Set();\nlet segFilterInitialized = false;", 1)
     html = html.replace(
         '<input type="date" id="bulkFrom">',
         '<input type="date" id="bulkFrom" readonly aria-readonly="true">',
@@ -221,11 +234,29 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
   sel.value = segFilter;
 }""",
         """function populateSegFilterSel(){
-  const sel = document.getElementById('segFilterSel');
-  const segs = Array.from(new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean))).sort();
-  if(segFilter !== 'Todos' && !segs.includes(segFilter)) segFilter = 'Todos';
-  sel.innerHTML = '<option value="Todos">Todos os segmentos</option>' + segs.map(s=>`<option value="${s}">${s}</option>`).join('');
-  sel.value = segFilter;
+  const box = document.getElementById('segFilterSel');
+  const segs = Array.from(new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt'));
+  if(!segFilterInitialized){
+    segFilter = new Set(segs);
+    segFilterInitialized = true;
+  } else {
+    segFilter = new Set(Array.from(segFilter).filter(s=>segs.includes(s)));
+    if(segFilter.size === 0) segFilter = new Set(segs);
+  }
+  box.innerHTML = '';
+  segs.forEach(segment=>{
+    const lab = document.createElement('label');
+    const checked = segFilter.has(segment);
+    if(checked) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${segment}" ${checked?'checked':''}> ${segment}`;
+    box.appendChild(lab);
+    const cb = lab.querySelector('input');
+    cb.addEventListener('change', ()=>{
+      if(cb.checked) segFilter.add(segment); else segFilter.delete(segment);
+      lab.classList.toggle('checked', cb.checked);
+      onFilterChange();
+    });
+  });
 }""",
         1,
     )
@@ -237,9 +268,7 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
 }""",
         """function groupsOfFiltered(fileKey, loc){
   const list = groupsOf(fileKey, loc);
-  const filtered = (!segFilter || segFilter==='Todos')
-    ? list
-    : list.filter(g=>(SEGMENTS[g]||'')===segFilter);
+  const filtered = list.filter(g=>segFilter.has(SEGMENTS[g]||''));
   return filtered.slice().sort((a,b)=>{
     const bySegment = (SEGMENTS[a]||'Outro').localeCompare(SEGMENTS[b]||'Outro','pt');
     return bySegment || a.localeCompare(b,'pt');
@@ -264,7 +293,8 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
   const box = document.getElementById('gridGroupFilter');
   box.innerHTML = '';
   const groups = groupsOfFiltered(currentFile);
-  const autoSelectAllGroups = Boolean(segFilter && segFilter !== 'Todos');
+  const availableSegments = new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean));
+  const autoSelectAllGroups = segFilter.size < availableSegments.size;
   gridGroupFilter = new Set(autoSelectAllGroups ? groups : (groups.length ? [groups[0]] : []));
   activeGroup = groups.length ? groups[0] : null;
   let previousSegment = null;
@@ -289,6 +319,131 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
     html = html.replace(
         "let model = v.desc.replace(",
         "let model = (ADJUSTMENT_GROUP_DESCRIPTIONS[g] || v.desc).replace(",
+        1,
+    )
+    html = html.replace(
+        """      } else {
+        gridGroupFilter.delete(g);
+        if(activeGroup === g) activeGroup = null;
+      }
+      const pg = primaryGroup();""",
+        """      } else {
+        gridGroupFilter.delete(g);
+        if(activeGroup === g) activeGroup = null;
+      }
+      syncBulkGroupCheckboxes();
+      const pg = primaryGroup();""",
+        1,
+    )
+    html = html.replace(
+        """  activeGroup = groupsOf(currentFile).find(g=>gridGroupFilter.has(g)) || null;
+  const pg = primaryGroup();""",
+        """  activeGroup = groupsOfFiltered(currentFile).find(g=>gridGroupFilter.has(g)) || null;
+  syncBulkGroupCheckboxes();
+  const pg = primaryGroup();""",
+        1,
+    )
+    html = html.replace(
+        """  gridGroupFilter.clear();
+  activeGroup = null;
+  refreshAll();""",
+        """  gridGroupFilter.clear();
+  activeGroup = null;
+  syncBulkGroupCheckboxes();
+  refreshAll();""",
+        1,
+    )
+    html = html.replace(
+        """      gridGroupFilter = new Set([g]);
+      activeGroup = g;
+      syncGridGroupFilterCheckboxes();""",
+        """      gridGroupFilter = new Set([g]);
+      activeGroup = g;
+      syncGridGroupFilterCheckboxes();
+      syncBulkGroupCheckboxes();""",
+        1,
+    )
+    html = html.replace(
+        """// ---- bulk group checklist ----
+function populateBulkGroups(){
+  const box = document.getElementById('bulkGroups');
+  box.innerHTML = '';
+  groupsOfFiltered(currentFile).forEach(g=>{
+    const lab = document.createElement('label');
+    lab.innerHTML = `<input type="checkbox" value="${g}"> ${g}`;
+    box.appendChild(lab);
+    const cb = lab.querySelector('input');
+    cb.addEventListener('change', ()=>{ lab.classList.toggle('checked', cb.checked); refreshBulkPreview(); });
+  });
+}
+document.getElementById('bulkGroupsAll').addEventListener('click', ()=>{
+  document.querySelectorAll('#bulkGroups input').forEach(cb=>{ cb.checked=true; cb.parentElement.classList.add('checked'); });
+  refreshBulkPreview();
+});
+document.getElementById('bulkGroupsNone').addEventListener('click', ()=>{
+  document.querySelectorAll('#bulkGroups input').forEach(cb=>{ cb.checked=false; cb.parentElement.classList.remove('checked'); });
+  refreshBulkPreview();
+});""",
+        """// ---- bulk group checklist ----
+function populateBulkGroups(){
+  const box = document.getElementById('bulkGroups');
+  box.innerHTML = '';
+  groupsOfFiltered(currentFile).forEach(g=>{
+    const lab = document.createElement('label');
+    const isChecked = gridGroupFilter.has(g);
+    if(isChecked) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${g}" ${isChecked?'checked':''}> ${g}`;
+    box.appendChild(lab);
+    const cb = lab.querySelector('input');
+    cb.addEventListener('change', ()=>{
+      if(cb.checked){
+        gridGroupFilter.add(g);
+        activeGroup = g;
+      } else {
+        gridGroupFilter.delete(g);
+        if(activeGroup === g) activeGroup = null;
+      }
+      lab.classList.toggle('checked', cb.checked);
+      syncGridGroupFilterCheckboxes();
+      const pg = primaryGroup();
+      if(pg){ updateGroupDesc(pg); populatePeriodSelect(pg); }
+      refreshAll();
+      refreshBulkPreview();
+    });
+  });
+}
+function syncBulkGroupCheckboxes(){
+  document.querySelectorAll('#bulkGroups label').forEach(lab=>{
+    const cb = lab.querySelector('input');
+    const on = gridGroupFilter.has(cb.value);
+    cb.checked = on;
+    lab.classList.toggle('checked', on);
+  });
+}
+document.getElementById('bulkGroupsAll').addEventListener('click', ()=>{
+  document.querySelectorAll('#bulkGroups input').forEach(cb=>{
+    cb.checked = true;
+    cb.parentElement.classList.add('checked');
+    gridGroupFilter.add(cb.value);
+  });
+  activeGroup = groupsOfFiltered(currentFile).find(g=>gridGroupFilter.has(g)) || null;
+  syncGridGroupFilterCheckboxes();
+  const pg = primaryGroup();
+  if(pg){ updateGroupDesc(pg); populatePeriodSelect(pg); }
+  refreshAll();
+  refreshBulkPreview();
+});
+document.getElementById('bulkGroupsNone').addEventListener('click', ()=>{
+  document.querySelectorAll('#bulkGroups input').forEach(cb=>{
+    cb.checked = false;
+    cb.parentElement.classList.remove('checked');
+    gridGroupFilter.delete(cb.value);
+  });
+  activeGroup = null;
+  syncGridGroupFilterCheckboxes();
+  refreshAll();
+  refreshBulkPreview();
+});""",
         1,
     )
     html = html.replace(
@@ -336,7 +491,7 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
     )
     html = html.replace(
         "<th>Grupo</th><th>Localização</th>",
-        "<th>Segmento</th><th>Grupo</th><th>Estação</th>",
+        "<th>Grupo</th><th>Segmento</th><th>Estação</th>",
         2,
     )
     html = html.replace("<th>Localização</th>", "<th>Estação</th>", 1)
@@ -350,8 +505,8 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
         tds += `<td class="group-cell" rowspan="${rowsForGroup.length}">${groupLabel(g)}</td>`;
       }""",
         """if(idx===0){
-        tds += `<td class="segment-cell" rowspan="${rowsForGroup.length}">${SEGMENTS[g] || 'Outro'}</td>`;
         tds += `<td class="group-cell" rowspan="${rowsForGroup.length}">${groupLabel(g)}</td>`;
+        tds += `<td class="segment-cell" rowspan="${rowsForGroup.length}">${SEGMENTS[g] || 'Outro'}</td>`;
       }""",
         1,
     )
@@ -378,14 +533,18 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
     lab.classList.toggle('checked', on);
   });
 }
-document.getElementById('segFilterSel').addEventListener('change', e=>{
-  segFilter = e.target.value;
-  if(segFilter === 'Veículos comerciais' && currentFile !== 'VAN'){
-    const tariffSelect = document.getElementById('fileFilterSel');
-    tariffSelect.value = 'VAN';
-    tariffSelect.dispatchEvent(new Event('change'));
-    return;
-  }
+document.getElementById('segFilterAll').addEventListener('click', ()=>{
+  document.querySelectorAll('#segFilterSel input').forEach(cb=>segFilter.add(cb.value));
+  populateSegFilterSel();
+  onFilterChange();
+});
+document.getElementById('segFilterNone').addEventListener('click', ()=>{
+  segFilter.clear();
+  document.querySelectorAll('#segFilterSel label').forEach(lab=>{
+    const cb = lab.querySelector('input');
+    cb.checked = false;
+    lab.classList.remove('checked');
+  });
   onFilterChange();
 });""",
         1,

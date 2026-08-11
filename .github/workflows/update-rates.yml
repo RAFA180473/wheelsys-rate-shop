@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - "data/incoming/**"
       - "public/index.template.html"
+      - "public/rate-shop.html"
       - "public/data/rateshop-history.json"
       - "scripts/**"
       - "requirements.txt"
@@ -30,6 +30,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      MS_TENANT_ID: ${{ secrets.MS_TENANT_ID }}
+      MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+      MS_CLIENT_SECRET: ${{ secrets.MS_CLIENT_SECRET }}
+      SHAREPOINT_DRIVE_ID: b!xwmEBgEH00ujiRgMsJd2Yv53BYWpg_FEgcR3FtNZmn4HGYIuutM5S5XGcFz-a35B
+      SHAREPOINT_FOLDER_PATH: Comercial/Brokers/Rates/Tarifas/files 2027
+
     steps:
       - name: Obter repositorio
         uses: actions/checkout@v6
@@ -51,6 +58,9 @@ jobs:
       - name: Instalar dependencias
         run: python -m pip install -r requirements.txt
 
+      - name: Sincronizar tarifas do SharePoint
+        run: python scripts/sync_sharepoint.py
+
       - name: Gerar tarifas e HTML
         run: python scripts/build_all.py
 
@@ -63,7 +73,7 @@ jobs:
             echo "Script update_rateshop_history.py nao encontrado; historico existente sera mantido."
           fi
 
-      - name: Guardar ficheiros gerados
+      - name: Guardar ficheiros gerados e manifestos
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
@@ -74,13 +84,14 @@ jobs:
           if [ -f public/data/rateshop-history.json ]; then
             git add public/data/rateshop-history.json
           fi
-
           if [ -f selection_manifest.json ]; then
             git add selection_manifest.json
           fi
-
           if [ -f build_manifest.json ]; then
             git add build_manifest.json
+          fi
+          if [ -f sharepoint_sync_manifest.json ]; then
+            git add sharepoint_sync_manifest.json
           fi
 
           if git diff --cached --quiet; then
@@ -97,10 +108,12 @@ jobs:
         shell: bash
         run: |
           test -f public/index.html
+          test -f public/rate-shop.html
           test -f public/data/rates.json
           test -f public/data/rateshop-history.json
           test -f selection_manifest.json
           test -f build_manifest.json
+          test -f sharepoint_sync_manifest.json
 
       - name: Carregar site
         uses: actions/upload-pages-artifact@v3

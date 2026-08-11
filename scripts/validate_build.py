@@ -97,6 +97,7 @@ def main() -> int:
             'id="segFilterAll"',
             'id="segFilterNone"',
             "segFilter = new Set()",
+            "segmentOrderOf",
             "groupsOf(currentFile).map(g=>SEGMENTS[g])",
             "A tarifa Commercial VAN não utiliza cascata",
             "syncBulkPeriodFromPickup",

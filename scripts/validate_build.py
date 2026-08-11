@@ -94,6 +94,7 @@ def main() -> int:
             "syncAdjustLocCheckboxes",
             "RateGroup Commercial VAN",
             "segFilter === 'Veículos comerciais' && currentFile !== 'VAN'",
+            "groupsOf(currentFile).map(g=>SEGMENTS[g])",
         ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")

@@ -145,6 +145,31 @@ def ensure_adjustment_panel_updates(html: str) -> str:
         "Estações a visualizar <span",
         1,
     )
+    html = html.replace(
+        '<label for="bulkFrom">Período de</label>',
+        '<label for="bulkFrom">Período pickup de</label>',
+        1,
+    )
+    html = html.replace(
+        '<input type="date" id="bulkFrom">',
+        '<input type="date" id="bulkFrom" readonly aria-readonly="true">',
+        1,
+    )
+    html = html.replace(
+        '<input type="date" id="bulkTo">',
+        '<input type="date" id="bulkTo" readonly aria-readonly="true">',
+        1,
+    )
+    html = html.replace(
+        'Só são afetados os períodos já existentes que estejam totalmente dentro deste intervalo — os restantes mantêm o preço atual.',
+        'Intervalo ligado automaticamente ao Período (pickup) selecionado no topo.',
+        1,
+    )
+    html = html.replace(
+        '<div class="quickrange">\n        <button type="button" data-from=',
+        '<div class="quickrange" style="display:none;" aria-hidden="true">\n        <button type="button" data-from=',
+        1,
+    )
 
     commercial_config = """
 const ADJUSTMENT_GROUP_DESCRIPTIONS = {
@@ -278,6 +303,65 @@ document.getElementById('segFilterSel').addEventListener('change', e=>{
     html = html.replace(
         "applyMode === 'cascade' && cb === 'p7'",
         "applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'",
+    )
+    html = html.replace(
+        "// ---- mode tabs ----",
+        """function syncBulkPeriodFromPickup(){
+  const periodSelect = document.getElementById('perSel');
+  const bulkFrom = document.getElementById('bulkFrom');
+  const bulkTo = document.getElementById('bulkTo');
+  if(!periodSelect || !bulkFrom || !bulkTo || !periodSelect.value) return;
+  const [pickupStart, pickupEnd] = periodSelect.value.split('|');
+  if(!pickupStart || !pickupEnd) return;
+  bulkFrom.value = toISO(pickupStart);
+  bulkTo.value = toISO(pickupEnd);
+  if(typeof refreshBulkPreview === 'function') refreshBulkPreview();
+}
+
+// ---- mode tabs ----""",
+        1,
+    )
+    html = html.replace(
+        """document.getElementById('perSel').addEventListener('change', ()=>{
+  refreshAll();
+  syncRateShopDatesFromPeriod();
+});""",
+        """document.getElementById('perSel').addEventListener('change', ()=>{
+  refreshAll();
+  syncBulkPeriodFromPickup();
+  syncRateShopDatesFromPeriod();
+});""",
+        1,
+    )
+    html = html.replace(
+        """  populateBulkGroups();
+  populateBulkCostbreaks();
+  refreshBulkPreview();
+});
+
+// ---- date helpers""",
+        """  populateBulkGroups();
+  populateBulkCostbreaks();
+  syncBulkPeriodFromPickup();
+  refreshBulkPreview();
+});
+
+// ---- date helpers""",
+        1,
+    )
+    html = html.replace(
+        """    populateBulkGroups();
+    populateBulkCostbreaks();
+    refreshBulkPreview();
+  }
+}""",
+        """    populateBulkGroups();
+    populateBulkCostbreaks();
+    syncBulkPeriodFromPickup();
+    refreshBulkPreview();
+  }
+}""",
+        1,
     )
     html = html.replace(
         """document.getElementById('fileFilterSel').addEventListener('change', e=>{

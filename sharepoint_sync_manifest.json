@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-08-11T18:42:54+00:00",
+  "source": "Microsoft SharePoint via Microsoft Graph",
+  "drive_id": "b!xwmEBgEH00ujiRgMsJd2Yv53BYWpg_FEgcR3FtNZmn4HGYIuutM5S5XGcFz-a35B",
+  "folder_path": "Comercial/Brokers/Rates/Tarifas/files 2027",
+  "selection_rule": "latest lastModifiedDateTime per family; filename dates ignored",
+  "selected": [
+    {
+      "family": "BK",
+      "filename": "RateGroup_Export_BK_080826_311226.xlsx",
+      "item_id": "01J4GBPX3GEDMTYN7WBZE27X2LVD65K5K4",
+      "lastModifiedDateTime": "2026-08-11T13:00:33Z",
+      "size": 140932,
+      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7B3CD92066-F637-490E-AFDF-4BA8FDD5755C%7D&file=RateGroup_Export_BK_080826_311226.xlsx&action=default&mobileredirect=true",
+      "downloaded_to": "data/incoming/RateGroup_Export_BK_080826_311226.xlsx"
+    },
+    {
+      "family": "FCI",
+      "filename": "RateGroup_Export_FCI_110826_311226.xlsx",
+      "item_id": "01J4GBPX6E26FOYS2DWVALDPCHDOMDZKJB",
+      "lastModifiedDateTime": "2026-08-11T15:16:46Z",
+      "size": 155439,
+      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7BEC8AD7C4-434B-40B5-B1BC-471B983CA921%7D&file=RateGroup_Export_FCI_110826_311226.xlsx&action=default&mobileredirect=true",
+      "downloaded_to": "data/incoming/RateGroup_Export_FCI_110826_311226.xlsx"
+    },
+    {
+      "family": "VAN",
+      "filename": "RateGroup_Export_Commercial_VAN_150826_300627.xlsx",
+      "item_id": "01J4GBPX4C3IQ2EFEUKJBKFYSGNG4BKWHK",
+      "lastModifiedDateTime": "2026-08-11T13:00:19Z",
+      "size": 42103,
+      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7BA221DA82-9414-4252-A2E2-4669B81558EA%7D&file=RateGroup_Export_Commercial_VAN_150826_300627.xlsx&action=default&mobileredirect=true",
+      "downloaded_to": "data/incoming/RateGroup_Export_Commercial_VAN_150826_300627.xlsx"
+    }
+  ]
+}

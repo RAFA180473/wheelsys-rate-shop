@@ -201,6 +201,39 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
         "const locLabel = locs.length ? locs.join(', ') : 'nenhuma estação selecionada';\n  document.getElementById('gridTitle').textContent = 'Todos os grupos — período ' + pStart + ' a ' + pEnd + ' (' + TARIFF_LABELS[currentFile] + ' · ' + locLabel + ')';",
         1,
     )
+    html = html.replace(
+        """if(cb !== 'p7'){
+    cascadeBtn.disabled = true;
+    cascadeBtn.style.opacity = 0.45;
+    cascadeBtn.style.cursor = 'not-allowed';
+    cascadeNote.textContent = 'A cascata só está disponível quando o cost break selecionado é "7 dias" (a base). Para outros cost breaks, o ajuste aplica-se sempre só a essa célula.';
+  } else {
+    cascadeBtn.disabled = false;
+    cascadeBtn.style.opacity = 1;
+    cascadeBtn.style.cursor = 'pointer';
+    cascadeNote.textContent = 'A cascata segue os rácios do ficheiro original (1d=155%, 2d=120%, 3d=115%, 4-6d=110%, 7d=base, 8-13d=90%, 14-29d=85%, 30+=igual a 4-6d) e só se aplica quando ajustas o cost break "7 dias".';
+  }""",
+        """if(currentFile === 'VAN'){
+    applyMode = 'only';
+    cascadeBtn.disabled = true;
+    cascadeBtn.style.opacity = 0.45;
+    cascadeBtn.style.cursor = 'not-allowed';
+    cascadeBtn.classList.remove('sel','inc');
+    onlyBtn.classList.add('sel','inc');
+    cascadeNote.textContent = 'A tarifa Commercial VAN não utiliza cascata. O ajuste aplica-se apenas ao cost break selecionado.';
+  } else if(cb !== 'p7'){
+    cascadeBtn.disabled = true;
+    cascadeBtn.style.opacity = 0.45;
+    cascadeBtn.style.cursor = 'not-allowed';
+    cascadeNote.textContent = 'A cascata só está disponível quando o cost break selecionado é "7 dias" (a base). Para outros cost breaks, o ajuste aplica-se sempre só a essa célula.';
+  } else {
+    cascadeBtn.disabled = false;
+    cascadeBtn.style.opacity = 1;
+    cascadeBtn.style.cursor = 'pointer';
+    cascadeNote.textContent = 'A cascata segue os rácios do ficheiro original (1d=155%, 2d=120%, 3d=115%, 4-6d=110%, 7d=base, 8-13d=90%, 14-29d=85%, 30+=igual a 4-6d) e só se aplica quando ajustas o cost break "7 dias".';
+  }""",
+        1,
+    )
     html = html.replace("<th>Localização</th>", "<th>Estação</th>", 1)
     html = html.replace(
         "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      refreshAll();",
@@ -241,6 +274,10 @@ document.getElementById('segFilterSel').addEventListener('change', e=>{
         "currentFile==='BK'?'BK':'BK_FCI'",
         "EXPORT_FILE_LABELS[currentFile]",
         1,
+    )
+    html = html.replace(
+        "applyMode === 'cascade' && cb === 'p7'",
+        "applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'",
     )
     html = html.replace(
         """document.getElementById('fileFilterSel').addEventListener('change', e=>{

@@ -1,20 +1,32 @@
 {
-  "generated_at": "2026-08-10T09:52:38+01:00",
-  "rule": "latest file per family; filename date first, modified time fallback",
+  "generated_at": "2026-08-11T14:32:28+00:00",
+  "rule": "latest per family BK/FCI/VAN by last Git change; filename dates ignored",
   "selected": [
     {
-      "family": "rategroup_export_bk_fci_lisboa_porto_faro_ajustado.xlsx",
-      "source": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx",
-      "selected": "data/selected/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_060826.xlsx",
-      "effective_date": "2026-08-06T00:00:00",
-      "selection_method": "filename_date"
+      "family": "BK",
+      "source": "data/incoming/RateGroup_Export_BK_AutoUnion_080826_311226.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_AutoUnion_080826_311226.xlsx",
+      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "selection_method": "git_last_change"
     },
     {
-      "family": "rategroup_export_bk_lisboa_porto_faro_ajustado.xlsx",
-      "source": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx",
-      "selected": "data/selected/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_060826.xlsx",
-      "effective_date": "2026-08-06T00:00:00",
-      "selection_method": "filename_date"
+      "family": "FCI",
+      "source": "data/incoming/RateGroup_Export_FCI_Portugal_IMPORT_EXT2027_300726.xlsx",
+      "selected": "data/selected/RateGroup_Export_FCI_Portugal_IMPORT_EXT2027_300726.xlsx",
+      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "selection_method": "git_last_change"
+    },
+    {
+      "family": "VAN",
+      "source": "data/incoming/RateGroup_Export_Commercial_VAN_AutoUnion_150826_300627.xlsx",
+      "selected": "data/selected/RateGroup_Export_Commercial_VAN_AutoUnion_150826_300627.xlsx",
+      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "selection_method": "git_last_change"
     }
+  ],
+  "available_families": [
+    "BK",
+    "FCI",
+    "VAN"
   ]
 }

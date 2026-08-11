@@ -170,6 +170,23 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
     )
 
     html = html.replace(
+        """function populateSegFilterSel(){
+  const sel = document.getElementById('segFilterSel');
+  const segs = Array.from(new Set(Object.values(SEGMENTS))).sort();
+  sel.innerHTML = '<option value="Todos">Todos os segmentos</option>' + segs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.value = segFilter;
+}""",
+        """function populateSegFilterSel(){
+  const sel = document.getElementById('segFilterSel');
+  const segs = Array.from(new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean))).sort();
+  if(segFilter !== 'Todos' && !segs.includes(segFilter)) segFilter = 'Todos';
+  sel.innerHTML = '<option value="Todos">Todos os segmentos</option>' + segs.map(s=>`<option value="${s}">${s}</option>`).join('');
+  sel.value = segFilter;
+}""",
+        1,
+    )
+
+    html = html.replace(
         "let model = v.desc.replace(",
         "let model = (ADJUSTMENT_GROUP_DESCRIPTIONS[g] || v.desc).replace(",
         1,
@@ -223,6 +240,18 @@ document.getElementById('segFilterSel').addEventListener('change', e=>{
     html = html.replace(
         "currentFile==='BK'?'BK':'BK_FCI'",
         "EXPORT_FILE_LABELS[currentFile]",
+        1,
+    )
+    html = html.replace(
+        """document.getElementById('fileFilterSel').addEventListener('change', e=>{
+  currentFile = e.target.value;
+  onFilterChange();
+});""",
+        """document.getElementById('fileFilterSel').addEventListener('change', e=>{
+  currentFile = e.target.value;
+  populateSegFilterSel();
+  onFilterChange();
+});""",
         1,
     )
     # Obsolete call raised a ReferenceError whenever a top-panel filter changed.

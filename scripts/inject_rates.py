@@ -168,6 +168,10 @@ def ensure_adjustment_panel_updates(html: str) -> str:
 .gridfilter .checklist,#bulkGroups{gap:3px;padding:5px;border-radius:7px;background:#fbfcfd;}
 .gridfilter .checklist label,#bulkGroups label,.segment-filter-checklist label{padding:3px 6px;font-size:10.5px;border:1px solid transparent;border-radius:5px;line-height:1.2;}
 .gridfilter .checklist label.checked,#bulkGroups label.checked,.segment-filter-checklist label.checked{border-color:rgba(31,163,148,.3);}
+#gridGroupFilter{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));align-items:start;gap:7px;max-height:none!important;overflow:visible;}
+.group-segment-column{display:flex;flex-direction:column;gap:3px;min-width:0;padding:4px;border:1px solid var(--line);border-radius:7px;background:var(--seg-soft,#fff);}
+.group-segment-column .group-segment-label{width:auto;margin:0 0 2px;padding:4px 5px;flex-basis:auto;border-radius:4px;}
+#gridGroupFilter .group-segment-column label{display:flex;width:auto;min-width:0;margin:0;padding:3px 5px;}
 .segment-tone-0{--seg-soft:#f2fbf8;--seg-strong:#d9f2eb;--seg-accent:#2f9e87;}
 .segment-tone-1{--seg-soft:#fff6f7;--seg-strong:#f9e1e5;--seg-accent:#c96b7d;}
 .segment-tone-2{--seg-soft:#fff9ed;--seg-strong:#f8ebc9;--seg-accent:#c99425;}
@@ -336,20 +340,24 @@ function populateSegFilterSel(){
   gridGroupFilter = new Set(autoSelectAllGroups ? groups : (groups.length ? [groups[0]] : []));
   activeGroup = groups.length ? groups[0] : null;
   let previousSegment = null;
+  let segmentColumn = null;
   groups.forEach(g=>{
     const segment = SEGMENTS[g] || 'Outro';
     if(segment !== previousSegment){
+      segmentColumn = document.createElement('div');
+      segmentColumn.className = `group-segment-column ${segmentToneClass(segment)}`;
       const heading = document.createElement('div');
       heading.className = `group-segment-label ${segmentToneClass(segment)}`;
       heading.textContent = segment;
-      box.appendChild(heading);
+      segmentColumn.appendChild(heading);
+      box.appendChild(segmentColumn);
       previousSegment = segment;
     }
     const lab = document.createElement('label');
     const isChecked = gridGroupFilter.has(g);
     if(isChecked) lab.className = 'checked';
     lab.innerHTML = `<input type="checkbox" value="${g}" ${isChecked?'checked':''}> ${g}`;
-    box.appendChild(lab);
+    segmentColumn.appendChild(lab);
     const cb = lab.querySelector('input');""",
         1,
     )

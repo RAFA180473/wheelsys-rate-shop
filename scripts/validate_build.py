@@ -101,6 +101,9 @@ def main() -> int:
             "Intervalo ligado automaticamente ao Período (pickup)",
             'href="rate-shop.html"',
             'class="panel comp-panel" hidden',
+            "autoSelectAllGroups",
+            "group-segment-label",
+            '<th>Segmento</th><th>Grupo</th><th>Estação</th>',
         ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")

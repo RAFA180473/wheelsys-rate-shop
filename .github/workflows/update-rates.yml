@@ -7,7 +7,6 @@ on:
       - main
     paths:
       - "public/index.template.html"
-      - "public/rate-shop.html"
       - "public/data/rateshop-history.json"
       - "scripts/**"
       - "requirements.txt"
@@ -108,7 +107,6 @@ jobs:
         shell: bash
         run: |
           test -f public/index.html
-          test -f public/rate-shop.html
           test -f public/data/rates.json
           test -f public/data/rateshop-history.json
           test -f selection_manifest.json

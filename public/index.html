@@ -786,7 +786,15 @@ function refreshPriceBox(){
   const cascadeBtn = document.getElementById('btnCascade');
   const onlyBtn = document.getElementById('btnOnlyThis');
   const cascadeNote = document.getElementById('cascadeNote');
-  if(cb !== 'p7'){
+  if(currentFile === 'VAN'){
+    applyMode = 'only';
+    cascadeBtn.disabled = true;
+    cascadeBtn.style.opacity = 0.45;
+    cascadeBtn.style.cursor = 'not-allowed';
+    cascadeBtn.classList.remove('sel','inc');
+    onlyBtn.classList.add('sel','inc');
+    cascadeNote.textContent = 'A tarifa Commercial VAN não utiliza cascata. O ajuste aplica-se apenas ao cost break selecionado.';
+  } else if(cb !== 'p7'){
     cascadeBtn.disabled = true;
     cascadeBtn.style.opacity = 0.45;
     cascadeBtn.style.cursor = 'not-allowed';
@@ -958,7 +966,7 @@ document.getElementById('btnApply').addEventListener('click', ()=>{
       else { novo = row[cb] + direction*adjValRaw; }
       novo = Math.max(0, Math.round(novo*100)/100);
 
-      if(applyMode === 'cascade' && cb === 'p7'){
+      if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
         row.p7 = novo;
         row.p1 = Math.round(novo * CB_RATIOS.p1 * 100) / 100;
         row.p2 = Math.round(novo * CB_RATIOS.p2 * 100) / 100;
@@ -982,7 +990,7 @@ document.getElementById('btnResetCell').addEventListener('click', ()=>{
       const row = findRow(currentFile, group, pStart, pEnd, loc);
       const orig = findOrigRow(currentFile, group, pStart, pEnd, loc);
       if(!row || !orig) return;
-      if(applyMode === 'cascade' && cb === 'p7'){
+      if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
         CB_FIELDS.forEach(f=>{ row[f] = orig[f]; });
       } else {
         row[cb] = orig[cb];

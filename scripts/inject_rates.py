@@ -186,8 +186,11 @@ def ensure_adjustment_panel_updates(html: str) -> str:
 .segment-tone-11{--seg-soft:#f8f3fb;--seg-strong:#e9dcf0;--seg-accent:#8d63a4;}
 .segment-tone-12{--seg-soft:#f5f7f8;--seg-strong:#e1e7ea;--seg-accent:#607681;}
 tbody tr[class*="segment-tone-"]{background:var(--seg-soft);}
+tbody tr[class*="segment-tone-"] td{background:var(--seg-soft);}
 tbody tr[class*="segment-tone-"] td.group-cell,tbody tr[class*="segment-tone-"] td.segment-cell{background:var(--seg-strong)!important;}
 tbody tr[class*="segment-tone-"] td.group-cell{border-left:4px solid var(--seg-accent);}
+tbody tr[class*="segment-tone-"] td.selected-cell{background:var(--teal-400)!important;}
+tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-500)!important;}
 .group-segment-label[class*="segment-tone-"]{background:var(--seg-strong);border-left-color:var(--seg-accent);}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
 """

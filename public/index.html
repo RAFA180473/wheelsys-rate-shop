@@ -626,7 +626,8 @@ function groupsOfFiltered(fileKey, loc){
 }
 function populateSegFilterSel(){
   const sel = document.getElementById('segFilterSel');
-  const segs = Array.from(new Set(Object.values(SEGMENTS))).sort();
+  const segs = Array.from(new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean))).sort();
+  if(segFilter !== 'Todos' && !segs.includes(segFilter)) segFilter = 'Todos';
   sel.innerHTML = '<option value="Todos">Todos os segmentos</option>' + segs.map(s=>`<option value="${s}">${s}</option>`).join('');
   sel.value = segFilter;
 }
@@ -1058,6 +1059,7 @@ function onFilterChange(){
 }
 document.getElementById('fileFilterSel').addEventListener('change', e=>{
   currentFile = e.target.value;
+  populateSegFilterSel();
   onFilterChange();
 });
 function populateLocFilterChecklist(){

@@ -98,6 +98,7 @@ def main() -> int:
             'id="segFilterNone"',
             "segFilter = new Set()",
             "segmentOrderOf",
+            "const cabrioOrder = ['Cabrio','Cabrio Elite']",
             "SEGMENT_TONE_INDEX",
             "segmentToneClass",
             "segment-tone-12",

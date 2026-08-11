@@ -75,6 +75,14 @@ jobs:
             git add public/data/rateshop-history.json
           fi
 
+          if [ -f selection_manifest.json ]; then
+            git add selection_manifest.json
+          fi
+
+          if [ -f build_manifest.json ]; then
+            git add build_manifest.json
+          fi
+
           if git diff --cached --quiet; then
             echo "Sem alteracoes nos ficheiros gerados."
           else
@@ -91,6 +99,8 @@ jobs:
           test -f public/index.html
           test -f public/data/rates.json
           test -f public/data/rateshop-history.json
+          test -f selection_manifest.json
+          test -f build_manifest.json
 
       - name: Carregar site
         uses: actions/upload-pages-artifact@v3

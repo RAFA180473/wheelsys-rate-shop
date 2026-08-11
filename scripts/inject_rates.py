@@ -159,6 +159,8 @@ def ensure_adjustment_panel_updates(html: str) -> str:
     navigation_css = """
 .page-nav{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.28);border-radius:6px;background:var(--teal-500);color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
 .page-nav:hover{background:var(--teal-400);color:var(--navy-950);}
+.group-segment-label{flex-basis:100%;margin-top:6px;padding:6px 8px;border-left:3px solid var(--teal-500);background:var(--mist-100);color:var(--navy-700);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;}
+.segment-cell{min-width:125px;background:#e9f2f4!important;color:var(--navy-700);font-weight:800;text-transform:uppercase;font-size:10px;letter-spacing:.35px;}
 @media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
 """
     html = html.replace("</style>", navigation_css + "</style>", 1)
@@ -227,6 +229,62 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
 }""",
         1,
     )
+    html = html.replace(
+        """function groupsOfFiltered(fileKey, loc){
+  const list = groupsOf(fileKey, loc);
+  if(!segFilter || segFilter==='Todos') return list;
+  return list.filter(g=>(SEGMENTS[g]||'')===segFilter);
+}""",
+        """function groupsOfFiltered(fileKey, loc){
+  const list = groupsOf(fileKey, loc);
+  const filtered = (!segFilter || segFilter==='Todos')
+    ? list
+    : list.filter(g=>(SEGMENTS[g]||'')===segFilter);
+  return filtered.slice().sort((a,b)=>{
+    const bySegment = (SEGMENTS[a]||'Outro').localeCompare(SEGMENTS[b]||'Outro','pt');
+    return bySegment || a.localeCompare(b,'pt');
+  });
+}""",
+        1,
+    )
+    html = html.replace(
+        """function populateGridGroupFilter(){
+  const box = document.getElementById('gridGroupFilter');
+  box.innerHTML = '';
+  const groups = groupsOfFiltered(currentFile);
+  gridGroupFilter = new Set(groups.length ? [groups[0]] : []);
+  activeGroup = groups.length ? groups[0] : null;
+  groups.forEach((g,i)=>{
+    const lab = document.createElement('label');
+    if(i===0) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${g}" ${i===0?'checked':''}> ${g}`;
+    box.appendChild(lab);
+    const cb = lab.querySelector('input');""",
+        """function populateGridGroupFilter(){
+  const box = document.getElementById('gridGroupFilter');
+  box.innerHTML = '';
+  const groups = groupsOfFiltered(currentFile);
+  const autoSelectAllGroups = Boolean(segFilter && segFilter !== 'Todos');
+  gridGroupFilter = new Set(autoSelectAllGroups ? groups : (groups.length ? [groups[0]] : []));
+  activeGroup = groups.length ? groups[0] : null;
+  let previousSegment = null;
+  groups.forEach(g=>{
+    const segment = SEGMENTS[g] || 'Outro';
+    if(segment !== previousSegment){
+      const heading = document.createElement('div');
+      heading.className = 'group-segment-label';
+      heading.textContent = segment;
+      box.appendChild(heading);
+      previousSegment = segment;
+    }
+    const lab = document.createElement('label');
+    const isChecked = gridGroupFilter.has(g);
+    if(isChecked) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${g}" ${isChecked?'checked':''}> ${g}`;
+    box.appendChild(lab);
+    const cb = lab.querySelector('input');""",
+        1,
+    )
 
     html = html.replace(
         "let model = v.desc.replace(",
@@ -276,7 +334,27 @@ const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
   }""",
         1,
     )
+    html = html.replace(
+        "<th>Grupo</th><th>Localização</th>",
+        "<th>Segmento</th><th>Grupo</th><th>Estação</th>",
+        2,
+    )
     html = html.replace("<th>Localização</th>", "<th>Estação</th>", 1)
+    html = html.replace(
+        "const groups = groupsOf(currentFile).filter(g=>gridGroupFilter.has(g));",
+        "const groups = groupsOfFiltered(currentFile).filter(g=>gridGroupFilter.has(g));",
+        1,
+    )
+    html = html.replace(
+        """if(idx===0){
+        tds += `<td class="group-cell" rowspan="${rowsForGroup.length}">${groupLabel(g)}</td>`;
+      }""",
+        """if(idx===0){
+        tds += `<td class="segment-cell" rowspan="${rowsForGroup.length}">${SEGMENTS[g] || 'Outro'}</td>`;
+        tds += `<td class="group-cell" rowspan="${rowsForGroup.length}">${groupLabel(g)}</td>`;
+      }""",
+        1,
+    )
     html = html.replace(
         "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      refreshAll();",
         "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      refreshAll();",

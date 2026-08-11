@@ -96,6 +96,8 @@ def main() -> int:
             "segFilter === 'Veículos comerciais' && currentFile !== 'VAN'",
             "groupsOf(currentFile).map(g=>SEGMENTS[g])",
             "A tarifa Commercial VAN não utiliza cascata",
+            "syncBulkPeriodFromPickup",
+            "Intervalo ligado automaticamente ao Período (pickup)",
         ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")

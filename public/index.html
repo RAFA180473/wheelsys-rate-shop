@@ -640,14 +640,24 @@ let segFilterInitialized = false;
 function groupsOfFiltered(fileKey, loc){
   const list = groupsOf(fileKey, loc);
   const filtered = list.filter(g=>segFilter.has(SEGMENTS[g]||''));
+  const segmentOrder = segmentOrderOf(fileKey);
+  const groupOrder = new Map(list.map((g,index)=>[g,index]));
   return filtered.slice().sort((a,b)=>{
-    const bySegment = (SEGMENTS[a]||'Outro').localeCompare(SEGMENTS[b]||'Outro','pt');
-    return bySegment || a.localeCompare(b,'pt');
+    const bySegment = segmentOrder.indexOf(SEGMENTS[a]) - segmentOrder.indexOf(SEGMENTS[b]);
+    return bySegment || groupOrder.get(a) - groupOrder.get(b);
   });
+}
+function segmentOrderOf(fileKey){
+  const order = [];
+  groupsOf(fileKey).forEach(g=>{
+    const segment = SEGMENTS[g];
+    if(segment && !order.includes(segment)) order.push(segment);
+  });
+  return order;
 }
 function populateSegFilterSel(){
   const box = document.getElementById('segFilterSel');
-  const segs = Array.from(new Set(groupsOf(currentFile).map(g=>SEGMENTS[g]).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt'));
+  const segs = segmentOrderOf(currentFile);
   if(!segFilterInitialized){
     segFilter = new Set(segs);
     segFilterInitialized = true;

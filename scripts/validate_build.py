@@ -118,7 +118,10 @@ def main() -> int:
         for marker in (
             "Rate Shop Concorrência",
             'href="index.html"',
-            'class="blank-workspace"',
+            'class="rate-shop-page"',
+            'id="btnRunRateShop"',
+            'id="rsBody"',
+            '<div class="panel comp-panel">',
         ):
             if marker not in rate_shop_html:
                 errors.append(f"Marcador ausente em public/rate-shop.html: {marker}")

@@ -146,6 +146,22 @@ def ensure_adjustment_panel_updates(html: str) -> str:
         1,
     )
     html = html.replace(
+        '<div class="panel comp-panel">',
+        '<div class="panel comp-panel" hidden aria-hidden="true">',
+        1,
+    )
+    html = html.replace(
+        '<span class="tag">ICONIQ &middot; Broker Rates &middot; Wheelsys export</span>',
+        '<span class="tag">ICONIQ &middot; Broker Rates &middot; Wheelsys export</span>\n  <a class="page-nav" href="rate-shop.html">Rate Shop Concorrência →</a>',
+        1,
+    )
+    navigation_css = """
+.page-nav{margin-left:auto;padding:9px 14px;border:1px solid rgba(255,255,255,.28);border-radius:6px;background:var(--teal-500);color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap;}
+.page-nav:hover{background:var(--teal-400);color:var(--navy-950);}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.page-nav{margin-left:0}}
+"""
+    html = html.replace("</style>", navigation_css + "</style>", 1)
+    html = html.replace(
         '<label for="bulkFrom">Período de</label>',
         '<label for="bulkFrom">Período pickup de</label>',
         1,

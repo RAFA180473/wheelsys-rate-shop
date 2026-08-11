@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Build the Rate Shop JSON from the newest selected Wheelsys spreadsheets.
+"""Build rates.json from the newest selected Wheelsys spreadsheets.
 
-Expected columns are the same columns exported by the current HTML:
+Families supported:
+- BK
+- FCI
+- VAN
+
+Expected columns:
 Group, Pickup start, Pickup end, Rate zone, Booking start, Booking end,
 1 per day, 2 per day, 3 per day, 4 - 6 per day, 7 per day,
 8 - 13 per day, 14 - 29 per day, 30+ per day.
 
-Tariff family is inferred from filename: names containing FCI -> FCI, otherwise BK.
 Locations are inferred from Rate zone: LXA -> Lisboa, OPT -> Porto, FAO -> Faro.
 """
 from __future__ import annotations
@@ -26,6 +30,7 @@ OUT_JSON = OUT_DIR / "rates.json"
 BUILD_MANIFEST = ROOT / "build_manifest.json"
 
 ZONE_TO_LOCATION = {"LXA": "Lisboa", "OPT": "Porto", "FAO": "Faro"}
+FAMILIES = ("BK", "FCI", "VAN")
 
 CANONICAL = {
     "group": ["group"],
@@ -48,8 +53,7 @@ CANONICAL = {
 def norm(value: Any) -> str:
     text = "" if value is None else str(value)
     text = text.strip().lower()
-    text = re.sub(r"\s+", " ", text)
-    return text
+    return re.sub(r"\s+", " ", text)
 
 
 def format_date(value: Any, booking: bool = False) -> str:
@@ -59,13 +63,18 @@ def format_date(value: Any, booking: bool = False) -> str:
         return value.strftime("%Y-%m-%d %H:%M:%S" if booking else "%d/%m/%Y")
     if isinstance(value, date):
         return value.strftime("%Y-%m-%d 00:00:00" if booking else "%d/%m/%Y")
-    text = str(value).strip()
-    # Preserve already formatted values.
-    return text
+    return str(value).strip()
 
 
 def tariff_from_filename(path: Path) -> str:
-    return "FCI" if "FCI" in path.stem.upper() else "BK"
+    name = path.stem.upper()
+    if "COMMERCIAL_VAN" in name or "VAN" in name:
+        return "VAN"
+    if "FCI" in name:
+        return "FCI"
+    if "BK" in name:
+        return "BK"
+    raise ValueError(f"Familia de tarifa nao reconhecida: {path.name}")
 
 
 def choose_sheet(wb):
@@ -84,8 +93,7 @@ def map_headers(values: list[Any]) -> dict[str, int]:
             if value in alias_set:
                 result[key] = idx
                 break
-    required = set(CANONICAL)
-    missing = sorted(required - set(result))
+    missing = sorted(set(CANONICAL) - set(result))
     if missing:
         raise ValueError("Colunas em falta: " + ", ".join(missing))
     return result
@@ -112,6 +120,7 @@ def parse_workbook(path: Path) -> tuple[str, list[dict[str, Any]], list[str]]:
         header = list(next(rows))
     except StopIteration:
         raise ValueError("Folha vazia")
+
     mapping = map_headers(header)
     tariff = tariff_from_filename(path)
     records: list[dict[str, Any]] = []
@@ -129,7 +138,8 @@ def parse_workbook(path: Path) -> tuple[str, list[dict[str, Any]], list[str]]:
         if not group:
             warnings.append(f"{path.name}: linha {excel_row}: Group vazio")
             continue
-        record = {
+
+        records.append({
             "tariff": tariff,
             "location": location,
             "group": group,
@@ -145,8 +155,8 @@ def parse_workbook(path: Path) -> tuple[str, list[dict[str, Any]], list[str]]:
             "p813": numeric(row[mapping["p813"]]),
             "p1429": numeric(row[mapping["p1429"]]),
             "p30": numeric(row[mapping["p30"]]),
-        }
-        records.append(record)
+        })
+
     wb.close()
     return tariff, records, warnings
 
@@ -159,8 +169,10 @@ def main() -> int:
         print(f"Nenhum Excel encontrado em {SELECTED}")
         return 1
 
-    rates = {"BK": {loc: [] for loc in ZONE_TO_LOCATION.values()},
-             "FCI": {loc: [] for loc in ZONE_TO_LOCATION.values()}}
+    rates = {
+        family: {loc: [] for loc in ZONE_TO_LOCATION.values()}
+        for family in FAMILIES
+    }
     source_summary = []
     all_warnings: list[str] = []
 
@@ -181,6 +193,7 @@ def main() -> int:
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "output": str(OUT_JSON.relative_to(ROOT)),
         "sources": source_summary,
+        "families": list(FAMILIES),
         "warnings": all_warnings,
     }
     BUILD_MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

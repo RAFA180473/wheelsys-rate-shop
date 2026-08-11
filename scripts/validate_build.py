@@ -104,6 +104,7 @@ def main() -> int:
             "segment-tone-12",
             'td.selected-cell{background:var(--teal-400)!important;}',
             "group-segment-column",
+            ".grid-wrap tbody td{border-right:1px solid #bdc9d2;border-bottom:1px solid #aebdc8;}",
             "groupsOf(currentFile).map(g=>SEGMENTS[g])",
             "A tarifa Commercial VAN não utiliza cascata",
             "syncBulkPeriodFromPickup",

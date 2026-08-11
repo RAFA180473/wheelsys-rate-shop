@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-08-11T15:32:59+00:00",
+  "generated_at": "2026-08-11T15:45:04+00:00",
   "rule": "latest per family BK/FCI/VAN by last Git change; filename dates ignored",
   "selected": [
     {
       "family": "BK",
-      "source": "data/incoming/RateGroup_Export_BK_AutoUnion_080826_311226.xlsx",
-      "selected": "data/selected/RateGroup_Export_BK_AutoUnion_080826_311226.xlsx",
-      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "source": "data/incoming/RateGroup_Export_BK_080826_311226.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_080826_311226.xlsx",
+      "effective_datetime": "2026-08-11T15:44:40+00:00",
       "selection_method": "git_last_change"
     },
     {
       "family": "FCI",
-      "source": "data/incoming/RateGroup_Export_FCI_Portugal_IMPORT_EXT2027_300726.xlsx",
-      "selected": "data/selected/RateGroup_Export_FCI_Portugal_IMPORT_EXT2027_300726.xlsx",
-      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "source": "data/incoming/RateGroup_Export_FCI_110826_311226.xlsx",
+      "selected": "data/selected/RateGroup_Export_FCI_110826_311226.xlsx",
+      "effective_datetime": "2026-08-11T15:44:40+00:00",
       "selection_method": "git_last_change"
     },
     {
       "family": "VAN",
-      "source": "data/incoming/RateGroup_Export_Commercial_VAN_AutoUnion_150826_300627.xlsx",
-      "selected": "data/selected/RateGroup_Export_Commercial_VAN_AutoUnion_150826_300627.xlsx",
-      "effective_datetime": "2026-08-11T14:27:07+00:00",
+      "source": "data/incoming/RateGroup_Export_Commercial_VAN_150826_300627.xlsx",
+      "selected": "data/selected/RateGroup_Export_Commercial_VAN_150826_300627.xlsx",
+      "effective_datetime": "2026-08-11T15:44:40+00:00",
       "selection_method": "git_last_change"
     }
   ],

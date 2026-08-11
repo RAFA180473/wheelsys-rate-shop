@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-08-11T15:33:00+00:00",
+  "generated_at": "2026-08-11T15:45:05+00:00",
   "output": "public/data/rates.json",
   "sources": [
     {
-      "file": "RateGroup_Export_BK_AutoUnion_080826_311226.xlsx",
+      "file": "RateGroup_Export_BK_080826_311226.xlsx",
       "tariff": "BK",
       "rows": 2079
     },
     {
-      "file": "RateGroup_Export_Commercial_VAN_AutoUnion_150826_300627.xlsx",
+      "file": "RateGroup_Export_Commercial_VAN_150826_300627.xlsx",
       "tariff": "VAN",
       "rows": 414
     },
     {
-      "file": "RateGroup_Export_FCI_Portugal_IMPORT_EXT2027_300726.xlsx",
+      "file": "RateGroup_Export_FCI_110826_311226.xlsx",
       "tariff": "FCI",
-      "rows": 7770
+      "rows": 2079
     }
   ],
   "families": [

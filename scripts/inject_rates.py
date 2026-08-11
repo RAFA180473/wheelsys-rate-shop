@@ -135,6 +135,89 @@ def ensure_van_support(html: str) -> str:
     return html
 
 
+def ensure_adjustment_panel_updates(html: str) -> str:
+    """Apply the commercial/station UX to the adjustment panel only."""
+    if "const ADJUSTMENT_GROUP_DESCRIPTIONS" in html:
+        return html
+
+    html = html.replace(
+        "Localizações a visualizar <span",
+        "Estações a visualizar <span",
+        1,
+    )
+
+    commercial_config = """
+const ADJUSTMENT_GROUP_DESCRIPTIONS = {
+  VANS:'VW Caddy Cargo',
+  VANM:'VW Transporter Cargo',
+  VANL:'VW Crafter Cargo 9900 L'
+};
+Object.assign(SEGMENTS, {
+  VANS:'Veículos comerciais',
+  VANM:'Veículos comerciais',
+  VANL:'Veículos comerciais',
+  VCXL:'Veículos comerciais'
+});
+const TARIFF_LABELS = {BK:'RateGroup BK', FCI:'RateGroup BK FCI', VAN:'RateGroup Commercial VAN'};
+const EXPORT_FILE_LABELS = {BK:'BK', FCI:'BK_FCI', VAN:'Commercial_VAN'};
+"""
+    html = re.sub(
+        r"(const SEGMENTS = \{.*?\};)",
+        lambda m: m.group(1) + commercial_config,
+        html,
+        count=1,
+        flags=re.S,
+    )
+
+    html = html.replace(
+        "let model = v.desc.replace(",
+        "let model = (ADJUSTMENT_GROUP_DESCRIPTIONS[g] || v.desc).replace(",
+        1,
+    )
+    html = html.replace(
+        "const v = VGROUPS[group];\n  document.getElementById('grpDesc').textContent = v ? (`Grupo ${group} — ${v.desc} · SIPP ${v.sipp}`) : '';",
+        "const v = VGROUPS[group];\n  const desc = v ? (ADJUSTMENT_GROUP_DESCRIPTIONS[group] || v.desc) : '';\n  document.getElementById('grpDesc').textContent = v ? (`Grupo ${group} — ${desc} · SIPP ${v.sipp}`) : '';",
+        1,
+    )
+    html = html.replace(
+        "const locLabel = locs.length ? locs.join(', ') : 'nenhuma localização selecionada';\n  document.getElementById('gridTitle').textContent = 'Todos os grupos — período ' + pStart + ' a ' + pEnd + ' (' + (currentFile==='BK'?'RateGroup BK':'RateGroup BK FCI') + ' · ' + locLabel + ')';",
+        "const locLabel = locs.length ? locs.join(', ') : 'nenhuma estação selecionada';\n  document.getElementById('gridTitle').textContent = 'Todos os grupos — período ' + pStart + ' a ' + pEnd + ' (' + TARIFF_LABELS[currentFile] + ' · ' + locLabel + ')';",
+        1,
+    )
+    html = html.replace("<th>Localização</th>", "<th>Estação</th>", 1)
+    html = html.replace(
+        "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      refreshAll();",
+        "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      refreshAll();",
+        1,
+    )
+    html = html.replace(
+        "lab.classList.toggle('checked', cb.checked);\n      onFilterChange();",
+        "lab.classList.toggle('checked', cb.checked);\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      onFilterChange();",
+        1,
+    )
+    html = html.replace(
+        "document.getElementById('segFilterSel').addEventListener('change', e=>{",
+        """function syncAdjustLocCheckboxes(){
+  document.querySelectorAll('#adjustLocChecklist label').forEach(lab=>{
+    const cb = lab.querySelector('input');
+    const on = adjustLocations.has(cb.value);
+    cb.checked = on;
+    lab.classList.toggle('checked', on);
+  });
+}
+document.getElementById('segFilterSel').addEventListener('change', e=>{""",
+        1,
+    )
+    html = html.replace(
+        "currentFile==='BK'?'BK':'BK_FCI'",
+        "EXPORT_FILE_LABELS[currentFile]",
+        1,
+    )
+    # Obsolete call raised a ReferenceError whenever a top-panel filter changed.
+    html = html.replace("  populateCompGroupSelect();\n", "", 1)
+    return html
+
+
 def inject_source_ui(html: str, meta: dict[str, dict[str, str]]) -> str:
     if not SELECT_RE.search(html):
         print("AVISO: seletor #fileFilterSel não encontrado; metadados de versão não foram mostrados.")
@@ -166,6 +249,7 @@ def main() -> int:
     html = TEMPLATE.read_text(encoding="utf-8")
     html = clean_previous_injection(html)
     html = ensure_van_support(html)
+    html = ensure_adjustment_panel_updates(html)
 
     rates = json.loads(RATES_JSON.read_text(encoding="utf-8"))
     span, error = find_rates_span(html)

@@ -147,6 +147,29 @@ def ensure_adjustment_panel_updates(html: str) -> str:
         1,
     )
     html = html.replace(
+        """let selectedLocations = new Set(['Lisboa']);
+let adjustLocations = new Set(['Lisboa']);
+function primaryLocation(){
+  for(const l of ALL_LOCS){ if(selectedLocations.has(l)) return l; }
+  return ALL_LOCS[0];
+}""",
+        """let selectedLocations = new Set(['Lisboa']);
+let adjustLocations = new Set(['Lisboa']);
+let activeLocation = 'Lisboa';
+function primaryLocation(){
+  if(selectedLocations.has(activeLocation)) return activeLocation;
+  for(const l of ALL_LOCS){
+    if(selectedLocations.has(l)){
+      activeLocation = l;
+      return l;
+    }
+  }
+  activeLocation = ALL_LOCS[0];
+  return activeLocation;
+}""",
+        1,
+    )
+    html = html.replace(
         '<div class="panel comp-panel">',
         '<div class="panel comp-panel" hidden aria-hidden="true">',
         1,
@@ -578,12 +601,21 @@ document.getElementById('bulkGroupsNone').addEventListener('click', ()=>{
     )
     html = html.replace(
         "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      refreshAll();",
-        "selectedLocations = new Set([loc]);\n      syncLocFilterCheckboxes();\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      refreshAll();",
+        "activeLocation = loc;\n      syncLocFilterCheckboxes();\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      refreshAll();",
         1,
     )
     html = html.replace(
-        "lab.classList.toggle('checked', cb.checked);\n      onFilterChange();",
-        "lab.classList.toggle('checked', cb.checked);\n      adjustLocations = new Set(selectedLocations);\n      syncAdjustLocCheckboxes();\n      refreshBulkPreview();\n      onFilterChange();",
+        """      if(cb.checked) selectedLocations.add(loc); else selectedLocations.delete(loc);
+      if(selectedLocations.size===0){ selectedLocations.add(loc); cb.checked = true; }
+      lab.classList.toggle('checked', cb.checked);
+      onFilterChange();""",
+        """      if(cb.checked) selectedLocations.add(loc); else selectedLocations.delete(loc);
+      if(selectedLocations.size===0){ selectedLocations.add(loc); cb.checked = true; }
+      lab.classList.toggle('checked', cb.checked);
+      adjustLocations = new Set(selectedLocations);
+      syncAdjustLocCheckboxes();
+      refreshBulkPreview();
+      onFilterChange();""",
         1,
     )
     html = html.replace(

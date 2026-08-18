@@ -723,9 +723,6 @@ function populateSegFilterSel(){
     cb.addEventListener('change', ()=>{
       if(cb.checked) segFilter.add(segment); else segFilter.delete(segment);
       lab.classList.toggle('checked', cb.checked);
-      adjustLocations = new Set(selectedLocations);
-      syncAdjustLocCheckboxes();
-      refreshBulkPreview();
       onFilterChange();
     });
   });
@@ -760,9 +757,17 @@ let currentFile = 'BK';
 const ALL_LOCS = ['Lisboa','Porto','Faro'];
 let selectedLocations = new Set(['Lisboa']);
 let adjustLocations = new Set(['Lisboa']);
+let activeLocation = 'Lisboa';
 function primaryLocation(){
-  for(const l of ALL_LOCS){ if(selectedLocations.has(l)) return l; }
-  return ALL_LOCS[0];
+  if(selectedLocations.has(activeLocation)) return activeLocation;
+  for(const l of ALL_LOCS){
+    if(selectedLocations.has(l)){
+      activeLocation = l;
+      return l;
+    }
+  }
+  activeLocation = ALL_LOCS[0];
+  return activeLocation;
 }
 function viewLocations(){ return ALL_LOCS.filter(l=>selectedLocations.has(l)); }
 let direction = 1;
@@ -969,7 +974,7 @@ function renderGrid(){
       document.getElementById('simDias').value = CB_DAYS_DEFAULT[f];
       updateSimDiasSuffix();
       updateGroupDesc(g);
-      selectedLocations = new Set([loc]);
+      activeLocation = loc;
       syncLocFilterCheckboxes();
       adjustLocations = new Set(selectedLocations);
       syncAdjustLocCheckboxes();
@@ -1206,6 +1211,9 @@ function populateLocFilterChecklist(){
       if(cb.checked) selectedLocations.add(loc); else selectedLocations.delete(loc);
       if(selectedLocations.size===0){ selectedLocations.add(loc); cb.checked = true; }
       lab.classList.toggle('checked', cb.checked);
+      adjustLocations = new Set(selectedLocations);
+      syncAdjustLocCheckboxes();
+      refreshBulkPreview();
       onFilterChange();
     });
   });

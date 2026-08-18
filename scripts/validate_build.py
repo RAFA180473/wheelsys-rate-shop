@@ -93,6 +93,8 @@ def main() -> int:
             "VW Transporter Cargo",
             "VW Crafter Cargo 9900 L",
             "syncAdjustLocCheckboxes",
+            "let activeLocation = 'Lisboa'",
+            "activeLocation = loc",
             "RateGroup Commercial VAN",
             'id="segFilterAll"',
             'id="segFilterNone"',

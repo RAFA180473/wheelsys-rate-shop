@@ -1,9 +1,14 @@
 {
-  "generated_at": "2026-08-18T15:07:25+00:00",
+  "generated_at": "2026-08-21T10:10:07+00:00",
   "output": "public/data/rates.json",
   "sources": [
     {
-      "file": "RateGroup_Export_BK_080826_311226.xlsx",
+      "file": "RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_200826.xlsx",
+      "tariff": "FCI",
+      "rows": 2079
+    },
+    {
+      "file": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_200826.xlsx",
       "tariff": "BK",
       "rows": 2079
     },
@@ -11,11 +16,6 @@
       "file": "RateGroup_Export_Commercial_VAN_150826_300627.xlsx",
       "tariff": "VAN",
       "rows": 414
-    },
-    {
-      "file": "RateGroup_Export_FCI_110826_311226.xlsx",
-      "tariff": "FCI",
-      "rows": 2079
     }
   ],
   "families": [

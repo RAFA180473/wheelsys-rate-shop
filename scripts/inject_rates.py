@@ -6,11 +6,13 @@ import json
 import re
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "public" / "index.template.html"
 RATES_JSON = ROOT / "public" / "data" / "rates.json"
 MANIFEST = ROOT / "selection_manifest.json"
+SHAREPOINT_MANIFEST = ROOT / "sharepoint_sync_manifest.json"
 OUTPUT = ROOT / "public" / "index.html"
 RATE_SHOP_OUTPUT = ROOT / "public" / "rate-shop.html"
 
@@ -22,7 +24,8 @@ OLD_META_SCRIPT_RE = re.compile(
     re.I | re.S,
 )
 OLD_META_CSS_RE = re.compile(
-    r'/\* source-version badge injected by build \*/.*?#rateSourceFile\{[^}]*\}\s*',
+    r'/\* source-version badge injected by build \*/.*?#rateSourceFile\{[^}]*\}'
+    r'(?:.*?/\* end source-version badge \*/)?\s*',
     re.I | re.S,
 )
 
@@ -80,6 +83,29 @@ def fmt_date(value: str | None) -> str:
         return value[:10]
 
 
+def fmt_datetime(value: str | None) -> str:
+    if not value:
+        return "data não disponível"
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is not None:
+            parsed = parsed.astimezone(ZoneInfo("Europe/Lisbon"))
+        return parsed.strftime("%d/%m/%Y %H:%M")
+    except ValueError:
+        return value[:16]
+
+
+def dashboard_updated_at() -> str:
+    for path in (SHAREPOINT_MANIFEST, MANIFEST):
+        if not path.exists():
+            continue
+        data = json.loads(path.read_text(encoding="utf-8"))
+        updated = data.get("generated_at")
+        if updated:
+            return fmt_datetime(str(updated))
+    return "data não disponível"
+
+
 def source_metadata() -> dict[str, dict[str, str]]:
     meta = {
         key: {"filename": "", "date": "", "method": "", "status": "missing"}
@@ -104,6 +130,7 @@ def source_metadata() -> dict[str, dict[str, str]]:
         meta[family] = {
             "filename": name,
             "date": fmt_date(effective),
+            "modified_at": fmt_datetime(effective),
             "method": str(rec.get("selection_method") or ""),
             "status": "ok",
         }
@@ -766,19 +793,23 @@ def build_rate_shop_page(html: str) -> str:
     return page
 
 
-def inject_source_ui(html: str, meta: dict[str, dict[str, str]]) -> str:
+def inject_source_ui(html: str, meta: dict[str, dict[str, str]], updated_at: str) -> str:
     if not SELECT_RE.search(html):
         print("AVISO: seletor #fileFilterSel não encontrado; metadados de versão não foram mostrados.")
         return html
 
-    box = '''\n<div id="rateSourceMeta" class="rate-source-meta" aria-live="polite">\n  <span id="rateSourceDot" class="rate-source-dot"></span>\n  <span><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>\n  <span class="rate-source-sub"><b>Data detetada:</b> <span id="rateSourceDate"></span></span></span>\n</div>'''
+    box = f'''\n<div id="rateSourceMeta" class="rate-source-meta" aria-live="polite">\n  <span id="rateSourceDot" class="rate-source-dot"></span>\n  <span class="rate-source-copy"><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>\n  <span class="rate-source-sub"><b>Ficheiro atualizado:</b> <span id="rateSourceDate"></span><br>\n  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">{updated_at}</span><br>\n  Atualização automática: duas vezes por dia.</span></span>\n  <a id="btnUpdateTariffs" class="rate-update-btn" href="https://github.com/RAFA180473/wheelsys-rate-shop/actions/workflows/update-rates.yml" target="_blank" rel="noopener">Atualizar tarifas ↗</a>\n</div>'''
     html = SELECT_RE.sub(lambda m: m.group(1) + box, html, count=1)
 
-    css = '''\n/* source-version badge injected by build */\n.rate-source-meta{display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--mist-100);font-size:11px;line-height:1.35;color:var(--navy-700)}\n.rate-source-dot{width:9px;height:9px;border-radius:50%;background:var(--up);margin-top:3px;flex:0 0 9px;box-shadow:0 0 0 3px rgba(0,168,136,.10)}\n.rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}\n.rate-source-sub{color:var(--steel-500)}\n#rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}\n'''
+    css = '''\n/* source-version badge injected by build */\n.rate-source-meta{display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--mist-100);font-size:11px;line-height:1.4;color:var(--navy-700)}\n.rate-source-dot{width:9px;height:9px;border-radius:50%;background:var(--up);margin-top:3px;flex:0 0 9px;box-shadow:0 0 0 3px rgba(0,168,136,.10)}\n.rate-source-meta.missing .rate-source-dot{background:var(--coral-500);box-shadow:0 0 0 3px rgba(217,97,79,.10)}\n.rate-source-sub{color:var(--steel-500)}\n#rateSourceFile{font-family:'IBM Plex Mono',monospace;word-break:break-all}\n.rate-source-copy{min-width:0;flex:1}\n.rate-update-btn{align-self:center;flex:0 0 auto;padding:6px 9px;border-radius:5px;background:var(--teal-500);color:#fff;text-decoration:none;font-size:10px;font-weight:700;white-space:nowrap}\n.rate-update-btn:hover{background:var(--teal-400);color:var(--navy-950)}\n/* end source-version badge */\n'''
     if "</style>" in html:
         html = html.replace("</style>", css + "</style>", 1)
 
     script = f'''\n<script>\n// Source metadata injected automatically from selection_manifest.json\nconst RATE_SOURCE_META = {json.dumps(meta, ensure_ascii=False, separators=(",", ":"))};\n(function(){{\n  const sel = document.getElementById('fileFilterSel');\n  const box = document.getElementById('rateSourceMeta');\n  const fileEl = document.getElementById('rateSourceFile');\n  const dateEl = document.getElementById('rateSourceDate');\n  if(!sel || !box || !fileEl || !dateEl) return;\n  const baseLabels = {{\n    BK:'RateGroup BK (CDW)',\n    FCI:'RateGroup BK FCI (CDW + FCI)',\n    VAN:'RateGroup Commercial VAN'\n  }};\n  Array.from(sel.options).forEach(opt=>{{\n    const m = RATE_SOURCE_META[opt.value];\n    opt.textContent = baseLabels[opt.value] || opt.textContent;\n    if(m && m.status === 'ok' && m.date) opt.textContent += ' — ficheiro ' + m.date;\n  }});\n  function refreshSourceVersion(){{\n    const m = RATE_SOURCE_META[sel.value] || {{status:'missing',filename:'',date:''}};\n    const ok = m.status === 'ok';\n    box.classList.toggle('missing', !ok);\n    fileEl.textContent = ok ? m.filename : 'ficheiro não identificado';\n    dateEl.textContent = ok ? m.date : 'não disponível';\n    box.title = ok && m.method ? 'Seleção: ' + m.method : '';\n  }}\n  sel.addEventListener('change', refreshSourceVersion);\n  refreshSourceVersion();\n}})();\n</script>\n'''
+    script = script.replace(
+        "dateEl.textContent = ok ? m.date : 'não disponível';",
+        "dateEl.textContent = ok ? (m.modified_at || m.date) : 'não disponível';",
+    )
     if "</body>" in html:
         html = html.replace("</body>", script + "</body>", 1)
     else:
@@ -808,7 +839,7 @@ def main() -> int:
     start, end, keyword = span
     replacement = f"{keyword} RATES = " + json.dumps(rates, ensure_ascii=False, separators=(",", ":")) + ";"
     updated = html[:start] + replacement + html[end:]
-    updated = inject_source_ui(updated, source_metadata())
+    updated = inject_source_ui(updated, source_metadata(), dashboard_updated_at())
     OUTPUT.write_text(updated, encoding="utf-8")
     RATE_SHOP_OUTPUT.write_text(build_rate_shop_page(updated), encoding="utf-8")
 

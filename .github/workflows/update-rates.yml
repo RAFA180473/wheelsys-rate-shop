@@ -2,6 +2,9 @@ name: Atualizar e publicar Wheelsys Rate Shop
 
 on:
   workflow_dispatch:
+  schedule:
+    # Duas verificações diárias ao SharePoint (07:00 e 15:00 UTC).
+    - cron: "0 7,15 * * *"
   push:
     branches:
       - main

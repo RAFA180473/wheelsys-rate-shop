@@ -98,8 +98,6 @@ def main() -> int:
             "RateGroup Commercial VAN",
             "Última atualização do dashboard",
             "Atualização automática: duas vezes por dia",
-            'id="btnUpdateTariffs"',
-            "actions/workflows/update-rates.yml",
             'id="segFilterAll"',
             'id="segFilterNone"',
             "segFilter = new Set()",

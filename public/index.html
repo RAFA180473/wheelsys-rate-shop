@@ -379,7 +379,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
   <span id="rateSourceDot" class="rate-source-dot"></span>
   <span class="rate-source-copy"><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
   <span class="rate-source-sub"><b>Ficheiro atualizado:</b> <span id="rateSourceDate"></span><br>
-  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">13/09/2026 19:01</span><br>
+  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">13/09/2026 16:30</span><br>
   Atualização automática: duas vezes por dia.</span></span>
 </div>
 
@@ -387,10 +387,6 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
     <div>
       <label>Estações a visualizar <span style="font-weight:400;text-transform:none;letter-spacing:0;">(uma ou várias)</span></label>
       <div class="checklist" id="locFilterChecklist"></div>
-    </div>
-    <div>
-      <label for="perSel">Período (pickup)</label>
-      <select id="perSel"></select>
     </div>
     <div>
       <label>Períodos (pickup) a visualizar na grelha <span style="font-weight:400;color:var(--steel-500);">(mín. 4)</span></label>
@@ -429,7 +425,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
         <button type="button" id="adjustPeriodsAll">Todos</button>
         <button type="button" id="adjustPeriodsNone">Nenhum</button>
       </div>
-      <div class="desc" id="adjustPeriodsNote" style="margin-bottom:14px;">O período acima em "Período (pickup)" define a pré-visualização de preço; ao clicar "Aplicar", o ajuste é escrito em todos os períodos marcados aqui.</div>
+      <div class="desc" id="adjustPeriodsNote" style="margin-bottom:14px;">Por predefinição, segue os períodos selecionados acima em "Períodos (pickup) a visualizar na grelha" — podes ajustar esta seleção livremente. A pré-visualização de preço usa o período mais próximo aqui marcado; ao clicar "Aplicar", o ajuste é escrito em todos os períodos marcados aqui.</div>
       <div class="adjust-top">
       <label>Ajuste</label>
       <div class="adjrow">
@@ -839,25 +835,32 @@ function findPeriodForToday(periods){
   }
   return null;
 }
+function hidePastPeriods(periods){
+  // oculta períodos já totalmente anteriores à semana (período) atual, nos filtros de visualizar/ajustar
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const current = findPeriodForToday(periods);
+  const cutoff = current ? parseDMY(current.pickupStart) : today;
+  return periods.filter(r => parseDMY(r.pickupEnd) >= cutoff);
+}
 function populatePeriodSelect(group){
-  const sel = document.getElementById('perSel');
-  const prev = sel.value;
-  sel.innerHTML = '';
-  const periods = periodsOf(currentFile, group).slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
-  periods.forEach(r=>{
-    const o = document.createElement('option');
-    o.value = r.pickupStart + '|' + r.pickupEnd;
-    o.textContent = r.pickupStart + ' a ' + r.pickupEnd;
-    sel.appendChild(o);
-  });
-  if(prev && periods.some(r => (r.pickupStart+'|'+r.pickupEnd) === prev)){
-    sel.value = prev;
-  } else {
-    const todays = findPeriodForToday(periods);
-    if(todays) sel.value = todays.pickupStart + '|' + todays.pickupEnd;
-  }
-  populateAdjustPeriodsChecklist(periods);
+  const periods = hidePastPeriods(periodsOf(currentFile, group)).sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
+  // a checklist de visualizar é preenchida primeiro: a de ajustar usa-a como predefinição (ver populateAdjustPeriodsChecklist)
   populateViewPeriodsChecklist(periods);
+  populateAdjustPeriodsChecklist(periods);
+}
+function primaryPeriodKey(){
+  // período "ativo" (pré-visualização de preço, grelha, Rate Shop): o mais próximo entre os marcados para ajustar,
+  // com recurso aos marcados para visualizar caso a lista de ajustar esteja vazia.
+  const fromAdjust = Array.from(adjustPeriods).sort((a,b)=>parseDMY(a.split('|')[0]) - parseDMY(b.split('|')[0]));
+  if(fromAdjust.length) return fromAdjust[0];
+  const fromView = Array.from(viewPeriods).sort((a,b)=>parseDMY(a.split('|')[0]) - parseDMY(b.split('|')[0]));
+  return fromView.length ? fromView[0] : null;
+}
+function onAdjustPeriodsChanged(){
+  refreshAll();
+  syncBulkPeriodFromPickup();
+  syncRateShopDatesFromPeriod();
 }
 function populateAdjustPeriodsChecklist(periods){
   const box = document.getElementById('adjustPeriodsChecklist');
@@ -866,8 +869,9 @@ function populateAdjustPeriodsChecklist(periods){
   // mantém as seleções anteriores que ainda existem neste grupo/ficheiro
   let stillValid = new Set(Array.from(adjustPeriods).filter(k=>keys.includes(k)));
   if(stillValid.size===0){
-    const perVal = document.getElementById('perSel').value;
-    if(perVal && keys.includes(perVal)) stillValid.add(perVal);
+    // pré-definição: segue os períodos selecionados para visualizar
+    const viewKeys = keys.filter(k=>viewPeriods.has(k));
+    if(viewKeys.length) viewKeys.forEach(k=>stillValid.add(k));
     else if(keys.length) stillValid.add(keys[0]);
   }
   adjustPeriods = stillValid;
@@ -884,6 +888,7 @@ function populateAdjustPeriodsChecklist(periods){
       if(cbx.checked) adjustPeriods.add(key); else adjustPeriods.delete(key);
       if(adjustPeriods.size===0){ adjustPeriods.add(key); cbx.checked = true; }
       lab.classList.toggle('checked', cbx.checked);
+      onAdjustPeriodsChanged();
     });
   });
 }
@@ -893,6 +898,7 @@ document.getElementById('adjustPeriodsAll').addEventListener('click', ()=>{
     cbx.parentElement.classList.add('checked');
     adjustPeriods.add(cbx.value);
   });
+  onAdjustPeriodsChanged();
 });
 document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
   const boxes = document.querySelectorAll('#adjustPeriodsChecklist input');
@@ -903,6 +909,7 @@ document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
   boxes[0].checked = true;
   boxes[0].parentElement.classList.add('checked');
   adjustPeriods.add(boxes[0].value);
+  onAdjustPeriodsChanged();
 });
 function sortedPeriodKeys(periods){
   return periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart)).map(r=>r.pickupStart+'|'+r.pickupEnd);
@@ -985,7 +992,8 @@ function updateGroupDesc(group){
 }
 function currentSelection(){
   const group = primaryGroup();
-  const [pStart, pEnd] = document.getElementById('perSel').value.split('|');
+  const perKey = primaryPeriodKey();
+  const [pStart, pEnd] = perKey ? perKey.split('|') : ['', ''];
   const cb = document.getElementById('cbSel').value;
   return {group, pStart, pEnd, cb};
 }
@@ -1059,10 +1067,7 @@ function refreshChangeCount(){
   el.className = 'changecount' + (n===0?' zero':'');
 }
 function viewPeriodsList(){
-  if(viewPeriods.size===0){
-    const [pStart, pEnd] = document.getElementById('perSel').value.split('|');
-    return pStart && pEnd ? [{pStart, pEnd}] : [];
-  }
+  if(viewPeriods.size===0) return [];
   return Array.from(viewPeriods).map(k=>{ const [pStart,pEnd] = k.split('|'); return {pStart, pEnd}; }).sort((a,b)=>parseDMY(a.pStart) - parseDMY(b.pStart));
 }
 function renderGrid(){
@@ -1148,11 +1153,6 @@ function updateSimDiasSuffix(){
 }
 function refreshAll(){ refreshPriceBox(); renderGrid(); refreshChangeCount(); }
 
-document.getElementById('perSel').addEventListener('change', ()=>{
-  refreshAll();
-  syncBulkPeriodFromPickup();
-  syncRateShopDatesFromPeriod();
-});
 document.getElementById('cbSel').addEventListener('change', e=>{
   document.getElementById('simDias').value = CB_DAYS_DEFAULT[e.target.value];
   updateSimDiasSuffix();
@@ -1465,11 +1465,11 @@ const CB_LABELS = {p1:'1 dia',p2:'2 dias',p3:'3 dias',p46:'4-6 dias',p7:'7 dias'
 let bulkDirection = 1;
 
 function syncBulkPeriodFromPickup(){
-  const periodSelect = document.getElementById('perSel');
   const bulkFrom = document.getElementById('bulkFrom');
   const bulkTo = document.getElementById('bulkTo');
-  if(!periodSelect || !bulkFrom || !bulkTo || !periodSelect.value) return;
-  const [pickupStart, pickupEnd] = periodSelect.value.split('|');
+  const perKey = (typeof primaryPeriodKey === 'function') ? primaryPeriodKey() : null;
+  if(!bulkFrom || !bulkTo || !perKey) return;
+  const [pickupStart, pickupEnd] = perKey.split('|');
   if(!pickupStart || !pickupEnd) return;
   bulkFrom.value = toISO(pickupStart);
   bulkTo.value = toISO(pickupEnd);
@@ -1708,12 +1708,12 @@ function ptDateToInputValue(s){
 function parsePtDateUTC(s){ if(!s) return null; const [d,m,y]=s.split('/').map(Number); return new Date(Date.UTC(y,m-1,d)); }
 function rateFieldForDays(days){ if(days<=1)return 'p1'; if(days===2)return 'p2'; if(days===3)return 'p3'; if(days<=6)return 'p46'; if(days===7)return 'p7'; if(days<=13)return 'p813'; if(days<=29)return 'p1429'; return 'p30'; }
 function syncRateShopDatesFromPeriod(){
-  const perSel=document.getElementById('perSel');
+  const perKey=primaryPeriodKey();
   const pickup=document.getElementById('rsPickupDate');
   const dropoff=document.getElementById('rsDropoffDate');
-  if(!perSel || !pickup || !dropoff || !perSel.value) return;
+  if(!pickup || !dropoff || !perKey) return;
 
-  const parts=perSel.value.split('|');
+  const parts=perKey.split('|');
   if(parts.length<2) return;
 
   const start=ptDateToInputValue(parts[0]);
@@ -1740,9 +1740,9 @@ function ourBasePriceFor(group, loc){
   // REGRA PRINCIPAL:
   // usar sempre o período selecionado no painel de tarifas.
   let row=null;
-  const perSel=document.getElementById('perSel');
-  if(perSel && perSel.value){
-    const [pStart,pEnd]=perSel.value.split('|');
+  const perKey=primaryPeriodKey();
+  if(perKey){
+    const [pStart,pEnd]=perKey.split('|');
     row=rows.find(r=>r.group===group && r.pickupStart===pStart && r.pickupEnd===pEnd);
   }
 

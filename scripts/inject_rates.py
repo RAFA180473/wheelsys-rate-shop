@@ -686,11 +686,11 @@ document.getElementById('segFilterNone').addEventListener('click', ()=>{
     html = html.replace(
         "// ---- mode tabs ----",
         """function syncBulkPeriodFromPickup(){
-  const periodSelect = document.getElementById('perSel');
   const bulkFrom = document.getElementById('bulkFrom');
   const bulkTo = document.getElementById('bulkTo');
-  if(!periodSelect || !bulkFrom || !bulkTo || !periodSelect.value) return;
-  const [pickupStart, pickupEnd] = periodSelect.value.split('|');
+  const perKey = (typeof primaryPeriodKey === 'function') ? primaryPeriodKey() : null;
+  if(!bulkFrom || !bulkTo || !perKey) return;
+  const [pickupStart, pickupEnd] = perKey.split('|');
   if(!pickupStart || !pickupEnd) return;
   bulkFrom.value = toISO(pickupStart);
   bulkTo.value = toISO(pickupEnd);
@@ -701,15 +701,15 @@ document.getElementById('segFilterNone').addEventListener('click', ()=>{
         1,
     )
     html = html.replace(
-        """document.getElementById('perSel').addEventListener('change', ()=>{
+        """function onAdjustPeriodsChanged(){
   refreshAll();
   syncRateShopDatesFromPeriod();
-});""",
-        """document.getElementById('perSel').addEventListener('change', ()=>{
+}""",
+        """function onAdjustPeriodsChanged(){
   refreshAll();
   syncBulkPeriodFromPickup();
   syncRateShopDatesFromPeriod();
-});""",
+}""",
         1,
     )
     html = html.replace(

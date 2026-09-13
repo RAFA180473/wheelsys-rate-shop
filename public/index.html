@@ -412,6 +412,13 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
       </div>
 
       <div id="modeIndividual">
+      <label>Períodos (pickup) a ajustar <span style="font-weight:400;color:var(--steel-500);">(um ou vários)</span></label>
+      <div class="checklist" id="adjustPeriodsChecklist" style="margin-bottom:6px;"></div>
+      <div class="quickrange" style="margin-bottom:6px;">
+        <button type="button" id="adjustPeriodsAll">Todos</button>
+        <button type="button" id="adjustPeriodsNone">Nenhum</button>
+      </div>
+      <div class="desc" id="adjustPeriodsNote" style="margin-bottom:14px;">O período acima em "Período (pickup)" define a pré-visualização de preço; ao clicar "Aplicar", o ajuste é escrito em todos os períodos marcados aqui.</div>
       <div class="adjust-top">
       <label>Ajuste</label>
       <div class="adjrow">
@@ -774,6 +781,7 @@ function primaryLocation(){
   return activeLocation;
 }
 function viewLocations(){ return ALL_LOCS.filter(l=>selectedLocations.has(l)); }
+let adjustPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos alvo do Individual (Aplicar / Repor célula)
 let direction = 1;
 
 function groupsOf(fileKey, loc){
@@ -836,7 +844,53 @@ function populatePeriodSelect(group){
     const todays = findPeriodForToday(periods);
     if(todays) sel.value = todays.pickupStart + '|' + todays.pickupEnd;
   }
+  populateAdjustPeriodsChecklist(periods);
 }
+function populateAdjustPeriodsChecklist(periods){
+  const box = document.getElementById('adjustPeriodsChecklist');
+  if(!box) return;
+  const keys = periods.map(r=>r.pickupStart+'|'+r.pickupEnd);
+  // mantém as seleções anteriores que ainda existem neste grupo/ficheiro
+  let stillValid = new Set(Array.from(adjustPeriods).filter(k=>keys.includes(k)));
+  if(stillValid.size===0){
+    const perVal = document.getElementById('perSel').value;
+    if(perVal && keys.includes(perVal)) stillValid.add(perVal);
+    else if(keys.length) stillValid.add(keys[0]);
+  }
+  adjustPeriods = stillValid;
+  box.innerHTML = '';
+  periods.forEach(r=>{
+    const key = r.pickupStart + '|' + r.pickupEnd;
+    const lab = document.createElement('label');
+    const on = adjustPeriods.has(key);
+    if(on) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
+    box.appendChild(lab);
+    const cbx = lab.querySelector('input');
+    cbx.addEventListener('change', ()=>{
+      if(cbx.checked) adjustPeriods.add(key); else adjustPeriods.delete(key);
+      if(adjustPeriods.size===0){ adjustPeriods.add(key); cbx.checked = true; }
+      lab.classList.toggle('checked', cbx.checked);
+    });
+  });
+}
+document.getElementById('adjustPeriodsAll').addEventListener('click', ()=>{
+  document.querySelectorAll('#adjustPeriodsChecklist input').forEach(cbx=>{
+    cbx.checked = true;
+    cbx.parentElement.classList.add('checked');
+    adjustPeriods.add(cbx.value);
+  });
+});
+document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
+  const boxes = document.querySelectorAll('#adjustPeriodsChecklist input');
+  if(boxes.length===0) return;
+  boxes.forEach(cbx=>{ cbx.checked = false; cbx.parentElement.classList.remove('checked'); });
+  adjustPeriods.clear();
+  // mantém sempre pelo menos um período selecionado, tal como as outras checklists
+  boxes[0].checked = true;
+  boxes[0].parentElement.classList.add('checked');
+  adjustPeriods.add(boxes[0].value);
+});
 function updateGroupDesc(group){
   const v = VGROUPS[group];
   const desc = v ? (ADJUSTMENT_GROUP_DESCRIPTIONS[group] || v.desc) : '';
@@ -1062,50 +1116,57 @@ document.getElementById('btnDec').addEventListener('click', ()=>{
   refreshPriceBox();
 });
 document.getElementById('btnApply').addEventListener('click', ()=>{
-  const { pStart, pEnd, cb } = currentSelection();
+  const { cb } = currentSelection();
   const groups = getSelectedGroupsList();
   if(groups.length===0){ alert('Seleciona pelo menos um grupo.'); return; }
   if(adjustLocations.size===0){ alert('Seleciona pelo menos uma estação a ajustar.'); return; }
+  if(adjustPeriods.size===0){ alert('Seleciona pelo menos um período (pickup) a ajustar.'); return; }
   const adjType = document.getElementById('adjType').value;
   const adjValRaw = Math.round(parseFloat(document.getElementById('adjValue').value)) || 0;
-  Array.from(adjustLocations).forEach(loc=>{
-    groups.forEach(group=>{
-      const row = findRow(currentFile, group, pStart, pEnd, loc);
-      if(!row) return;
-      let novo;
-      if(adjType==='pct'){ novo = row[cb] * (1 + direction*adjValRaw/100); }
-      else { novo = row[cb] + direction*adjValRaw; }
-      novo = Math.max(0, Math.round(novo*100)/100);
+  Array.from(adjustPeriods).forEach(perKey=>{
+    const [pStart, pEnd] = perKey.split('|');
+    Array.from(adjustLocations).forEach(loc=>{
+      groups.forEach(group=>{
+        const row = findRow(currentFile, group, pStart, pEnd, loc);
+        if(!row) return;
+        let novo;
+        if(adjType==='pct'){ novo = row[cb] * (1 + direction*adjValRaw/100); }
+        else { novo = row[cb] + direction*adjValRaw; }
+        novo = Math.max(0, Math.round(novo*100)/100);
 
-      if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
-        row.p7 = novo;
-        row.p1 = Math.round(novo * CB_RATIOS.p1 * 100) / 100;
-        row.p2 = Math.round(novo * CB_RATIOS.p2 * 100) / 100;
-        row.p3 = Math.round(novo * CB_RATIOS.p3 * 100) / 100;
-        row.p46 = Math.round(novo * CB_RATIOS.p46 * 100) / 100;
-        row.p813 = Math.round(novo * CB_RATIOS.p813 * 100) / 100;
-        row.p1429 = Math.round(novo * CB_RATIOS.p1429 * 100) / 100;
-        row.p30 = row.p46;
-      } else {
-        row[cb] = novo;
-      }
+        if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
+          row.p7 = novo;
+          row.p1 = Math.round(novo * CB_RATIOS.p1 * 100) / 100;
+          row.p2 = Math.round(novo * CB_RATIOS.p2 * 100) / 100;
+          row.p3 = Math.round(novo * CB_RATIOS.p3 * 100) / 100;
+          row.p46 = Math.round(novo * CB_RATIOS.p46 * 100) / 100;
+          row.p813 = Math.round(novo * CB_RATIOS.p813 * 100) / 100;
+          row.p1429 = Math.round(novo * CB_RATIOS.p1429 * 100) / 100;
+          row.p30 = row.p46;
+        } else {
+          row[cb] = novo;
+        }
+      });
     });
   });
   refreshAll();
 });
 document.getElementById('btnResetCell').addEventListener('click', ()=>{
-  const { pStart, pEnd, cb } = currentSelection();
+  const { cb } = currentSelection();
   const groups = getSelectedGroupsList();
-  Array.from(adjustLocations).forEach(loc=>{
-    groups.forEach(group=>{
-      const row = findRow(currentFile, group, pStart, pEnd, loc);
-      const orig = findOrigRow(currentFile, group, pStart, pEnd, loc);
-      if(!row || !orig) return;
-      if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
-        CB_FIELDS.forEach(f=>{ row[f] = orig[f]; });
-      } else {
-        row[cb] = orig[cb];
-      }
+  Array.from(adjustPeriods).forEach(perKey=>{
+    const [pStart, pEnd] = perKey.split('|');
+    Array.from(adjustLocations).forEach(loc=>{
+      groups.forEach(group=>{
+        const row = findRow(currentFile, group, pStart, pEnd, loc);
+        const orig = findOrigRow(currentFile, group, pStart, pEnd, loc);
+        if(!row || !orig) return;
+        if(applyMode === 'cascade' && currentFile !== 'VAN' && cb === 'p7'){
+          CB_FIELDS.forEach(f=>{ row[f] = orig[f]; });
+        } else {
+          row[cb] = orig[cb];
+        }
+      });
     });
   });
   refreshAll();

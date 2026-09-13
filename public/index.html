@@ -143,6 +143,8 @@
   td.group-cell{vertical-align:middle; background:var(--mist-100); border-right:1px solid var(--line);}
   td.loc-cell{font-weight:700; text-align:center; font-family:'IBM Plex Sans',sans-serif;}
   td.loc-cell.loc-active{color:var(--teal-500);}
+  td.period-cell{text-align:center; font-size:11px; color:var(--steel-500); white-space:nowrap;}
+  td.period-cell.loc-active{color:var(--teal-500); font-weight:700;}
   #locFilterChecklist{flex-direction:column;}
   #locFilterChecklist label{width:100%; justify-content:center; text-align:center; font-weight:700;}
   #locFilterChecklist label.checked{background:var(--teal-400); color:var(--navy-950);}
@@ -391,6 +393,15 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
       <select id="perSel"></select>
     </div>
     <div>
+      <label>Períodos (pickup) a visualizar na grelha <span style="font-weight:400;color:var(--steel-500);">(mín. 4)</span></label>
+      <div class="checklist" id="viewPeriodsChecklist" style="margin-bottom:6px;"></div>
+      <div class="quickrange" style="margin-bottom:6px;">
+        <button type="button" id="viewPeriodsFirst4">Primeiros 4</button>
+        <button type="button" id="viewPeriodsAll">Todos</button>
+        <button type="button" id="viewPeriodsNone">Nenhum</button>
+      </div>
+    </div>
+    <div>
       <label>Segmentos a visualizar <span style="font-weight:400;text-transform:none;letter-spacing:0;">(um ou vários)</span></label>
       <div class="segment-filter-card">
         <div class="checklist segment-filter-checklist" id="segFilterSel"></div>
@@ -556,7 +567,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
         <table>
           <thead>
             <tr>
-              <th>Grupo</th><th>Segmento</th><th>Estação</th>
+              <th>Grupo</th><th>Segmento</th><th>Estação</th><th>Período</th>
               <th>1d</th><th>2d</th><th>3d</th><th>4-6d</th><th>7d</th><th>8-13d</th><th>14-29d</th><th>30+d</th>
             </tr>
           </thead>
@@ -782,6 +793,7 @@ function primaryLocation(){
 }
 function viewLocations(){ return ALL_LOCS.filter(l=>selectedLocations.has(l)); }
 let adjustPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos alvo do Individual (Aplicar / Repor célula)
+let viewPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos mostrados na grelha principal (mín. 4)
 let direction = 1;
 
 function groupsOf(fileKey, loc){
@@ -845,6 +857,7 @@ function populatePeriodSelect(group){
     if(todays) sel.value = todays.pickupStart + '|' + todays.pickupEnd;
   }
   populateAdjustPeriodsChecklist(periods);
+  populateViewPeriodsChecklist(periods);
 }
 function populateAdjustPeriodsChecklist(periods){
   const box = document.getElementById('adjustPeriodsChecklist');
@@ -890,6 +903,67 @@ document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
   boxes[0].checked = true;
   boxes[0].parentElement.classList.add('checked');
   adjustPeriods.add(boxes[0].value);
+});
+function sortedPeriodKeys(periods){
+  return periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart)).map(r=>r.pickupStart+'|'+r.pickupEnd);
+}
+function populateViewPeriodsChecklist(periods){
+  const box = document.getElementById('viewPeriodsChecklist');
+  if(!box) return;
+  const keys = sortedPeriodKeys(periods);
+  // mantém as seleções anteriores que ainda existem neste grupo/ficheiro
+  let stillValid = new Set(Array.from(viewPeriods).filter(k=>keys.includes(k)));
+  if(stillValid.size===0){
+    keys.slice(0, 4).forEach(k=>stillValid.add(k));
+  }
+  viewPeriods = stillValid;
+  box.innerHTML = '';
+  const sorted = periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
+  sorted.forEach(r=>{
+    const key = r.pickupStart + '|' + r.pickupEnd;
+    const lab = document.createElement('label');
+    const on = viewPeriods.has(key);
+    if(on) lab.className = 'checked';
+    lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
+    box.appendChild(lab);
+    const cbx = lab.querySelector('input');
+    cbx.addEventListener('change', ()=>{
+      if(cbx.checked) viewPeriods.add(key); else viewPeriods.delete(key);
+      if(viewPeriods.size===0){ viewPeriods.add(key); cbx.checked = true; }
+      lab.classList.toggle('checked', cbx.checked);
+      renderGrid();
+    });
+  });
+}
+document.getElementById('viewPeriodsFirst4').addEventListener('click', ()=>{
+  const keys = Array.from(document.querySelectorAll('#viewPeriodsChecklist input')).map(cbx=>cbx.value);
+  viewPeriods = new Set(keys.slice(0, 4));
+  document.querySelectorAll('#viewPeriodsChecklist label').forEach((lab, idx)=>{
+    const cbx = lab.querySelector('input');
+    const on = idx < 4;
+    cbx.checked = on;
+    lab.classList.toggle('checked', on);
+  });
+  renderGrid();
+});
+document.getElementById('viewPeriodsAll').addEventListener('click', ()=>{
+  document.querySelectorAll('#viewPeriodsChecklist input').forEach(cbx=>{
+    cbx.checked = true;
+    cbx.parentElement.classList.add('checked');
+    viewPeriods.add(cbx.value);
+  });
+  renderGrid();
+});
+document.getElementById('viewPeriodsNone').addEventListener('click', ()=>{
+  const boxes = document.querySelectorAll('#viewPeriodsChecklist input');
+  if(boxes.length===0) return;
+  boxes.forEach(cbx=>{ cbx.checked = false; cbx.parentElement.classList.remove('checked'); });
+  viewPeriods.clear();
+  // mantém sempre pelo menos um período selecionado, tal como as outras checklists
+  boxes[0].checked = true;
+  boxes[0].parentElement.classList.add('checked');
+  viewPeriods.add(boxes[0].value);
+  renderGrid();
 });
 function updateGroupDesc(group){
   const v = VGROUPS[group];
@@ -984,21 +1058,39 @@ function refreshChangeCount(){
   el.textContent = n + ' alteraç' + (n===1?'ão':'ões');
   el.className = 'changecount' + (n===0?' zero':'');
 }
+function viewPeriodsList(){
+  if(viewPeriods.size===0){
+    const [pStart, pEnd] = document.getElementById('perSel').value.split('|');
+    return pStart && pEnd ? [{pStart, pEnd}] : [];
+  }
+  return Array.from(viewPeriods).map(k=>{ const [pStart,pEnd] = k.split('|'); return {pStart, pEnd}; }).sort((a,b)=>parseDMY(a.pStart) - parseDMY(b.pStart));
+}
 function renderGrid(){
   const {group, pStart, pEnd, cb} = currentSelection();
   const locs = viewLocations();
+  const periodsList = viewPeriodsList();
   const locLabel = locs.length ? locs.join(', ') : 'nenhuma estação selecionada';
   document.getElementById('gridTitle').textContent = 'Todos os grupos — período ' + pStart + ' a ' + pEnd + ' (' + TARIFF_LABELS[currentFile] + ' · ' + locLabel + ')';
+  if(periodsList.length > 1){
+    document.getElementById('gridTitle').textContent += ' · ' + periodsList.length + ' períodos selecionados';
+  }
   const theadRow = document.querySelector('.grid-wrap thead tr');
-  theadRow.innerHTML = '<th>Grupo</th><th>Segmento</th><th>Estação</th><th>1d</th><th>2d</th><th>3d</th><th>4-6d</th><th>7d</th><th>8-13d</th><th>14-29d</th><th>30+d</th>';
+  theadRow.innerHTML = '<th>Grupo</th><th>Segmento</th><th>Estação</th><th>Período</th><th>1d</th><th>2d</th><th>3d</th><th>4-6d</th><th>7d</th><th>8-13d</th><th>14-29d</th><th>30+d</th>';
   const tbody = document.getElementById('gridBody');
   tbody.innerHTML = '';
   const groups = groupsOfFiltered(currentFile).filter(g=>gridGroupFilter.has(g));
   groups.forEach(g=>{
     const isSelRow = gridGroupFilter.has(g);
-    const rowsForGroup = locs.map(loc=>({loc, row: findRow(currentFile, g, pStart, pEnd, loc), orig: findOrigRow(currentFile, g, pStart, pEnd, loc)})).filter(x=>x.row);
+    const rowsForGroup = [];
+    periodsList.forEach(per=>{
+      locs.forEach(loc=>{
+        const row = findRow(currentFile, g, per.pStart, per.pEnd, loc);
+        const orig = findOrigRow(currentFile, g, per.pStart, per.pEnd, loc);
+        if(row) rowsForGroup.push({loc, per, row, orig});
+      });
+    });
     rowsForGroup.forEach((entry, idx)=>{
-      const { loc, row, orig } = entry;
+      const { loc, per, row, orig } = entry;
       const tr = document.createElement('tr');
       tr.className = `${isSelRow ? 'selected-row ' : ''}${segmentToneClass(SEGMENTS[g] || 'Outro')}`;
       let tds = '';
@@ -1007,13 +1099,14 @@ function renderGrid(){
         tds += `<td class="segment-cell" rowspan="${rowsForGroup.length}">${SEGMENTS[g] || 'Outro'}</td>`;
       }
       tds += `<td class="loc-cell${loc===primaryLocation()?' loc-active':''}">${loc}</td>`;
+      tds += `<td class="period-cell${(per.pStart===pStart&&per.pEnd===pEnd)?' loc-active':''}">${per.pStart} a ${per.pEnd}</td>`;
       CB_FIELDS.forEach(f=>{
         const edited = Math.abs(row[f]-orig[f])>0.0001;
-        const isSelCell = isSelRow && f===cb && loc===primaryLocation();
+        const isSelCell = isSelRow && f===cb && loc===primaryLocation() && per.pStart===pStart && per.pEnd===pEnd;
         let cls = ['clickable-cell'];
         if(edited) cls.push('edited');
         if(isSelCell) cls.push('selected-cell');
-        tds += `<td class="${cls.join(' ')}" data-group="${g}" data-field="${f}" data-loc="${loc}">${fmt(row[f])}</td>`;
+        tds += `<td class="${cls.join(' ')}" data-group="${g}" data-field="${f}" data-loc="${loc}" data-pstart="${per.pStart}" data-pend="${per.pEnd}">${fmt(row[f])}</td>`;
       });
       tr.innerHTML = tds;
       tbody.appendChild(tr);

@@ -237,7 +237,6 @@
   .rs-controls{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;margin:12px 0 14px;}
   .rs-controls label{margin:0 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--steel-500);}
   .rs-controls select,.rs-controls input{padding:8px;font-size:12px;}
-  .rs-status{font-size:11px;padding:8px 10px;border-radius:5px;background:#fff;border:1px solid var(--line);margin-bottom:10px;}
   .rs-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:var(--mist-100);color:var(--navy-700);}
   .rs-badge.live{background:#dff7f1;color:#087861;}
   .rs-badge.nomatch{background:#fff0ed;color:#a33d30;}
@@ -299,22 +298,14 @@
     background:#fff;
     color:var(--navy-900);
   }
-  .rs-shop-action .btn{min-width:150px;margin:0;}
   @media(max-width:1100px){
     .rs-shop-controls{grid-template-columns:repeat(2,1fr);}
-    .rs-shop-action{grid-column:1/-1;}
-    .rs-shop-action .btn{width:100%;}
   }
 
-
   .rs-days-badge{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:5px 9px;border-radius:12px;background:var(--navy-950);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
-  .rs-progress{display:none;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--steel-500);}
-  .rs-progress.active{display:flex;}
-  .rs-spinner{width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--teal-500);border-radius:50%;animation:rs-spin .7s linear infinite;}
-  @keyframes rs-spin{to{transform:rotate(360deg);}}
 
   .rs-shop-controls-clean{
-    grid-template-columns:minmax(150px,1.1fr) minmax(145px,1fr) minmax(145px,1fr) 90px minmax(155px,auto);
+    grid-template-columns:minmax(150px,1.1fr) minmax(145px,1fr) minmax(145px,1fr) 90px;
     align-items:end;
   }
   .rs-days-field{min-width:80px;}
@@ -325,12 +316,9 @@
   }
   .rs-days-card b{font-size:15px;color:var(--teal-400);}
   .rs-days-card span{font-size:11px;color:var(--mist-100);}
-  .rs-shop-action{display:flex;flex-direction:column;justify-content:flex-end;}
-  .rs-shop-action .btn{height:39px;}
   @media(max-width:1100px){
     .rs-shop-controls-clean{grid-template-columns:repeat(2,minmax(0,1fr));}
     .rs-days-field{min-width:0;}
-    .rs-shop-action{grid-column:1/-1;}
   }
 
 </style>
@@ -581,17 +569,6 @@
             <label>Duração</label>
             <div class="rs-days-card"><b id="rsDays">7</b><span>dias</span></div>
           </div>
-
-          <div class="rs-shop-action">
-            <button type="button" class="btn primary" id="btnRunRateShop">Fazer Rate Shop</button>
-            <div id="rsProgress" class="rs-progress">
-              <span class="rs-spinner"></span><span>A processar Rate Shop…</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="rs-status" id="rsStatus">
-          Seleciona o período e clica em <b>Fazer Rate Shop</b>.
         </div>
 
         <div class="rs-pbi-bar">
@@ -1818,46 +1795,6 @@ function updateRateShopDays(autoSetCheckIn=false){
 
 document.getElementById('rsPickupDate')?.addEventListener('change',()=>updateRateShopDays(true));
 document.getElementById('rsDropoffDate')?.addEventListener('change',()=>updateRateShopDays(false));
-
-document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
-  const loc=document.getElementById('rsLocation')?.value||'Lisboa';
-  const checkout=document.getElementById('rsPickupDate')?.value;
-  const checkin=document.getElementById('rsDropoffDate')?.value;
-  const status=document.getElementById('rsStatus');
-  const progress=document.getElementById('rsProgress');
-  const button=document.getElementById('btnRunRateShop');
-
-  updateRateShopDays(false);
-
-  if(!checkout||!checkin){
-    if(status) status.innerHTML='<span class="rs-badge nomatch">Falta período</span> Seleciona o Check-out e o Check-in.';
-    return;
-  }
-
-  const a=rsDateToUTC(checkout), b=rsDateToUTC(checkin);
-  const days=Math.round((b-a)/86400000);
-  if(days<=0){
-    if(status) status.innerHTML='<span class="rs-badge nomatch">Datas inválidas</span> O Check-in tem de ser posterior ao Check-out.';
-    return;
-  }
-
-  if(button){button.disabled=true;button.textContent='A processar…';}
-  if(progress) progress.classList.add('active');
-  if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · a cruzar dados Power BI…`;
-
-  window.setTimeout(()=>{
-    renderRateShop();
-    const rows=[...document.querySelectorAll('#rsBody tr')];
-    const found=rows.filter(r=>r.dataset.hasPbi==='1').length;
-    if(status){
-      status.innerHTML=found>0
-        ? `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge live">Concluído</span> ${found} grupos com dados Power BI.`
-        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem dados Power BI para este período/localização</span>.`;
-    }
-    if(progress) progress.classList.remove('active');
-    if(button){button.disabled=false;button.textContent='Fazer Rate Shop';}
-  },650);
-});
 
 const _rsPick=document.getElementById('rsPickupDate');
 const _rsDrop=document.getElementById('rsDropoffDate');

@@ -137,7 +137,7 @@ def main() -> int:
             "Rate Shop Concorrência",
             'href="index.html"',
             'class="rate-shop-page"',
-            'id="btnRunRateShop"',
+            'id="btnRefreshPbi"',
             'id="rsBody"',
             '<div class="panel comp-panel">',
         ):

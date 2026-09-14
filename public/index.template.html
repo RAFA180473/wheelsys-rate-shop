@@ -248,6 +248,18 @@
   .rs-note{font-size:10.5px;color:var(--steel-500);line-height:1.45;margin-top:9px;}
   @media(max-width:1000px){.rs-controls{grid-template-columns:repeat(2,1fr);}}
 
+  .rs-pbi-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px;}
+  .rs-pbi-updated{font-size:10.5px;color:var(--steel-500);}
+  .rs-pbi-updated b{color:var(--navy-700);}
+  .rs-alert-banner{display:none;align-items:center;gap:8px;margin:0 0 10px;padding:9px 12px;border-radius:6px;background:#fff0ed;border:1px solid #f0b8ad;color:#a33d30;font-size:12px;font-weight:700;}
+  .rs-alert-banner.show{display:flex;animation:rs-flash-bg 1.1s ease-in-out infinite;}
+  @keyframes rs-flash-bg{0%,100%{background:#fff0ed;}50%{background:#ffd9d1;}}
+  tr.rs-flash{animation:rs-flash-row 1.1s ease-in-out infinite;}
+  @keyframes rs-flash-row{0%,100%{background:transparent;}50%{background:#fff0ed;}}
+  .rs-flash-tag{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:8px;font-size:9.5px;font-weight:700;background:#fff0ed;color:#a33d30;}
+  .rs-flash-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#fff0ed;color:#a33d30;}
+  .rs-ok-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#dff7f1;color:#087861;}
+
 /* source-version badge injected by build */
 .rate-source-meta{display:flex;gap:8px;align-items:flex-start;margin-top:7px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--mist-100);font-size:11px;line-height:1.35;color:var(--navy-700)}
 .rate-source-dot{width:9px;height:9px;border-radius:50%;background:var(--up);margin-top:3px;flex:0 0 9px;box-shadow:0 0 0 3px rgba(0,168,136,.10)}
@@ -535,7 +547,7 @@
       </div>
 
       <div class="rateshop-box">
-        <div class="rateshop-head">Rate Shop — ICONIQ vs AutoUnion (DiscoverCars)</div>
+        <div class="rateshop-head">Rate Shop — ICONIQ vs AutoUnion (Power BI)</div>
 
         <div class="rs-shop-controls rs-shop-controls-clean">
           <div>
@@ -574,12 +586,19 @@
           Seleciona o período e clica em <b>Fazer Rate Shop</b>.
         </div>
 
+        <div class="rs-pbi-bar">
+          <div class="rs-pbi-updated" id="rsPbiUpdated">A carregar dados do Power BI…</div>
+          <button type="button" class="btn ghost" id="btnRefreshPbi">↻ Atualizar agora</button>
+        </div>
+
+        <div class="rs-alert-banner" id="rsAlertBanner"></div>
+
         <div class="rs-controls">
           <div><label>Segmento</label><select id="rsSegment"><option value="">Todos</option></select></div>
           <div><label>Grupo ICONIQ</label><select id="rsGroup"><option value="">Todos</option></select></div>
           <div><label>SIPP / ACRISS</label><input id="rsSipp" type="text" placeholder="ex.: EDMR"></div>
           <div><label>Transmissão</label><select id="rsTransmission"><option value="">Todas</option><option value="manual">Manual</option><option value="automatic">Automática</option></select></div>
-          <div><label>Correspondência</label><select id="rsMatch"><option value="">Todas</option><option value="live">Com AutoUnion</option><option value="none">Sem AutoUnion</option></select></div>
+          <div><label>Correspondência</label><select id="rsMatch"><option value="">Todas</option><option value="live">Com dados Power BI</option><option value="none">Sem dados Power BI</option></select></div>
         </div>
 
         <div class="rs-scroll">
@@ -591,13 +610,13 @@
                 <th>SIPP ref.</th>
                 <th>Viatura ICONIQ</th>
                 <th>Preço ICONIQ /dia</th>
-                <th>Melhor concorrência (DiscoverCars) /dia</th>
-                <th>Fornecedor</th>
-                <th>AutoUnion (DiscoverCars) /dia</th>
-                <th>Dif. AutoUnion vs ICONIQ €</th>
-                <th>Dif. AutoUnion vs ICONIQ %</th>
-                <th>Oferta AutoUnion</th>
-                <th>Estado</th>
+                <th>AutoUnion /dia</th>
+                <th>Drivalia /dia</th>
+                <th>Cael /dia</th>
+                <th>Drive on Holidays /dia</th>
+                <th>Tangerine /dia</th>
+                <th>Preço sugerido /dia</th>
+                <th>Alerta / Estado</th>
               </tr>
             </thead>
             <tbody id="rsBody"></tbody>
@@ -605,9 +624,10 @@
         </div>
 
         <div class="rs-note">
-          “Melhor concorrência” mostra a oferta mais barata disponível no conjunto DiscoverCars atualmente carregado.
-          “AutoUnion” fica sempre numa coluna própria. As diferenças €/% são calculadas exclusivamente como
-          <b>AutoUnion − ICONIQ</b>. O painel procura primeiro em <b>rateshop-history.json</b>. Se existir uma recolha guardada para Localização + Check-out + Check-in, usa essa versão; caso contrário mostra “sem pesquisa guardada”.
+          Fonte: Power BI — relatório <b>Franchisees · Booking</b> (app “Autounion Partners App”), visual “Minimum Rental per Pickup Date”.
+          Comparação fixa com as 4 marcas alinhadas com o perfil AutoUnion: <b>Drivalia</b>, <b>Cael</b>, <b>Drive on Holidays</b> e <b>Tangerine</b>.
+          O <b>preço sugerido</b> segue sempre a tarifa AutoUnion observada no Power BI. Sempre que uma marca concorrente se desvia ±30% da AutoUnion, a linha fica assinalada com um alerta a piscar.
+          Os grupos ICONIQ são mapeados nos 7 segmentos do Power BI (small / medium / large / premium / estate / suvs / carriers) por aproximação ao SIPP/ACRISS — recomenda-se validar este mapeamento periodicamente.
         </div>
       </div>
     </div>
@@ -1515,7 +1535,6 @@ function syncRateShopDatesFromPeriod(){
   if(end) dropoff.value=end;
 
   if(typeof updateRsDays==='function') updateRsDays();
-  applyRateShopHistory();
   if(typeof renderRateShop==='function') renderRateShop();
 }
 
@@ -1560,134 +1579,67 @@ const RS_GROUP_SEGMENT = {
   O:'Luxury',OEV:'Electric premium',P:'Luxury SUV',Q:'Luxury',R:'Cabrio premium',
   VANL:'Cargo van',VANM:'Cargo van',VANS:'Cargo van',VCXL:'Cargo van'
 };
-const RS_HISTORY_FALLBACK=[{"id":"verified-user-snapshot|Lisboa|2026-08-20|2026-08-27","location":"Lisboa","checkout":"2026-08-20","checkin":"2026-08-27","days":7,"collectedAt":"2026-08-08T14:56:00+01:00","source":"DiscoverCars","sourceType":"user_verified_snapshot","status":"collected","notes":"AutoUnion: valores verificados pelo utilizador para Lisboa 20/08/2026-27/08/2026. Restantes concorrentes: snapshot DiscoverCars previamente embutido no HTML; são apresentados como referência histórica e não como cotação verificada para este período.","offers":[{"car":"Fiat 500","supplier":"Sicily By Car","transmission":"manual","total":65.27,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-Z9WA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=33802","bucket":"small","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Opel Corsa Hatchback","supplier":"Specific Rent","transmission":"manual","total":68.05,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-UVH8?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=87945","bucket":"small","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Audi A1","supplier":"Drive on Holidays","transmission":"manual","total":82.04,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-4NEA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Opel Astra","supplier":"Drive on Holidays","transmission":"automatic","total":85.52,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-DEXQ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Peugeot 308","supplier":"CRC Car Rental Company","transmission":"manual","total":87.5,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-S3W6?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161","bucket":"medium","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Audi A3","supplier":"CRC Car Rental Company","transmission":"manual","total":97.8,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-HRLN?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161","bucket":"large","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Mercedes-Benz A-Class","supplier":"H-Lead Hospitality","transmission":"automatic","total":121.3,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-B7WJ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=104010","bucket":"large","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Renault Captur","supplier":"Drive on Holidays","transmission":"manual","total":71.86,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-SNMF?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"SEAT Arona","supplier":"Drive4Move","transmission":"manual","total":78.44,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-U2VY?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29574","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"car":"Nissan Qashqai","supplier":"Drive on Holidays","transmission":"manual","total":85.37,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-XPL9?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470","bucket":"suv","source":"DiscoverCars","sourceType":"embedded_snapshot_prior","snapshotDateMatch":false},{"group":"A","sipp":"MDMR","bucket":"small","car":"Kia Picanto","supplier":"AutoUnion","transmission":"manual","total":154.33,"days":7,"daily":22.0471,"currency":"EUR","link":"","source":"DiscoverCars","sourceType":"user_verified_snapshot","snapshotDateMatch":true},{"group":"B","sipp":"MBMR","bucket":"small","car":"Fiat 500","supplier":"AutoUnion","transmission":"manual","total":152.09,"days":7,"daily":21.7271,"currency":"EUR","link":"","source":"DiscoverCars","sourceType":"user_verified_snapshot","snapshotDateMatch":true}]}];
-let RS_HISTORY={schemaVersion:1,targets:[],searches:[...RS_HISTORY_FALLBACK]};
-const RS_SEED={"small":[{"car":"Fiat 500","supplier":"Sicily By Car","transmission":"manual","total":65.27,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-Z9WA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=33802"},{"car":"Opel Corsa Hatchback","supplier":"Specific Rent","transmission":"manual","total":68.05,"days":3,"link":"https://www.discovercars.com/offer/c4fe5e5d-0d60-4b3d-9c14-ccb75477041c-UVH8?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=87945"}],"medium":[{"car":"Audi A1","supplier":"Drive on Holidays","transmission":"manual","total":82.04,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-4NEA?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"Opel Astra","supplier":"Drive on Holidays","transmission":"automatic","total":85.52,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-DEXQ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"Peugeot 308","supplier":"CRC Car Rental Company","transmission":"manual","total":87.5,"days":3,"link":"https://www.discovercars.com/offer/2be709bd-940f-4df2-baa6-9247a0cb119b-S3W6?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161"}],"large":[{"car":"Audi A3","supplier":"CRC Car Rental Company","transmission":"manual","total":97.8,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-HRLN?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=5161"},{"car":"Mercedes-Benz A-Class","supplier":"H-Lead Hospitality","transmission":"automatic","total":121.3,"days":3,"link":"https://www.discovercars.com/offer/1faa7527-4cbf-4340-98ea-421c1731c5ad-B7WJ?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=104010"}],"suv":[{"car":"Renault Captur","supplier":"Drive on Holidays","transmission":"manual","total":71.86,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-SNMF?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"},{"car":"SEAT Arona","supplier":"Drive4Move","transmission":"manual","total":78.44,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-U2VY?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29574"},{"car":"Nissan Qashqai","supplier":"Drive on Holidays","transmission":"manual","total":85.37,"days":3,"link":"https://www.discovercars.com/offer/32436016-b7b4-421e-8227-46ef2bec50ee-XPL9?utm_medium=aggregator&utm_source=max&utm_campaign=en-PT&utm_term=1876&affpartner=max&pkid=29470"}]};
-let RS_LIVE=JSON.parse(JSON.stringify(RS_SEED));
-let RS_HISTORY_LOADED=false;
-async function loadRateShopHistory(){
-  const status=document.getElementById('rsStatus');
+const RS_COMPETITORS=['Drivalia','Cael','Drive on Holidays','Tangerine'];
+const PBI_COMPANIES=['Autounion',...RS_COMPETITORS];
+let PBI_HISTORY={schemaVersion:1,generatedAt:null,source:'',companies:PBI_COMPANIES,buckets:[],locations:{}};
+let PBI_LOADED=false;
+async function loadRateShopPowerBI(){
+  const updated=document.getElementById('rsPbiUpdated');
   try{
-    const r=await fetch('data/rateshop-history.json?ts='+Date.now(),{cache:'no-store'});
+    const r=await fetch('data/rateshop-powerbi.json?ts='+Date.now(),{cache:'no-store'});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const external=await r.json();
-
-    const merged=[...(external.searches||[])];
-    RS_HISTORY_FALLBACK.forEach(seed=>{
-      if(!merged.some(s=>s.id===seed.id)) merged.push(seed);
-    });
-
-    RS_HISTORY={
-      ...external,
-      searches:merged
+    PBI_HISTORY={
+      schemaVersion:1,
+      generatedAt:external.generatedAt||null,
+      source:external.source||'',
+      companies:external.companies||PBI_COMPANIES,
+      buckets:external.buckets||[],
+      locations:external.locations||{}
     };
-    RS_HISTORY_LOADED=true;
-    applyRateShopHistory();
-
-    if(status){
-      status.innerHTML='<span class="rs-badge live">Histórico carregado</span> '+rsHistoryStatusText();
+    PBI_LOADED=true;
+    if(updated){
+      updated.innerHTML=PBI_HISTORY.generatedAt
+        ? `Dados Power BI atualizados em <b>${PBI_HISTORY.generatedAt}</b> · fonte: ${PBI_HISTORY.source||'Power BI'}`
+        : 'Dados Power BI carregados.';
     }
     return true;
   }catch(err){
-    RS_HISTORY={schemaVersion:1,targets:[],searches:[...RS_HISTORY_FALLBACK]};
-    RS_HISTORY_LOADED=false;
-    applyRateShopHistory();
-
-    if(status){
-      status.innerHTML='<span class="rs-badge nomatch">Fallback embutido</span> '+rsHistoryStatusText();
-    }
-    console.warn('Rate Shop history externo não disponível; a usar fallback embutido.',err);
+    PBI_LOADED=false;
+    if(updated) updated.innerHTML='<span class="rs-badge nomatch">Sem dados Power BI</span> não foi possível carregar rateshop-powerbi.json.';
+    console.warn('Rate Shop Power BI: não foi possível carregar dados.',err);
     return false;
   }
 }
-function currentRateShopSearch(){
-  const loc=(document.getElementById('rsLocation')?.value||primaryLocation()||'').trim().toLowerCase();
-  const checkout=(document.getElementById('rsPickupDate')?.value||'').trim();
-  const checkin=(document.getElementById('rsDropoffDate')?.value||'').trim();
-
-  return (RS_HISTORY.searches||[])
-    .filter(s=>
-      String(s.location||'').trim().toLowerCase()===loc &&
-      String(s.checkout||'').trim()===checkout &&
-      String(s.checkin||'').trim()===checkin
-    )
-    .sort((a,b)=>(b.collectedAt||'').localeCompare(a.collectedAt||''))[0]||null;
+function pbiRow(loc, bucket, dateISO){
+  if(!loc||!bucket||!dateISO) return null;
+  const byLoc=PBI_HISTORY.locations && PBI_HISTORY.locations[loc];
+  if(!byLoc) return null;
+  const byBucket=byLoc[bucket];
+  if(!byBucket) return null;
+  return byBucket[dateISO]||null;
 }
-function applyRateShopHistory(){
-  const s=currentRateShopSearch();
-  const status=document.getElementById('rsStatus');
-
-  if(!s||!Array.isArray(s.offers)){
-    RS_LIVE=JSON.parse(JSON.stringify(RS_SEED));
-    if(status){
-      status.innerHTML='<span class="rs-badge nomatch">Sem pesquisa guardada</span> '+rsHistoryStatusText();
-    }
-    return false;
-  }
-
-  const buckets={small:[],medium:[],large:[],suv:[]};
-  s.offers.forEach(o=>{
-    if(o.bucket&&buckets[o.bucket]) buckets[o.bucket].push(o);
-  });
-  RS_LIVE=buckets;
-
-  if(status){
-    const src=RS_HISTORY_LOADED?'Histórico JSON':'Fallback embutido';
-    status.innerHTML=`<span class="rs-badge live">${src}</span> ${rsHistoryStatusText()} · ${s.offers.length} ofertas`;
-  }
-  return true;
-}
-function refreshRateShopFromHistory(){
-  applyRateShopHistory();
-  renderRateShop();
-}
-
-function rsHistoryStatusText(){
-  const s=currentRateShopSearch();
-  if(!s) return 'Sem pesquisa guardada para estas datas';
-  return `Pesquisa guardada: ${s.collectedAt||'data desconhecida'} · ${s.source||'fonte desconhecida'}`;
+function pbiNum(v){
+  if(v===null||v===undefined||v==='') return null;
+  const n=Number(v);
+  return Number.isFinite(n)?n:null;
 }
 function rsTransmissionFromSipp(sipp){ const c=(sipp||'')[2]; return c==='A'?'automatic':(c==='M'?'manual':''); }
-function rsBucket(group){
-  const seg=RS_GROUP_SEGMENT[group]||'';
-  if(['A','B','C','CA'].includes(group)) return 'small';
-  if(['E','EA','C1','HA','H1A'].includes(group)) return 'medium';
-  if(['L','O','Q'].includes(group)) return 'large';
-  if(/SUV/.test(seg)||['D','DA','F','FA','G','I','IA','JA','K','P'].includes(group)) return 'suv';
-  return null;
-}
-function rsBestOffer(group){
-  const info=VGROUPS[group]||{};
-  const bucket=rsBucket(group);
-  if(!bucket||!RS_LIVE[bucket]) return null;
-  const trans=rsTransmissionFromSipp(info.sipp);
-  const candidates=RS_LIVE[bucket].filter(o=>{
-    const supplier=(o.supplier||'').toLowerCase().replace(/\s+/g,'');
-    if(!supplier.includes('autounion')) return false;
-    if(trans && o.transmission!==trans) return false;
-    if(o.group && o.group!==group) return false;
-    if(o.sipp && info.sipp && o.sipp!==info.sipp) return false;
-    return true;
-  });
-  return candidates.length
-    ? candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]
-    : null;
-}
-
-function rsBestCompetitor(group){
-  const info=VGROUPS[group]||{};
-  const bucket=rsBucket(group);
-  if(!bucket||!RS_LIVE[bucket]) return null;
-  const trans=rsTransmissionFromSipp(info.sipp);
-  const candidates=RS_LIVE[bucket].filter(o=>{
-    if(trans && o.transmission!==trans) return false;
-    if(o.group && o.group!==group) return false;
-    if(o.sipp && info.sipp && o.sipp!==info.sipp) return false;
-    return true;
-  });
-  return candidates.length
-    ? candidates.slice().sort((a,b)=>(a.total/a.days)-(b.total/b.days))[0]
-    : null;
+// Mapeamento dos grupos ICONIQ para os 7 segmentos do Power BI (small/medium/large/premium/estate/suvs/carriers).
+// Baseado na descrição de cada grupo e no código SIPP/ACRISS — recomenda-se validação periódica junto da equipa comercial.
+const PBI_BUCKET_MAP={
+  A:'small', B:'small', B1:'small', B2:'small', C:'small', CA:'small',
+  E:'medium', EA:'medium',
+  C1:'premium', HA:'premium', H1A:'premium', L:'premium', R:'premium', OEV:'premium',
+  O:'large', Q:'large',
+  E1:'estate', L1:'estate',
+  D:'suvs', DA:'suvs', F:'suvs', FA:'suvs', G:'suvs', G1:'suvs', EEV:'suvs',
+  I:'suvs', IA:'suvs', JA:'suvs', K:'suvs', P:'suvs',
+  M1:'carriers', M2:'carriers', MD:'carriers', MEV:'carriers', N:'carriers', N1:'carriers'
+  // VANL, VANM, VANS, VCXL: carrinhas de carga sem equivalente nos segmentos Power BI (não comparável).
+};
+function pbiBucket(group){
+  return PBI_BUCKET_MAP[group]||null;
 }
 function populateRsFilters(){
   const seg=document.getElementById('rsSegment'), grp=document.getElementById('rsGroup');
@@ -1699,49 +1651,81 @@ function renderRateShop(){
   const sipp=document.getElementById('rsSipp').value.trim().toUpperCase();
   const trans=document.getElementById('rsTransmission').value, match=document.getElementById('rsMatch').value;
   const body=document.getElementById('rsBody'); body.innerHTML='';
+  const selectedLoc=document.getElementById('rsLocation')?.value || primaryLocation();
+  const dateISO=document.getElementById('rsPickupDate')?.value || '';
+  let flashTotal=0;
+
   Object.keys(VGROUPS).forEach(g=>{
-    const v=VGROUPS[g], sg=RS_GROUP_SEGMENT[g]||'Outro', offer=rsBestOffer(g), gt=rsTransmissionFromSipp(v.sipp);
-    if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!offer||match==='none'&&offer)return;
+    const v=VGROUPS[g], sg=RS_GROUP_SEGMENT[g]||'Outro', gt=rsTransmissionFromSipp(v.sipp);
+    const bucket=pbiBucket(g);
+    const pbi=pbiRow(selectedLoc, bucket, dateISO);
+    const hasPbi=!!pbi;
+    if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!hasPbi||match==='none'&&hasPbi)return;
+
     const tr=document.createElement('tr');
-    const selectedLoc=document.getElementById('rsLocation')?.value || primaryLocation();
-    const bestCompetitor=rsBestCompetitor(g);
-    const autoUnionOffer=rsBestOffer(g);
     const ours=ourBasePriceFor(g, selectedLoc);
-    const bestDaily=bestCompetitor?(bestCompetitor.total/bestCompetitor.days):null;
-    const auDaily=autoUnionOffer?(autoUnionOffer.total/autoUnionOffer.days):null;
+    const auRaw=pbi?pbi['Autounion']:null;
+    const auPrice=pbiNum(auRaw);
+    const suggested=auPrice;
 
-    // Requested comparison: AutoUnion versus ICONIQ.
-    // Positive => AutoUnion is more expensive than ICONIQ.
-    // Negative => AutoUnion is cheaper than ICONIQ.
-    const diff=(ours!==null && auDaily!==null)?(auDaily-ours):null;
-    const diffPct=(diff!==null && ours)?(diff/ours*100):null;
-    const diffClass=diff===null?'':(diff>0?'rs-high':(diff<0?'rs-low':''));
+    let rowFlashCount=0;
+    const compCells=RS_COMPETITORS.map(name=>{
+      const raw=pbi?pbi[name]:null;
+      const val=pbiNum(raw);
+      if(val===null) return '<td class="mono">—</td>';
+      if(auPrice===null||auPrice===0) return `<td class="mono">${val.toFixed(2)} €</td>`;
+      const pct=(val-auPrice)/auPrice;
+      const flash=Math.abs(pct)>=0.30;
+      if(flash){ rowFlashCount++; flashTotal++; }
+      const tagClass=pct>=0?'rs-high':'rs-low';
+      const tag=flash?`<span class="rs-flash-tag">${pct>=0?'+':''}${(pct*100).toFixed(0)}%</span>`:'';
+      return `<td class="mono ${flash?tagClass:''}">${val.toFixed(2)} €${tag}</td>`;
+    }).join('');
 
-    const auLink=autoUnionOffer
-      ? (autoUnionOffer.link
-          ? `<a class="rs-link" target="_blank" rel="noopener" href="${autoUnionOffer.link}">${autoUnionOffer.car} ↗</a>`
-          : autoUnionOffer.car)
-      : '—';
+    let estadoCell;
+    if(!hasPbi){
+      estadoCell='<span class="rs-badge nomatch">sem dados Power BI</span>';
+    }else if(rowFlashCount>0){
+      estadoCell=`<span class="rs-flash-badge">⚠ ${rowFlashCount} desvio${rowFlashCount>1?'s':''} ±30%</span>`;
+    }else{
+      estadoCell='<span class="rs-ok-badge">OK</span>';
+    }
 
     tr.innerHTML=`<td>${sg}</td>
       <td><b>${g}</b></td>
       <td class="mono">${v.sipp||'—'}</td>
       <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
-      <td class="mono">${bestDaily!==null?bestDaily.toFixed(2)+' €':'—'}</td>
-      <td>${bestCompetitor
-        ? `${bestCompetitor.supplier||'—'}${bestCompetitor.snapshotDateMatch===false?' *':''}`
-        : '—'}</td>
-      <td class="mono">${auDaily!==null?auDaily.toFixed(2)+' €':'—'}</td>
-      <td class="mono ${diffClass}">${diff!==null?(diff>=0?'+':'')+diff.toFixed(2)+' €':'—'}</td>
-      <td class="mono ${diffClass}">${diffPct!==null?(diffPct>=0?'+':'')+diffPct.toFixed(1)+'%':'—'}</td>
-      <td>${auLink}</td>
-      <td>${autoUnionOffer?'<span class="rs-badge live">AutoUnion</span>':'<span class="rs-badge nomatch">sem AutoUnion</span>'}</td>`;
+      <td class="mono">${auPrice!==null?auPrice.toFixed(2)+' €':'—'}</td>
+      ${compCells}
+      <td class="mono">${suggested!==null?suggested.toFixed(2)+' €':'—'}</td>
+      <td>${estadoCell}</td>`;
+    if(rowFlashCount>0) tr.classList.add('rs-flash');
+    tr.dataset.hasPbi=hasPbi?'1':'0';
     body.appendChild(tr);
   });
+
+  const banner=document.getElementById('rsAlertBanner');
+  if(banner){
+    if(flashTotal>0){
+      banner.classList.add('show');
+      banner.innerHTML=`⚠ ${flashTotal} desvio${flashTotal>1?'s':''} de ±30% face à AutoUnion detetado${flashTotal>1?'s':''} nesta pesquisa.`;
+    }else{
+      banner.classList.remove('show');
+      banner.innerHTML='';
+    }
+  }
 }
 populateRsFilters();
-loadRateShopHistory().then(()=>renderRateShop());
+loadRateShopPowerBI().then(()=>renderRateShop());
+document.getElementById('btnRefreshPbi')?.addEventListener('click', ()=>{
+  const btn=document.getElementById('btnRefreshPbi');
+  if(btn){btn.disabled=true;btn.textContent='A atualizar…';}
+  loadRateShopPowerBI().then(()=>{
+    renderRateShop();
+    if(btn){btn.disabled=false;btn.textContent='↻ Atualizar agora';}
+  });
+});
 ['rsSegment','rsGroup','rsTransmission','rsMatch'].forEach(id=>document.getElementById(id).addEventListener('change',renderRateShop));
 document.getElementById('rsSipp').addEventListener('input',renderRateShop);
 
@@ -1803,18 +1787,16 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
 
   if(button){button.disabled=true;button.textContent='A processar…';}
   if(progress) progress.classList.add('active');
-  if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · a procurar AutoUnion…`;
+  if(status) status.innerHTML=`<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · a cruzar dados Power BI…`;
 
   window.setTimeout(()=>{
-    const hasSaved=applyRateShopHistory();
-    applyRateShopHistory();
-  renderRateShop();
+    renderRateShop();
     const rows=[...document.querySelectorAll('#rsBody tr')];
-    const found=rows.filter(r=>r.querySelector('.rs-badge.live')).length;
+    const found=rows.filter(r=>r.dataset.hasPbi==='1').length;
     if(status){
       status.innerHTML=found>0
-        ? `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge live">Concluído</span> ${found} grupos com preço AutoUnion.`
-        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem AutoUnion no conjunto carregado</span> · a melhor concorrência disponível continua visível na tabela.`;
+        ? `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge live">Concluído</span> ${found} grupos com dados Power BI.`
+        : `<b>${loc}</b> · Check-out ${checkout} → Check-in ${checkin} · <b>${days} dias</b> · <span class="rs-badge nomatch">Sem dados Power BI para este período/localização</span>.`;
     }
     if(progress) progress.classList.remove('active');
     if(button){button.disabled=false;button.textContent='Fazer Rate Shop';}
@@ -1823,9 +1805,21 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
 
 const _rsPick=document.getElementById('rsPickupDate');
 const _rsDrop=document.getElementById('rsDropoffDate');
-if(_rsPick && !_rsPick.value) _rsPick.value='2026-08-20';
+if(_rsPick && !_rsPick.value) _rsPick.value='2026-09-15';
 if(_rsPick && _rsDrop && !_rsDrop.value) updateRateShopDays(true);
 renderRateShop();
+
+document.getElementById('rsPickupDate')?.addEventListener('change', ()=>{
+  if(typeof updateRsDays==='function') updateRsDays();
+  renderRateShop();
+});
+document.getElementById('rsDropoffDate')?.addEventListener('change', ()=>{
+  if(typeof updateRsDays==='function') updateRsDays();
+  renderRateShop();
+});
+document.getElementById('rsLocation')?.addEventListener('change', ()=>{
+  renderRateShop();
+});
 
 </script>
 
@@ -1855,21 +1849,6 @@ const RATE_SOURCE_META = {"BK":{"filename":"RateGroup_Export_BK_Lisboa_Porto_Far
   sel.addEventListener('change', refreshSourceVersion);
   refreshSourceVersion();
 })();
-
-document.getElementById('rsPickupDate')?.addEventListener('change', ()=>{
-  applyRateShopHistory();
-  if(typeof updateRsDays==='function') updateRsDays();
-  renderRateShop();
-});
-document.getElementById('rsDropoffDate')?.addEventListener('change', ()=>{
-  applyRateShopHistory();
-  if(typeof updateRsDays==='function') updateRsDays();
-  renderRateShop();
-});
-document.getElementById('rsLocation')?.addEventListener('change', ()=>{
-  applyRateShopHistory();
-  renderRateShop();
-});
 </script>
 </body>
 </html>

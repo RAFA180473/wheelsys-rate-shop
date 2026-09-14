@@ -259,6 +259,13 @@
   .rs-flash-tag{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:8px;font-size:9.5px;font-weight:700;background:#fff0ed;color:#a33d30;}
   .rs-flash-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#fff0ed;color:#a33d30;}
   .rs-ok-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#dff7f1;color:#087861;}
+  .rs-pbi-cell{display:flex;flex-direction:column;gap:1px;}
+  .rs-pbi-cell .rs-pbi-d{font-weight:700;color:var(--navy-700);white-space:nowrap;}
+  .rs-pbi-cell .rs-pbi-d.rs-high{color:var(--coral-500);}
+  .rs-pbi-cell .rs-pbi-d.rs-low{color:var(--up);}
+  .rs-pbi-cell .rs-pbi-w{font-size:9.5px;color:var(--steel-500);white-space:nowrap;}
+  table.comp-table thead th small{display:block;font-weight:400;font-size:8.5px;letter-spacing:0;text-transform:none;color:var(--steel-500);margin-top:2px;}
+  table.comp-table tbody td{padding:8px 10px;vertical-align:middle;}
 
 .rs-shop-controls{
     display:grid;
@@ -669,11 +676,11 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
                 <th>SIPP ref.</th>
                 <th>Viatura ICONIQ</th>
                 <th>Preço ICONIQ /dia</th>
-                <th>AutoUnion /dia</th>
-                <th>Drivalia /dia</th>
-                <th>Cael /dia</th>
-                <th>Drive on Holidays /dia</th>
-                <th>Tangerine /dia</th>
+                <th>AutoUnion<small>€/dia · €/7d</small></th>
+                <th>Drivalia<small>€/dia · €/7d</small></th>
+                <th>Cael<small>€/dia · €/7d</small></th>
+                <th>Drive on Holidays<small>€/dia · €/7d</small></th>
+                <th>Tangerine<small>€/dia · €/7d</small></th>
                 <th>Preço sugerido /dia</th>
                 <th>Alerta / Estado</th>
               </tr>
@@ -686,6 +693,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
           Fonte: Power BI — relatório <b>Franchisees · Booking</b> (app “Autounion Partners App”), visual “Minimum Rental per Pickup Date”.
           Comparação fixa com as 4 marcas alinhadas com o perfil AutoUnion: <b>Drivalia</b>, <b>Cael</b>, <b>Drive on Holidays</b> e <b>Tangerine</b>.
           O <b>preço sugerido</b> segue sempre a tarifa AutoUnion observada no Power BI. Sempre que uma marca concorrente se desvia ±30% da AutoUnion, a linha fica assinalada com um alerta a piscar.
+          Os preços do Power BI referem-se sempre a uma estadia de <b>7 dias</b>: cada célula mostra o <b>preço diário</b> em destaque (= preço a 7 dias ÷ 7 — é este valor que alimenta o preço sugerido e o alerta ±30%) e, por baixo, mais pequeno, o <b>preço total a 7 dias</b> tal como aparece no Power BI, como referência.
           Os grupos ICONIQ são mapeados nos 7 segmentos do Power BI (small / medium / large / premium / estate / suvs / carriers) por aproximação ao SIPP/ACRISS — recomenda-se validar este mapeamento periodicamente.
         </div>
       </div>
@@ -1903,22 +1911,32 @@ function renderRateShop(){
 
     const tr=document.createElement('tr');
     const ours=ourBasePriceFor(g, selectedLoc);
+    // Os preços do Power BI (visual "Minimum Rental per Pickup Date") são sempre para uma estadia de 7 dias.
+    // Preço diário = preço a 7 dias ÷ 7. É o diário que alimenta o preço sugerido e o alerta ±30%; o valor a 7 dias fica visível como referência.
     const auRaw=pbi?pbi['Autounion']:null;
-    const auPrice=pbiNum(auRaw);
+    const auWeekly=pbiNum(auRaw);
+    const auPrice=auWeekly===null?null:auWeekly/7;
     const suggested=auPrice;
+
+    function pbiCell(weekly, flashClass, tag){
+      if(weekly===null) return '<td class="mono">—</td>';
+      const daily=weekly/7;
+      return `<td class="mono"><div class="rs-pbi-cell"><span class="rs-pbi-d ${flashClass||''}">${daily.toFixed(2)} €${tag||''}</span><span class="rs-pbi-w">${weekly.toFixed(2)} €/7d</span></div></td>`;
+    }
 
     let rowFlashCount=0;
     const compCells=RS_COMPETITORS.map(name=>{
       const raw=pbi?pbi[name]:null;
-      const val=pbiNum(raw);
-      if(val===null) return '<td class="mono">—</td>';
-      if(auPrice===null||auPrice===0) return `<td class="mono">${val.toFixed(2)} €</td>`;
-      const pct=(val-auPrice)/auPrice;
+      const weekly=pbiNum(raw);
+      if(weekly===null) return pbiCell(null);
+      if(auPrice===null||auPrice===0) return pbiCell(weekly);
+      const daily=weekly/7;
+      const pct=(daily-auPrice)/auPrice;
       const flash=Math.abs(pct)>=0.30;
       if(flash){ rowFlashCount++; flashTotal++; }
       const tagClass=pct>=0?'rs-high':'rs-low';
       const tag=flash?`<span class="rs-flash-tag">${pct>=0?'+':''}${(pct*100).toFixed(0)}%</span>`:'';
-      return `<td class="mono ${flash?tagClass:''}">${val.toFixed(2)} €${tag}</td>`;
+      return pbiCell(weekly, flash?tagClass:'', tag);
     }).join('');
 
     let estadoCell;
@@ -1935,7 +1953,7 @@ function renderRateShop(){
       <td class="mono">${v.sipp||'—'}</td>
       <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
-      <td class="mono">${auPrice!==null?auPrice.toFixed(2)+' €':'—'}</td>
+      ${pbiCell(auWeekly)}
       ${compCells}
       <td class="mono">${suggested!==null?suggested.toFixed(2)+' €':'—'}</td>
       <td>${estadoCell}</td>`;

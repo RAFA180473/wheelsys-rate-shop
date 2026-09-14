@@ -130,6 +130,9 @@
     padding:8px 10px; position:sticky; top:0; font-size:11px; letter-spacing:.3px;
   }
   thead th:first-child{text-align:left;}
+  thead th.sortable-th{cursor:pointer; user-select:none;}
+  thead th.sortable-th:hover{background:var(--navy-700);}
+  thead th.sortable-th .sort-arrow{margin-left:3px; opacity:.9;}
   tbody td{padding:7px 10px; text-align:right; border-bottom:1px solid var(--line); font-family:'IBM Plex Mono',monospace;}
   tbody td:first-child{text-align:left; font-family:'IBM Plex Sans',sans-serif; font-weight:600; font-size:11.5px; padding-right:14px; white-space:nowrap;}
   tbody tr:hover{background:var(--mist-100);}
@@ -379,7 +382,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
   <span id="rateSourceDot" class="rate-source-dot"></span>
   <span class="rate-source-copy"><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
   <span class="rate-source-sub"><b>Ficheiro atualizado:</b> <span id="rateSourceDate"></span><br>
-  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">13/09/2026 16:30</span><br>
+  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">13/09/2026 22:16</span><br>
   Atualização automática: duas vezes por dia.</span></span>
 </div>
 
@@ -791,6 +794,9 @@ function viewLocations(){ return ALL_LOCS.filter(l=>selectedLocations.has(l)); }
 let adjustPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos alvo do Individual (Aplicar / Repor célula)
 let viewPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos mostrados na grelha principal (mín. 4)
 let direction = 1;
+let gridSortField = null; // 'period' ou uma chave de CB_FIELDS (p1,p2,p3,p46,p7,p813,p1429,p30); null = ordem predefinida
+let gridSortDir = 1; // 1 = ascendente, -1 = descendente
+const GRID_SORT_LABELS = {period:'Período', p1:'1d', p2:'2d', p3:'3d', p46:'4-6d', p7:'7d', p813:'8-13d', p1429:'14-29d', p30:'30+d'};
 
 function groupsOf(fileKey, loc){
   loc = loc || primaryLocation();
@@ -1080,7 +1086,19 @@ function renderGrid(){
     document.getElementById('gridTitle').textContent += ' · ' + periodsList.length + ' períodos selecionados';
   }
   const theadRow = document.querySelector('.grid-wrap thead tr');
-  theadRow.innerHTML = '<th>Grupo</th><th>Segmento</th><th>Estação</th><th>Período</th><th>1d</th><th>2d</th><th>3d</th><th>4-6d</th><th>7d</th><th>8-13d</th><th>14-29d</th><th>30+d</th>';
+  const sortableHeadHtml = Object.keys(GRID_SORT_LABELS).map(key=>{
+    const arrow = gridSortField===key ? `<span class="sort-arrow">${gridSortDir===1?'▲':'▼'}</span>` : '';
+    return `<th class="sortable-th" data-sort="${key}">${GRID_SORT_LABELS[key]}${arrow}</th>`;
+  }).join('');
+  theadRow.innerHTML = '<th>Grupo</th><th>Segmento</th><th>Estação</th>' + sortableHeadHtml;
+  theadRow.querySelectorAll('th.sortable-th').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.dataset.sort;
+      if(gridSortField === key){ gridSortDir = -gridSortDir; }
+      else { gridSortField = key; gridSortDir = 1; }
+      renderGrid();
+    });
+  });
   const tbody = document.getElementById('gridBody');
   tbody.innerHTML = '';
   const groups = groupsOfFiltered(currentFile).filter(g=>gridGroupFilter.has(g));
@@ -1094,6 +1112,13 @@ function renderGrid(){
         if(row) rowsForGroup.push({loc, per, row, orig});
       });
     });
+    if(gridSortField){
+      rowsForGroup.sort((a,b)=>{
+        const av = gridSortField==='period' ? parseDMY(a.per.pStart) : a.row[gridSortField];
+        const bv = gridSortField==='period' ? parseDMY(b.per.pStart) : b.row[gridSortField];
+        return (av - bv) * gridSortDir;
+      });
+    }
     rowsForGroup.forEach((entry, idx)=>{
       const { loc, per, row, orig } = entry;
       const tr = document.createElement('tr');

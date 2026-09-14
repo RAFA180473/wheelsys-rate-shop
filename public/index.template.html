@@ -636,6 +636,7 @@
           O <b>preço sugerido</b> segue sempre a tarifa AutoUnion observada no Power BI. Sempre que uma marca concorrente se desvia ±30% da AutoUnion, a linha fica assinalada com um alerta a piscar.
           Os preços do Power BI referem-se sempre a uma estadia de <b>7 dias</b>: cada célula mostra o <b>preço diário</b> em destaque (= preço a 7 dias ÷ 7 — é este valor que alimenta o preço sugerido e o alerta ±30%) e, por baixo, mais pequeno, o <b>preço total a 7 dias</b> tal como aparece no Power BI, como referência.
           Os grupos ICONIQ são mapeados nos 7 segmentos do Power BI (small / medium / large / premium / estate / suvs / carriers) por aproximação ao SIPP/ACRISS — recomenda-se validar este mapeamento periodicamente.
+          Nota: a AutoUnion por vezes não tem tarifa publicada no Power BI para as datas mais próximas (ex.: 1-2 dias); nesses casos a linha mostra "sem tarifa AutoUnion nesta data" — não é um erro do painel, foi confirmado diretamente no Power BI.
         </div>
       </div>
     </div>
@@ -1703,6 +1704,10 @@ function renderRateShop(){
     let estadoCell;
     if(!hasPbi){
       estadoCell='<span class="rs-badge nomatch">sem dados Power BI</span>';
+    }else if(auWeekly===null){
+      // A AutoUnion nem sempre tem tarifa publicada no Power BI para datas muito próximas (ex.: 1-2 dias) —
+      // distinto de "sem dados Power BI" (que significa não haver nenhuma linha para este grupo/data/localização).
+      estadoCell='<span class="rs-badge nomatch">sem tarifa AutoUnion nesta data</span>';
     }else if(rowFlashCount>0){
       estadoCell=`<span class="rs-flash-badge">⚠ ${rowFlashCount} desvio${rowFlashCount>1?'s':''} ±30%</span>`;
     }else{
@@ -1823,7 +1828,13 @@ document.getElementById('btnRunRateShop')?.addEventListener('click',()=>{
 
 const _rsPick=document.getElementById('rsPickupDate');
 const _rsDrop=document.getElementById('rsDropoffDate');
-if(_rsPick && !_rsPick.value) _rsPick.value='2026-09-15';
+if(_rsPick && !_rsPick.value){
+  // Por omissão usa "hoje + 3 dias": a AutoUnion nem sempre tem tarifa publicada no Power BI para os 1-2 dias mais próximos
+  // (verificado diretamente no Power BI em 14/09/2026: sem tarifa AutoUnion a 15 e 16/09, presente a partir de 17/09) —
+  // um valor fixo ficaria desatualizado; isto garante sempre uma data com dados completos ao abrir a página.
+  const _rsDefault=new Date(); _rsDefault.setDate(_rsDefault.getDate()+3);
+  _rsPick.value=_rsDefault.toISOString().slice(0,10);
+}
 if(_rsPick && _rsDrop && !_rsDrop.value) updateRateShopDays(true);
 renderRateShop();
 

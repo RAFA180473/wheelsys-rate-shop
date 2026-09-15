@@ -258,6 +258,9 @@
   .rs-flash-tag{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:8px;font-size:9.5px;font-weight:700;background:#fff0ed;color:#a33d30;}
   .rs-flash-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#fff0ed;color:#a33d30;}
   .rs-ok-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;background:#dff7f1;color:#087861;}
+  .rs-pct-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:700;}
+  .rs-pct-badge.rs-high{background:#fff0ed;color:#a33d30;}
+  .rs-pct-badge.rs-low{background:#dff7f1;color:#087861;}
   .rs-pbi-cell{display:flex;flex-direction:column;gap:1px;}
   .rs-pbi-cell .rs-pbi-d{font-weight:700;color:var(--navy-700);white-space:nowrap;}
   .rs-pbi-cell .rs-pbi-d.rs-high{color:var(--coral-500);}
@@ -660,7 +663,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
                 <th>Drive on Holidays<small>€/dia · €/7d</small></th>
                 <th>Tangerine<small>€/dia · €/7d</small></th>
                 <th>Preço sugerido /dia</th>
-                <th>Alerta / Estado</th>
+                <th>ICONIQ vs AutoUnion<small>ajuste sugerido</small></th>
               </tr>
             </thead>
             <tbody id="rsBody"></tbody>
@@ -670,7 +673,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
         <div class="rs-note">
           Fonte: Power BI — relatório <b>Franchisees · Booking</b> (app “Autounion Partners App”), visual “Minimum Rental per Pickup Date”.
           Comparação fixa com as 4 marcas alinhadas com o perfil AutoUnion: <b>Drivalia</b>, <b>Cael</b>, <b>Drive on Holidays</b> e <b>Tangerine</b>.
-          O <b>preço sugerido</b> segue sempre a tarifa AutoUnion observada no Power BI. Sempre que uma marca concorrente se desvia ±30% da AutoUnion, a linha fica assinalada com um alerta a piscar.
+          O <b>preço sugerido</b> segue sempre a tarifa AutoUnion observada no Power BI. Sempre que uma marca concorrente se desvia ±30% da AutoUnion, a linha fica assinalada com um alerta a piscar e cada célula da marca mostra a % de desvio. A coluna <b>ICONIQ vs AutoUnion</b> mostra a % entre o preço ICONIQ atual e a AutoUnion — positivo (vermelho) significa ICONIQ acima da AutoUnion, negativo (verde) significa ICONIQ abaixo; é a % de ajuste para equiparar as tarifas.
           Os preços do Power BI referem-se sempre a uma estadia de <b>7 dias</b> e variam dia a dia (a AutoUnion e os 4 concorrentes têm um valor próprio para cada data de pickup). Por isso, para a semana em análise (Check-out → Check-in), cada célula mostra sempre o <b>preço mais baixo</b> encontrado nessa semana para cada empresa — não o preço de um único dia do intervalo: em destaque o <b>preço diário</b> mínimo (= preço a 7 dias ÷ 7 desse dia — é este valor que alimenta o preço sugerido e o alerta ±30%), por baixo o <b>preço total a 7 dias</b> correspondente e, mais pequeno ainda, o dia exato em que esse mínimo ocorreu ("mín. DD/MM").
           Os grupos ICONIQ são mapeados nos 7 segmentos do Power BI (small / medium / large / premium / estate / suvs / carriers) por aproximação ao SIPP/ACRISS — recomenda-se validar este mapeamento periodicamente.
           Nota: a AutoUnion por vezes não tem tarifa publicada no Power BI nalguns dias da semana em análise; se não tiver em nenhum desses dias, a linha mostra "sem tarifa AutoUnion nesta semana" — não é um erro do painel, foi confirmado diretamente no Power BI.
@@ -1950,6 +1953,9 @@ function renderRateShop(){
       return pbiCell(entry, flash?tagClass:'', tag);
     }).join('');
 
+    // Coluna final: em vez do resumo de desvios face aos concorrentes (que continua visível por linha
+    // via o piscar + as tags junto a cada concorrente), mostra a % entre o preço ICONIQ e a AutoUnion —
+    // a métrica acionável para equiparar as tarifas (positivo = ICONIQ acima da AutoUnion, negativo = abaixo).
     let estadoCell;
     if(!hasPbi){
       estadoCell='<span class="rs-badge nomatch">sem dados Power BI</span>';
@@ -1957,10 +1963,13 @@ function renderRateShop(){
       // A AutoUnion nem sempre tem tarifa publicada no Power BI para todos os dias da semana em análise —
       // distinto de "sem dados Power BI" (que significa não haver nenhum dia com dados para este grupo/localização).
       estadoCell='<span class="rs-badge nomatch">sem tarifa AutoUnion nesta semana</span>';
-    }else if(rowFlashCount>0){
-      estadoCell=`<span class="rs-flash-badge">⚠ ${rowFlashCount} desvio${rowFlashCount>1?'s':''} ±30%</span>`;
+    }else if(ours===null){
+      estadoCell='<span class="rs-badge nomatch">sem preço ICONIQ neste período</span>';
     }else{
-      estadoCell='<span class="rs-ok-badge">OK</span>';
+      const pctIconiq=(ours-auPrice)/auPrice;
+      const pctCls=pctIconiq>=0?'rs-high':'rs-low';
+      const pctSign=pctIconiq>=0?'+':'';
+      estadoCell=`<span class="rs-pct-badge ${pctCls}">${pctSign}${(pctIconiq*100).toFixed(0)}%</span>`;
     }
 
     tr.innerHTML=`<td>${sg}</td>

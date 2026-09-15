@@ -393,7 +393,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
   <span id="rateSourceDot" class="rate-source-dot"></span>
   <span class="rate-source-copy"><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
   <span class="rate-source-sub"><b>Ficheiro atualizado:</b> <span id="rateSourceDate"></span><br>
-  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">14/09/2026 20:47</span><br>
+  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">14/09/2026 18:10</span><br>
   Atualização automática: duas vezes por dia.</span></span>
 </div>
 
@@ -628,7 +628,10 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
         </div>
 
         <div class="rs-pbi-bar">
-          <div class="rs-pbi-updated" id="rsPbiUpdated">A carregar dados do Power BI…</div>
+          <div>
+            <div class="rs-pbi-updated" id="rsPbiUpdated">A carregar dados do Power BI…</div>
+            <div class="rs-pbi-updated" id="rsVansUpdated">A carregar dados AutoUnion (carrinhas)…</div>
+          </div>
           <button type="button" class="btn ghost" id="btnRefreshPbi">↻ Atualizar agora</button>
         </div>
 
@@ -671,6 +674,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
           Os preços do Power BI referem-se sempre a uma estadia de <b>7 dias</b> e variam dia a dia (a AutoUnion e os 4 concorrentes têm um valor próprio para cada data de pickup). Por isso, para a semana em análise (Check-out → Check-in), cada célula mostra sempre o <b>preço mais baixo</b> encontrado nessa semana para cada empresa — não o preço de um único dia do intervalo: em destaque o <b>preço diário</b> mínimo (= preço a 7 dias ÷ 7 desse dia — é este valor que alimenta o preço sugerido e o alerta ±30%), por baixo o <b>preço total a 7 dias</b> correspondente e, mais pequeno ainda, o dia exato em que esse mínimo ocorreu ("mín. DD/MM").
           Os grupos ICONIQ são mapeados nos 7 segmentos do Power BI (small / medium / large / premium / estate / suvs / carriers) por aproximação ao SIPP/ACRISS — recomenda-se validar este mapeamento periodicamente.
           Nota: a AutoUnion por vezes não tem tarifa publicada no Power BI nalguns dias da semana em análise; se não tiver em nenhum desses dias, a linha mostra "sem tarifa AutoUnion nesta semana" — não é um erro do painel, foi confirmado diretamente no Power BI.
+          As 4 carrinhas de carga (<b>VANL, VANM, VANS, VCXL</b>) não têm segmento equivalente no Power BI — a tarifa AutoUnion destas linhas vem sempre diretamente do <b>motor de reservas público da AutoUnion</b> (autounionrentacar.com), mapeadas para os grupos do site Z1 (Caddy Cargo Van), Z3 (Transporter Cargo Van) e Z4 (Crafter Cargo Van, usado também para o VCXL). Não há dados de concorrência nestas linhas, por isso as colunas dos 4 concorrentes ficam sempre "—".
         </div>
       </div>
     </div>
@@ -1806,6 +1810,13 @@ const RS_COMPETITORS=['Drivalia','Cael','Drive on Holidays','Tangerine'];
 const PBI_COMPANIES=['Autounion',...RS_COMPETITORS];
 let PBI_HISTORY={schemaVersion:1,generatedAt:null,source:'',companies:PBI_COMPANIES,buckets:[],locations:{}};
 let PBI_LOADED=false;
+// VANL, VANM, VANS, VCXL (carrinhas de carga) não têm segmento equivalente no Power BI — pedido do utilizador:
+// a tarifa AutoUnion destes 4 grupos vem sempre diretamente do motor de reservas público da AutoUnion
+// (autounionrentacar.com, API /api/v1/rental/quote), não do Power BI. Não há dados de concorrência para
+// estes grupos (a AutoUnion não expõe preços de concorrentes no próprio site), por isso as colunas dos
+// 4 concorrentes ficam sempre "—" nestas linhas — só a coluna AutoUnion e "ICONIQ vs AutoUnion" têm dados.
+const RS_VAN_SITE_CODE={VANS:'Z1', VANM:'Z3', VANL:'Z4', VCXL:'Z4'};
+let VANS_HISTORY={schemaVersion:1,generatedAt:null,source:'',locations:{}};
 async function loadRateShopPowerBI(){
   const updated=document.getElementById('rsPbiUpdated');
   try{
@@ -1831,6 +1842,30 @@ async function loadRateShopPowerBI(){
     PBI_LOADED=false;
     if(updated) updated.innerHTML='<span class="rs-badge nomatch">Sem dados Power BI</span> não foi possível carregar rateshop-powerbi.json.';
     console.warn('Rate Shop Power BI: não foi possível carregar dados.',err);
+    return false;
+  }
+}
+async function loadRateShopVans(){
+  const updated=document.getElementById('rsVansUpdated');
+  try{
+    const r=await fetch('data/rateshop-vans.json?ts='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const external=await r.json();
+    VANS_HISTORY={
+      schemaVersion:1,
+      generatedAt:external.generatedAt||null,
+      source:external.source||'',
+      locations:external.locations||{}
+    };
+    if(updated){
+      updated.innerHTML=VANS_HISTORY.generatedAt
+        ? `Dados AutoUnion (carrinhas) atualizados em <b>${VANS_HISTORY.generatedAt}</b> · fonte: ${VANS_HISTORY.source||'site AutoUnion'}`
+        : 'Dados AutoUnion (carrinhas) carregados.';
+    }
+    return true;
+  }catch(err){
+    if(updated) updated.innerHTML='<span class="rs-badge nomatch">Sem dados</span> não foi possível carregar rateshop-vans.json.';
+    console.warn('Rate Shop AutoUnion (carrinhas): não foi possível carregar dados.',err);
     return false;
   }
 }
@@ -1875,6 +1910,33 @@ function pbiNum(v){
   const n=Number(v);
   return Number.isFinite(n)?n:null;
 }
+// Equivalente a pbiWeekMin, mas para a tarifa AutoUnion das carrinhas de carga (rateshop-vans.json),
+// obtida diretamente do site da AutoUnion (sempre preço total do período, tal como o Power BI).
+// Só devolve a AutoUnion (não há dados de concorrência nesta fonte) — a forma do resultado
+// ({Autounion:{value,dateISO}}) é igual à de pbiWeekMin para poder reutilizar o mesmo código de render.
+function vansWeekMin(loc, siteCode, startISO, endISO){
+  if(!loc||!siteCode||!startISO) return null;
+  const byLoc=VANS_HISTORY.locations && VANS_HISTORY.locations[loc];
+  if(!byLoc) return null;
+  const byCode=byLoc[siteCode];
+  if(!byCode) return null;
+
+  const start=new Date(startISO+'T00:00:00Z');
+  if(isNaN(start.getTime())) return null;
+  let end=endISO?new Date(endISO+'T00:00:00Z'):start;
+  if(isNaN(end.getTime())||end<start) end=start;
+  const maxEnd=new Date(start.getTime()+60*86400000);
+  if(end>maxEnd) end=maxEnd;
+
+  let best=null;
+  for(let t=start.getTime(); t<=end.getTime(); t+=86400000){
+    const iso=new Date(t).toISOString().slice(0,10);
+    const n=pbiNum(byCode[iso]);
+    if(n===null) continue;
+    if(best===null || n<best.value) best={value:n, dateISO:iso};
+  }
+  return best?{Autounion:best}:null;
+}
 function rsTransmissionFromSipp(sipp){ const c=(sipp||'')[2]; return c==='A'?'automatic':(c==='M'?'manual':''); }
 // Mapeamento dos grupos ICONIQ para os 7 segmentos do Power BI (small/medium/large/premium/estate/suvs/carriers).
 // Baseado na descrição de cada grupo e no código SIPP/ACRISS — recomenda-se validação periódica junto da equipa comercial.
@@ -1887,7 +1949,8 @@ const PBI_BUCKET_MAP={
   D:'suvs', DA:'suvs', F:'suvs', FA:'suvs', G:'suvs', G1:'suvs', EEV:'suvs',
   I:'suvs', IA:'suvs', JA:'suvs', K:'suvs', P:'suvs',
   M1:'carriers', M2:'carriers', MD:'carriers', MEV:'carriers', N:'carriers', N1:'carriers'
-  // VANL, VANM, VANS, VCXL: carrinhas de carga sem equivalente nos segmentos Power BI (não comparável).
+  // VANL, VANM, VANS, VCXL: carrinhas de carga sem equivalente nos segmentos Power BI — a tarifa AutoUnion
+  // destes 4 grupos vem antes de RS_VAN_SITE_CODE / vansWeekMin (site público da AutoUnion), ver acima.
 };
 function pbiBucket(group){
   return PBI_BUCKET_MAP[group]||null;
@@ -1917,10 +1980,14 @@ function renderRateShop(){
 
   Object.keys(VGROUPS).forEach(g=>{
     const v=VGROUPS[g], sg=RS_GROUP_SEGMENT[g]||'Outro', gt=rsTransmissionFromSipp(v.sipp);
+    const vanCode=RS_VAN_SITE_CODE[g];
     const bucket=pbiBucket(g);
     // Preço mais baixo de cada empresa dentro da semana em análise (Check-out -> Check-in),
-    // já que o valor do Power BI varia dia a dia — em vez de olhar só para um único dia do intervalo.
-    const pbiWeek=pbiWeekMin(selectedLoc, bucket, dateISO, dateEndISO);
+    // já que o valor varia dia a dia — em vez de olhar só para um único dia do intervalo.
+    // Carrinhas de carga (VANL/VANM/VANS/VCXL) usam a fonte AutoUnion (site), as restantes usam Power BI.
+    const pbiWeek=vanCode
+      ? vansWeekMin(selectedLoc, vanCode, dateISO, dateEndISO)
+      : pbiWeekMin(selectedLoc, bucket, dateISO, dateEndISO);
     const hasPbi=!!pbiWeek;
     if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!hasPbi||match==='none'&&hasPbi)return;
 
@@ -1952,7 +2019,9 @@ function renderRateShop(){
     // a métrica acionável para equiparar as tarifas (positivo = ICONIQ acima da AutoUnion, negativo = abaixo).
     let estadoCell;
     if(!hasPbi){
-      estadoCell='<span class="rs-badge nomatch">sem dados Power BI</span>';
+      estadoCell=vanCode
+        ? '<span class="rs-badge nomatch">sem dados AutoUnion (site)</span>'
+        : '<span class="rs-badge nomatch">sem dados Power BI</span>';
     }else if(auWeekly===null){
       // A AutoUnion nem sempre tem tarifa publicada no Power BI para todos os dias da semana em análise —
       // distinto de "sem dados Power BI" (que significa não haver nenhum dia com dados para este grupo/localização).
@@ -1992,11 +2061,11 @@ function renderRateShop(){
   }
 }
 populateRsFilters();
-loadRateShopPowerBI().then(()=>renderRateShop());
+Promise.all([loadRateShopPowerBI(), loadRateShopVans()]).then(()=>renderRateShop());
 document.getElementById('btnRefreshPbi')?.addEventListener('click', ()=>{
   const btn=document.getElementById('btnRefreshPbi');
   if(btn){btn.disabled=true;btn.textContent='A atualizar…';}
-  loadRateShopPowerBI().then(()=>{
+  Promise.all([loadRateShopPowerBI(), loadRateShopVans()]).then(()=>{
     renderRateShop();
     if(btn){btn.disabled=false;btn.textContent='↻ Atualizar agora';}
   });

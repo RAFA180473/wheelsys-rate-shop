@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-15T15:30:00+00:00",
+  "source": "AutoUnion Rent A Car - motor de reservas publico (autounionrentacar.com), API /api/v1/rental/quote",
+  "locationCodes": {
+    "Lisboa": "13335d02-2f7e-4cdf-a257-a30188df79b8",
+    "Porto": "1f8ba899-41d1-4843-8f6a-84882a2d9a63",
+    "Faro": "578f4610-71ef-4b88-8a7a-e8f1965e6775"
+  },
+  "iconiqGroupToSiteCode": {"VANS": "Z1", "VANM": "Z3", "VANL": "Z4", "VCXL": "Z4"},
+  "siteCodeModel": {"Z1": "VW Caddy Cargo Van (3100L)", "Z3": "VW Transporter Cargo Van (5800L)", "Z4": "VW Crafter Cargo Van (9900L)"},
+  "locations": {
+    "Lisboa": {
+      "Z1": {"2026-10-12": 108.98},
+      "Z3": {"2026-10-12": 202.61},
+      "Z4": {"2026-10-12": 273.16}
+    },
+    "Porto": {
+      "Z1": {"2026-10-12": 330.26},
+      "Z3": {"2026-10-12": 533.18},
+      "Z4": {"2026-10-12": 607.04}
+    },
+    "Faro": {
+      "Z1": {"2026-10-12": 330.26},
+      "Z3": {"2026-10-12": 533.18},
+      "Z4": {"2026-10-12": 607.04}
+    }
+  }
+}

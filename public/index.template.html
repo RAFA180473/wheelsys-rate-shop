@@ -353,7 +353,7 @@
       <div class="checklist" id="locFilterChecklist"></div>
     </div>
     <div>
-      <label>Períodos (pickup) a visualizar na grelha <span style="font-weight:400;color:var(--steel-500);">(mín. 4)</span></label>
+      <label>Períodos (pickup) a visualizar na grelha <span style="font-weight:400;color:var(--steel-500);">(ligado a "a ajustar")</span></label>
       <div class="checklist" id="viewPeriodsChecklist" style="margin-bottom:6px;"></div>
       <div class="quickrange" style="margin-bottom:6px;">
         <button type="button" id="viewPeriodsFirst4">Primeiros 4</button>
@@ -386,7 +386,7 @@
         <button type="button" id="adjustPeriodsAll">Todos</button>
         <button type="button" id="adjustPeriodsNone">Nenhum</button>
       </div>
-      <div class="desc" id="adjustPeriodsNote" style="margin-bottom:14px;">Por predefinição, segue os períodos selecionados acima em "Períodos (pickup) a visualizar na grelha" — podes ajustar esta seleção livremente. A pré-visualização de preço usa o período mais próximo aqui marcado; ao clicar "Aplicar", o ajuste é escrito em todos os períodos marcados aqui.</div>
+      <div class="desc" id="adjustPeriodsNote" style="margin-bottom:14px;">Ligado a "Períodos (pickup) a visualizar na grelha" acima — marcar ou desmarcar um período aqui ou ali aplica-se sempre aos dois filtros. A pré-visualização de preço usa o período mais próximo aqui marcado; ao clicar "Aplicar", o ajuste é escrito em todos os períodos marcados aqui.</div>
       <div class="adjust-top">
       <label>Ajuste</label>
       <div class="adjrow">
@@ -682,7 +682,10 @@ function primaryLocation(){
 }
 function viewLocations(){ return ALL_LOCS.filter(l=>selectedLocations.has(l)); }
 let adjustPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos alvo do Individual (Aplicar / Repor célula)
-let viewPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos mostrados na grelha principal (mín. 4)
+let viewPeriods = new Set(); // chaves "pickupStart|pickupEnd" dos períodos mostrados na grelha principal
+// "a visualizar na grelha" e "a ajustar" estão sempre ligados (ligação pedida pelo utilizador em 15/09/2026):
+// as duas listas partilham sempre a mesma seleção — ver setSyncedPeriods(). Mantêm-se como duas variáveis
+// (e dois <select> de checkboxes) só porque alimentam, respetivamente, a grelha e o modo Individual.
 let direction = 1;
 let gridSortField = null; // 'period' ou uma chave de CB_FIELDS (p1,p2,p3,p46,p7,p813,p1429,p30); null = ordem predefinida
 let gridSortDir = 1; // 1 = ascendente, -1 = descendente
@@ -741,9 +744,7 @@ function hidePastPeriods(periods){
 }
 function populatePeriodSelect(group){
   const periods = hidePastPeriods(periodsOf(currentFile, group)).sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
-  // a checklist de visualizar é preenchida primeiro: a de ajustar usa-a como predefinição (ver populateAdjustPeriodsChecklist)
-  populateViewPeriodsChecklist(periods);
-  populateAdjustPeriodsChecklist(periods);
+  populatePeriodsChecklists(periods);
 }
 function primaryPeriodKey(){
   // período "ativo" (pré-visualização de preço, grelha, Rate Shop): o mais próximo entre os marcados para ajustar,
@@ -757,115 +758,81 @@ function onAdjustPeriodsChanged(){
   refreshAll();
   syncRateShopDatesFromPeriod();
 }
-function populateAdjustPeriodsChecklist(periods){
-  const box = document.getElementById('adjustPeriodsChecklist');
-  if(!box) return;
-  const keys = periods.map(r=>r.pickupStart+'|'+r.pickupEnd);
-  // mantém as seleções anteriores que ainda existem neste grupo/ficheiro
-  let stillValid = new Set(Array.from(adjustPeriods).filter(k=>keys.includes(k)));
-  if(stillValid.size===0){
-    // pré-definição: segue os períodos selecionados para visualizar
-    const viewKeys = keys.filter(k=>viewPeriods.has(k));
-    if(viewKeys.length) viewKeys.forEach(k=>stillValid.add(k));
-    else if(keys.length) stillValid.add(keys[0]);
-  }
-  adjustPeriods = stillValid;
-  box.innerHTML = '';
-  periods.forEach(r=>{
-    const key = r.pickupStart + '|' + r.pickupEnd;
-    const lab = document.createElement('label');
-    const on = adjustPeriods.has(key);
-    if(on) lab.className = 'checked';
-    lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
-    box.appendChild(lab);
-    const cbx = lab.querySelector('input');
-    cbx.addEventListener('change', ()=>{
-      if(cbx.checked) adjustPeriods.add(key); else adjustPeriods.delete(key);
-      if(adjustPeriods.size===0){ adjustPeriods.add(key); cbx.checked = true; }
-      lab.classList.toggle('checked', cbx.checked);
-      onAdjustPeriodsChanged();
-    });
-  });
-}
-document.getElementById('adjustPeriodsAll').addEventListener('click', ()=>{
-  document.querySelectorAll('#adjustPeriodsChecklist input').forEach(cbx=>{
-    cbx.checked = true;
-    cbx.parentElement.classList.add('checked');
-    adjustPeriods.add(cbx.value);
-  });
-  onAdjustPeriodsChanged();
-});
-document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
-  const boxes = document.querySelectorAll('#adjustPeriodsChecklist input');
-  if(boxes.length===0) return;
-  boxes.forEach(cbx=>{ cbx.checked = false; cbx.parentElement.classList.remove('checked'); });
-  adjustPeriods.clear();
-  // mantém sempre pelo menos um período selecionado, tal como as outras checklists
-  boxes[0].checked = true;
-  boxes[0].parentElement.classList.add('checked');
-  adjustPeriods.add(boxes[0].value);
-  onAdjustPeriodsChanged();
-});
 function sortedPeriodKeys(periods){
   return periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart)).map(r=>r.pickupStart+'|'+r.pickupEnd);
 }
-function populateViewPeriodsChecklist(periods){
-  const box = document.getElementById('viewPeriodsChecklist');
-  if(!box) return;
+function setSyncedPeriods(keys){
+  // aplica a mesma seleção aos dois filtros ("a visualizar na grelha" e "a ajustar") e às duas checklists no DOM
+  const set = new Set(keys);
+  viewPeriods = set;
+  adjustPeriods = new Set(set);
+  document.querySelectorAll('#viewPeriodsChecklist input, #adjustPeriodsChecklist input').forEach(cbx=>{
+    const on = set.has(cbx.value);
+    cbx.checked = on;
+    cbx.parentElement.classList.toggle('checked', on);
+  });
+}
+function populatePeriodsChecklists(periods){
+  const viewBox = document.getElementById('viewPeriodsChecklist');
+  const adjustBox = document.getElementById('adjustPeriodsChecklist');
+  if(!viewBox || !adjustBox) return;
   const keys = sortedPeriodKeys(periods);
-  // mantém as seleções anteriores que ainda existem neste grupo/ficheiro
+  // mantém a seleção anterior que ainda existe neste grupo/ficheiro; por predefinição, os primeiros 4
   let stillValid = new Set(Array.from(viewPeriods).filter(k=>keys.includes(k)));
   if(stillValid.size===0){
     keys.slice(0, 4).forEach(k=>stillValid.add(k));
   }
   viewPeriods = stillValid;
-  box.innerHTML = '';
+  adjustPeriods = new Set(stillValid);
   const sorted = periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
-  sorted.forEach(r=>{
-    const key = r.pickupStart + '|' + r.pickupEnd;
-    const lab = document.createElement('label');
-    const on = viewPeriods.has(key);
-    if(on) lab.className = 'checked';
-    lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
-    box.appendChild(lab);
-    const cbx = lab.querySelector('input');
-    cbx.addEventListener('change', ()=>{
-      if(cbx.checked) viewPeriods.add(key); else viewPeriods.delete(key);
-      if(viewPeriods.size===0){ viewPeriods.add(key); cbx.checked = true; }
-      lab.classList.toggle('checked', cbx.checked);
-      renderGrid();
+  const onToggle = (key, cbx)=>{
+    const keys2 = new Set(viewPeriods);
+    if(cbx.checked) keys2.add(key); else keys2.delete(key);
+    if(keys2.size===0){ keys2.add(key); }
+    setSyncedPeriods(keys2);
+    onAdjustPeriodsChanged();
+  };
+  [viewBox, adjustBox].forEach(box=>{
+    box.innerHTML = '';
+    sorted.forEach(r=>{
+      const key = r.pickupStart + '|' + r.pickupEnd;
+      const lab = document.createElement('label');
+      const on = viewPeriods.has(key);
+      if(on) lab.className = 'checked';
+      lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
+      box.appendChild(lab);
+      const cbx = lab.querySelector('input');
+      cbx.addEventListener('change', ()=>onToggle(key, cbx));
     });
   });
 }
 document.getElementById('viewPeriodsFirst4').addEventListener('click', ()=>{
   const keys = Array.from(document.querySelectorAll('#viewPeriodsChecklist input')).map(cbx=>cbx.value);
-  viewPeriods = new Set(keys.slice(0, 4));
-  document.querySelectorAll('#viewPeriodsChecklist label').forEach((lab, idx)=>{
-    const cbx = lab.querySelector('input');
-    const on = idx < 4;
-    cbx.checked = on;
-    lab.classList.toggle('checked', on);
-  });
-  renderGrid();
+  setSyncedPeriods(keys.slice(0, 4));
+  onAdjustPeriodsChanged();
 });
 document.getElementById('viewPeriodsAll').addEventListener('click', ()=>{
-  document.querySelectorAll('#viewPeriodsChecklist input').forEach(cbx=>{
-    cbx.checked = true;
-    cbx.parentElement.classList.add('checked');
-    viewPeriods.add(cbx.value);
-  });
-  renderGrid();
+  const keys = Array.from(document.querySelectorAll('#viewPeriodsChecklist input')).map(cbx=>cbx.value);
+  setSyncedPeriods(keys);
+  onAdjustPeriodsChanged();
 });
 document.getElementById('viewPeriodsNone').addEventListener('click', ()=>{
   const boxes = document.querySelectorAll('#viewPeriodsChecklist input');
   if(boxes.length===0) return;
-  boxes.forEach(cbx=>{ cbx.checked = false; cbx.parentElement.classList.remove('checked'); });
-  viewPeriods.clear();
-  // mantém sempre pelo menos um período selecionado, tal como as outras checklists
-  boxes[0].checked = true;
-  boxes[0].parentElement.classList.add('checked');
-  viewPeriods.add(boxes[0].value);
-  renderGrid();
+  // mantém sempre pelo menos um período selecionado, tal como antes
+  setSyncedPeriods([boxes[0].value]);
+  onAdjustPeriodsChanged();
+});
+document.getElementById('adjustPeriodsAll').addEventListener('click', ()=>{
+  const keys = Array.from(document.querySelectorAll('#adjustPeriodsChecklist input')).map(cbx=>cbx.value);
+  setSyncedPeriods(keys);
+  onAdjustPeriodsChanged();
+});
+document.getElementById('adjustPeriodsNone').addEventListener('click', ()=>{
+  const boxes = document.querySelectorAll('#adjustPeriodsChecklist input');
+  if(boxes.length===0) return;
+  setSyncedPeriods([boxes[0].value]);
+  onAdjustPeriodsChanged();
 });
 function updateGroupDesc(group){
   const v = VGROUPS[group];

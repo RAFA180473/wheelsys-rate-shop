@@ -1551,6 +1551,24 @@ let PBI_LOADED=false;
 // 4 concorrentes ficam sempre "—" nestas linhas — só a coluna AutoUnion e "ICONIQ vs AutoUnion" têm dados.
 const RS_VAN_SITE_CODE={VANS:'Z1', VANM:'Z3', VANL:'Z4', VCXL:'Z4'};
 let VANS_HISTORY={schemaVersion:1,generatedAt:null,source:'',locations:{}};
+// Normaliza as chaves de data dos JSON do Rate Shop para YYYY-MM-DD (aceita também DD-MM-YYYY e DD/MM/YYYY),
+// para que um ficheiro gravado com outro formato de data não deixe o Rate Shop sem dados (incidente de 28/09/2026).
+function rsNormDateKey(k){
+  const m=/^(\d{2})[-\/](\d{2})[-\/](\d{4})$/.exec(String(k).trim());
+  return m?`${m[3]}-${m[2]}-${m[1]}`:String(k).trim();
+}
+function rsNormLocations(locs){
+  const out={};
+  Object.entries(locs||{}).forEach(([loc,byKey])=>{
+    out[loc]={};
+    Object.entries(byKey||{}).forEach(([key,byDate])=>{
+      const nd={};
+      Object.entries(byDate||{}).forEach(([d,v])=>{nd[rsNormDateKey(d)]=v;});
+      out[loc][key]=nd;
+    });
+  });
+  return out;
+}
 async function loadRateShopPowerBI(){
   const updated=document.getElementById('rsPbiUpdated');
   try{
@@ -1563,7 +1581,7 @@ async function loadRateShopPowerBI(){
       source:external.source||'',
       companies:external.companies||PBI_COMPANIES,
       buckets:external.buckets||[],
-      locations:external.locations||{}
+      locations:rsNormLocations(external.locations)
     };
     PBI_LOADED=true;
     if(updated){
@@ -1589,7 +1607,7 @@ async function loadRateShopVans(){
       schemaVersion:1,
       generatedAt:external.generatedAt||null,
       source:external.source||'',
-      locations:external.locations||{}
+      locations:rsNormLocations(external.locations)
     };
     if(updated){
       updated.innerHTML=VANS_HISTORY.generatedAt

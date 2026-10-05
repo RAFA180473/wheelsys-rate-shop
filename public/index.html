@@ -393,7 +393,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
   <span id="rateSourceDot" class="rate-source-dot"></span>
   <span class="rate-source-copy"><b>Última versão usada:</b> <span id="rateSourceFile"></span><br>
   <span class="rate-source-sub"><b>Ficheiro atualizado:</b> <span id="rateSourceDate"></span><br>
-  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">05/10/2026 16:46</span><br>
+  <b>Última atualização do dashboard:</b> <span id="rateDashboardUpdated">05/10/2026 17:00</span><br>
   Atualização automática: duas vezes por dia.</span></span>
 </div>
 
@@ -631,6 +631,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
           <div>
             <div class="rs-pbi-updated" id="rsPbiUpdated">A carregar dados do Power BI…</div>
             <div class="rs-pbi-updated" id="rsVansUpdated">A carregar dados AutoUnion (carrinhas)…</div>
+            <div class="rs-pbi-updated" id="rsAuSiteUpdated">A carregar preços AutoUnion (site)…</div>
           </div>
           <button type="button" class="btn ghost" id="btnRefreshPbi">↻ Atualizar agora</button>
         </div>
@@ -654,7 +655,7 @@ tbody tr[class*="segment-tone-"] td.selected-cell:hover{background:var(--teal-50
                 <th>SIPP ref.</th>
                 <th>Viatura ICONIQ</th>
                 <th>Preço ICONIQ /dia</th>
-                <th>AutoUnion<small>€/dia · €/7d</small></th>
+                <th>AutoUnion<small>€/dia · €/7d · site AutoUnion</small></th>
                 <th>Drivalia<small>€/dia · €/7d</small></th>
                 <th>Cael<small>€/dia · €/7d</small></th>
                 <th>Drive on Holidays<small>€/dia · €/7d</small></th>
@@ -1783,6 +1784,52 @@ let PBI_LOADED=false;
 // estes grupos (a AutoUnion não expõe preços de concorrentes no próprio site), por isso as colunas dos
 // 4 concorrentes ficam sempre "—" nestas linhas — só a coluna AutoUnion e "ICONIQ vs AutoUnion" têm dados.
 const RS_VAN_SITE_CODE={VANS:'Z1', VANM:'Z3', VANL:'Z4', VCXL:'Z4'};
+// Preço AutoUnion na coluna "AutoUnion" do Rate Shop: vem do site público da AutoUnion (autounionrentacar.com) para
+// todos os grupos com correspondência (validada pelo Nuno a 05/10/2026). Os 4 concorrentes continuam a vir do Power BI.
+// Grupos sem código no site (B1 Fiat 500c, MEV) usam o valor AutoUnion do Power BI como recurso (marcado "PBI").
+const RS_AU_SITE_CODE={A:'A', B:'BA', B2:'A2', C:'B1', C1:'B', CA:'BB', D:'H', DA:'H1', E:'C', E1:'D1', EA:'D', EEV:'IA',
+  F:'J', FA:'J1', G:'J2', G1:'F', H1A:'K', HA:'KA', I:'J2A', IA:'J3A', JA:'J4', K:'JHA', L:'KK', L1:'D2', M1:'MD',
+  M2:'P', MD:'M', N:'M1', N1:'PA', O:'N', OEV:'IB', P:'JA', Q:'NA', R:'L', VANS:'Z1', VANM:'Z3', VANL:'Z4', VCXL:'Z4'};
+let AU_SITE_HISTORY={generatedAt:null,source:'',locations:{}};
+async function loadRateShopAUSite(){
+  const updated=document.getElementById('rsAuSiteUpdated');
+  try{
+    const r=await fetch('data/rateshop-autounion-site.json?ts='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const external=await r.json();
+    AU_SITE_HISTORY={generatedAt:external.generatedAt||null, source:external.source||'', locations:rsNormLocations(external.locations)};
+    if(updated){
+      updated.innerHTML=AU_SITE_HISTORY.generatedAt
+        ? `Preços AutoUnion (coluna AutoUnion) do site atualizados em <b>${AU_SITE_HISTORY.generatedAt}</b> · fonte: ${AU_SITE_HISTORY.source||'site AutoUnion'}`
+        : 'Preços AutoUnion (site) carregados.';
+    }
+    return true;
+  }catch(err){
+    if(updated) updated.innerHTML='<span class="rs-badge nomatch">Sem dados</span> não foi possível carregar rateshop-autounion-site.json — a coluna AutoUnion usa o Power BI.';
+    console.warn('Rate Shop AutoUnion (site): não foi possível carregar dados.',err);
+    return false;
+  }
+}
+// Mínimo do preço AutoUnion (site) dentro do período em análise; mesma forma de resultado que vansWeekMin.
+function auSiteWeekMin(loc, siteCode, startISO, endISO){
+  if(!loc||!siteCode||!startISO) return null;
+  const byCode=AU_SITE_HISTORY.locations && AU_SITE_HISTORY.locations[loc] && AU_SITE_HISTORY.locations[loc][siteCode];
+  if(!byCode) return null;
+  const start=new Date(startISO+'T00:00:00Z');
+  if(isNaN(start.getTime())) return null;
+  let end=endISO?new Date(endISO+'T00:00:00Z'):start;
+  if(isNaN(end.getTime())||end<start) end=start;
+  const maxEnd=new Date(start.getTime()+60*86400000);
+  if(end>maxEnd) end=maxEnd;
+  let best=null;
+  for(let t=start.getTime(); t<=end.getTime(); t+=86400000){
+    const iso=new Date(t).toISOString().slice(0,10);
+    const n=pbiNum(byCode[iso]);
+    if(n===null) continue;
+    if(best===null || n<best.value) best={value:n, dateISO:iso};
+  }
+  return best?{Autounion:best}:null;
+}
 let VANS_HISTORY={schemaVersion:1,generatedAt:null,source:'',locations:{}};
 // Normaliza as chaves de data dos JSON do Rate Shop para YYYY-MM-DD (aceita também DD-MM-YYYY e DD/MM/YYYY),
 // para que um ficheiro gravado com outro formato de data não deixe o Rate Shop sem dados (incidente de 28/09/2026).
@@ -1973,14 +2020,18 @@ function renderRateShop(){
     const pbiWeek=vanCode
       ? vansWeekMin(selectedLoc, vanCode, dateISO, dateEndISO)
       : pbiWeekMin(selectedLoc, bucket, dateISO, dateEndISO);
-    const hasPbi=!!pbiWeek;
+    const auSite=auSiteWeekMin(selectedLoc, RS_AU_SITE_CODE[g], dateISO, dateEndISO);
+    const hasPbi=!!pbiWeek||!!auSite;
     if(seg&&sg!==seg||grp&&g!==grp||sipp&&!v.sipp.includes(sipp)||trans&&gt!==trans||match==='live'&&!hasPbi||match==='none'&&hasPbi)return;
 
     const tr=document.createElement('tr');
     const ours=ourBasePriceFor(g, selectedLoc);
     // Os preços do Power BI (visual "Minimum Rental per Pickup Date") são sempre para uma estadia de 7 dias.
     // Preço diário = preço a 7 dias ÷ 7. É o diário que alimenta o preço sugerido e o alerta ±30%; o valor a 7 dias fica visível como referência.
-    const auEntry=pbiWeek?pbiWeek['Autounion']:null;
+    // Preço AutoUnion: site da AutoUnion (preferencial); recurso = valor AutoUnion do Power BI / ficheiro de carrinhas.
+    const auFallback=pbiWeek?pbiWeek['Autounion']:null;
+    const auEntry=auSite?auSite['Autounion']:auFallback;
+    const auSrcTag=(!auSite&&auFallback&&!vanCode)?'<span class="rs-flash-tag" title="Sem preço no site AutoUnion — valor do Power BI">PBI</span>':'';
     const auWeekly=auEntry?auEntry.value:null;
     const auPrice=auWeekly===null?null:auWeekly/7;
     const suggested=auPrice;
@@ -2025,7 +2076,7 @@ function renderRateShop(){
       <td class="mono">${v.sipp||'—'}</td>
       <td>${v.desc||'—'}</td>
       <td class="mono">${ours!==null?ours.toFixed(2)+' €':'—'}</td>
-      ${pbiCell(auEntry)}
+      ${pbiCell(auEntry,'',auSrcTag)}
       ${compCells}
       <td class="mono">${suggested!==null?suggested.toFixed(2)+' €':'—'}</td>
       <td>${estadoCell}</td>`;
@@ -2046,11 +2097,11 @@ function renderRateShop(){
   }
 }
 populateRsFilters();
-Promise.all([loadRateShopPowerBI(), loadRateShopVans()]).then(()=>renderRateShop());
+Promise.all([loadRateShopPowerBI(), loadRateShopVans(), loadRateShopAUSite()]).then(()=>renderRateShop());
 document.getElementById('btnRefreshPbi')?.addEventListener('click', ()=>{
   const btn=document.getElementById('btnRefreshPbi');
   if(btn){btn.disabled=true;btn.textContent='A atualizar…';}
-  Promise.all([loadRateShopPowerBI(), loadRateShopVans()]).then(()=>{
+  Promise.all([loadRateShopPowerBI(), loadRateShopVans(), loadRateShopAUSite()]).then(()=>{
     renderRateShop();
     if(btn){btn.disabled=false;btn.textContent='↻ Atualizar agora';}
   });

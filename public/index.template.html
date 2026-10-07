@@ -560,12 +560,12 @@
 
           <div>
             <label for="rsPickupDate">Check-out</label>
-            <input id="rsPickupDate" type="date">
+            <select id="rsPickupDate"></select>
           </div>
 
           <div>
             <label for="rsDropoffDate">Check-in</label>
-            <input id="rsDropoffDate" type="date">
+            <select id="rsDropoffDate"></select>
           </div>
 
           <div class="rs-days-field">
@@ -580,7 +580,6 @@
             <div class="rs-pbi-updated" id="rsVansUpdated">A carregar dados AutoUnion (carrinhas)…</div>
             <div class="rs-pbi-updated" id="rsAuSiteUpdated">A carregar preços AutoUnion (site)…</div>
           </div>
-          <button type="button" class="btn ghost" id="btnRefreshPbi">↻ Atualizar agora</button>
         </div>
 
         <div class="rs-alert-banner" id="rsAlertBanner"></div>
@@ -1493,10 +1492,12 @@ function syncRateShopDatesFromPeriod(){
   const start=ptDateToInputValue(parts[0]);
   const end=ptDateToInputValue(parts[1]);
 
-  if(start) pickup.value=start;
-  if(end) dropoff.value=end;
+  // O filtro só pode apontar para datas com preços carregados (ver rsComputeAvailableDates) —
+  // por isso ajusta-se à data disponível mais próxima do período selecionado em vez de a usar literalmente.
+  if(start && RS_AVAILABLE_DATES.length) pickup.value=rsNearestAvailable(RS_AVAILABLE_DATES, start);
+  if(end && RS_AVAILABLE_DATES.length) dropoff.value=rsNearestAvailable(RS_AVAILABLE_DATES, end);
 
-  if(typeof updateRsDays==='function') updateRsDays();
+  if(typeof updateRateShopDays==='function') updateRateShopDays(false);
   if(typeof renderRateShop==='function') renderRateShop();
 }
 
@@ -1864,14 +1865,13 @@ function renderRateShop(){
   }
 }
 populateRsFilters();
-Promise.all([loadRateShopPowerBI(), loadRateShopVans(), loadRateShopAUSite()]).then(()=>renderRateShop());
-document.getElementById('btnRefreshPbi')?.addEventListener('click', ()=>{
-  const btn=document.getElementById('btnRefreshPbi');
-  if(btn){btn.disabled=true;btn.textContent='A atualizar…';}
-  Promise.all([loadRateShopPowerBI(), loadRateShopVans(), loadRateShopAUSite()]).then(()=>{
-    renderRateShop();
-    if(btn){btn.disabled=false;btn.textContent='↻ Atualizar agora';}
-  });
+// Os dados chegam de 3 ficheiros estáticos (Power BI, AutoUnion carrinhas, AutoUnion site) publicados no GitHub;
+// só depois de carregados é que se sabe quais as datas com preço disponível, por isso o filtro de datas
+// (populateRsDateSelects) só é construído aqui, dentro do .then(). Não há botão de atualização manual: a página
+// já vai sempre buscar a versão mais recente destes ficheiros ao carregar (fetch com cache:no-store acima).
+Promise.all([loadRateShopPowerBI(), loadRateShopVans(), loadRateShopAUSite()]).then(()=>{
+  populateRsDateSelects();
+  renderRateShop();
 });
 ['rsSegment','rsGroup','rsTransmission','rsMatch'].forEach(id=>document.getElementById(id).addEventListener('change',renderRateShop));
 document.getElementById('rsSipp').addEventListener('input',renderRateShop);
@@ -1889,6 +1889,57 @@ function rsFormatDateUTC(date){
   return `${y}-${m}-${d}`;
 }
 
+// Datas com preço disponível no Rate Shop (não necessariamente as mesmas em todas as fontes/grupos):
+// união das datas de rateshop-powerbi.json, rateshop-vans.json e rateshop-autounion-site.json para a
+// localização escolhida. Os filtros de Check-out/Check-in só podem apontar para datas desta lista —
+// pedido do utilizador para deixar de ser possível escolher datas sem preços carregados.
+let RS_AVAILABLE_DATES=[];
+function rsComputeAvailableDates(loc){
+  const set=new Set();
+  const byLocPbi=PBI_HISTORY.locations && PBI_HISTORY.locations[loc];
+  if(byLocPbi){
+    Object.values(byLocPbi).forEach(byDate=>{
+      Object.entries(byDate||{}).forEach(([d,row])=>{
+        if(row && Object.values(row).some(v=>pbiNum(v)!==null)) set.add(d);
+      });
+    });
+  }
+  const addNumeric=byLoc=>{
+    if(!byLoc) return;
+    Object.values(byLoc).forEach(byDate=>{
+      Object.entries(byDate||{}).forEach(([d,v])=>{
+        if(pbiNum(v)!==null) set.add(d);
+      });
+    });
+  };
+  addNumeric(VANS_HISTORY.locations && VANS_HISTORY.locations[loc]);
+  addNumeric(AU_SITE_HISTORY.locations && AU_SITE_HISTORY.locations[loc]);
+  return [...set].sort();
+}
+function rsFormatDateLabel(iso){
+  const d=rsDateToUTC(iso);
+  if(!d) return iso;
+  const dias=['dom','seg','ter','qua','qui','sex','sáb'];
+  const dd=String(d.getUTCDate()).padStart(2,'0');
+  const mm=String(d.getUTCMonth()+1).padStart(2,'0');
+  return `${dd}/${mm}/${d.getUTCFullYear()} (${dias[d.getUTCDay()]})`;
+}
+// Dada uma lista ordenada de datas disponíveis, devolve a mais próxima de "target" (datas YYYY-MM-DD);
+// usada para "encaixar" datas pedidas por outras partes da página (sincronização com o período ativo,
+// omissão hoje+3) na data real mais próxima com preço carregado.
+function rsNearestAvailable(dates, target){
+  if(!dates.length) return null;
+  if(!target) return dates[0];
+  if(dates.includes(target)) return target;
+  const t=rsDateToUTC(target)?.getTime();
+  if(t==null || isNaN(t)) return dates[0];
+  let best=dates[0], bestDiff=Infinity;
+  dates.forEach(d=>{
+    const diff=Math.abs(rsDateToUTC(d).getTime()-t);
+    if(diff<bestDiff){bestDiff=diff; best=d;}
+  });
+  return best;
+}
 function updateRateShopDays(autoSetCheckIn=false){
   const checkout=document.getElementById('rsPickupDate');
   const checkin=document.getElementById('rsDropoffDate');
@@ -1896,41 +1947,75 @@ function updateRateShopDays(autoSetCheckIn=false){
   if(!checkout||!checkin||!daysEl) return;
   const start=rsDateToUTC(checkout.value);
   if(!start){daysEl.textContent='—';return;}
-  if(autoSetCheckIn){
+  if(autoSetCheckIn && RS_AVAILABLE_DATES.length){
     const next=new Date(start.getTime());
     next.setUTCDate(next.getUTCDate()+7);
-    checkin.value=rsFormatDateUTC(next);
+    checkin.value=rsNearestAvailable(RS_AVAILABLE_DATES, rsFormatDateUTC(next));
   }
   const finish=rsDateToUTC(checkin.value);
   if(!finish){daysEl.textContent='—';return;}
   const days=Math.round((finish-start)/86400000);
   daysEl.textContent=days>0?days:'—';
 }
+// Recria as opções dos selects de Check-out/Check-in com as datas disponíveis para a localização atual.
+// preserve=true tenta manter a data já escolhida (encaixada na mais próxima ainda disponível) — usado ao
+// mudar de localização; preserve=false usa sempre a omissão "hoje + 3 dias" — usado no arranque da página.
+function populateRsDateSelects(preserve){
+  const loc=document.getElementById('rsLocation')?.value || primaryLocation();
+  RS_AVAILABLE_DATES=rsComputeAvailableDates(loc);
+  const pickupSel=document.getElementById('rsPickupDate');
+  const dropoffSel=document.getElementById('rsDropoffDate');
+  if(!pickupSel || !dropoffSel) return;
 
-document.getElementById('rsPickupDate')?.addEventListener('change',()=>updateRateShopDays(true));
-document.getElementById('rsDropoffDate')?.addEventListener('change',()=>updateRateShopDays(false));
+  const prevPickup=preserve ? pickupSel.value : '';
+  const prevDropoff=preserve ? dropoffSel.value : '';
 
-const _rsPick=document.getElementById('rsPickupDate');
-const _rsDrop=document.getElementById('rsDropoffDate');
-if(_rsPick && !_rsPick.value){
-  // Por omissão usa "hoje + 3 dias": a AutoUnion nem sempre tem tarifa publicada no Power BI para os 1-2 dias mais próximos
-  // (verificado diretamente no Power BI em 14/09/2026: sem tarifa AutoUnion a 15 e 16/09, presente a partir de 17/09) —
-  // um valor fixo ficaria desatualizado; isto garante sempre uma data com dados completos ao abrir a página.
-  const _rsDefault=new Date(); _rsDefault.setDate(_rsDefault.getDate()+3);
-  _rsPick.value=_rsDefault.toISOString().slice(0,10);
+  const opts=RS_AVAILABLE_DATES.map(d=>`<option value="${d}">${rsFormatDateLabel(d)}</option>`).join('');
+  pickupSel.innerHTML=opts;
+  dropoffSel.innerHTML=opts;
+
+  if(!RS_AVAILABLE_DATES.length){
+    pickupSel.disabled=true;
+    dropoffSel.disabled=true;
+    const daysEl=document.getElementById('rsDays');
+    if(daysEl) daysEl.textContent='—';
+    return;
+  }
+  pickupSel.disabled=false;
+  dropoffSel.disabled=false;
+
+  // Por omissão usa "hoje + 3 dias" encaixado na data disponível mais próxima: a AutoUnion nem sempre tem
+  // tarifa publicada para os 1-2 dias mais próximos — isto garante uma data com dados completos ao abrir a página.
+  let pickupTarget=prevPickup;
+  if(!pickupTarget){
+    const d=new Date(); d.setDate(d.getDate()+3);
+    pickupTarget=rsFormatDateUTC(d);
+  }
+  pickupSel.value=rsNearestAvailable(RS_AVAILABLE_DATES, pickupTarget);
+
+  let dropoffTarget=prevDropoff;
+  if(!dropoffTarget){
+    const start=rsDateToUTC(pickupSel.value);
+    const next=new Date(start.getTime()); next.setUTCDate(next.getUTCDate()+7);
+    dropoffTarget=rsFormatDateUTC(next);
+  }
+  let dropoffVal=rsNearestAvailable(RS_AVAILABLE_DATES, dropoffTarget);
+  if(rsDateToUTC(dropoffVal)<rsDateToUTC(pickupSel.value)) dropoffVal=RS_AVAILABLE_DATES[RS_AVAILABLE_DATES.length-1];
+  dropoffSel.value=dropoffVal;
+
+  updateRateShopDays(false);
 }
-if(_rsPick && _rsDrop && !_rsDrop.value) updateRateShopDays(true);
-renderRateShop();
 
 document.getElementById('rsPickupDate')?.addEventListener('change', ()=>{
-  if(typeof updateRsDays==='function') updateRsDays();
+  updateRateShopDays(true);
   renderRateShop();
 });
 document.getElementById('rsDropoffDate')?.addEventListener('change', ()=>{
-  if(typeof updateRsDays==='function') updateRsDays();
+  updateRateShopDays(false);
   renderRateShop();
 });
 document.getElementById('rsLocation')?.addEventListener('change', ()=>{
+  populateRsDateSelects(true);
   renderRateShop();
 });
 

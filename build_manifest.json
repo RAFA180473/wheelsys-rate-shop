@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-19T20:35:43+00:00",
+  "generated_at": "2026-10-20T12:42:59+00:00",
   "output": "public/data/rates.json",
   "sources": [
     {
@@ -8,9 +8,9 @@
       "rows": 7227
     },
     {
-      "file": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_071026.xlsx",
+      "file": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_201026.xlsx",
       "tariff": "BK",
-      "rows": 7227
+      "rows": 6237
     },
     {
       "file": "RateGroup_Export_Commercial_VAN_150826_311227.xlsx",

@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-10-06T20:07:06+00:00",
+  "generated_at": "2026-10-28T20:18:15+00:00",
   "rule": "latest per family BK/FCI/VAN by SharePoint lastModifiedDateTime",
   "selected": [
     {
       "family": "BK",
-      "source": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_051026.xlsx",
-      "selected": "data/selected/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_051026.xlsx",
-      "effective_datetime": "2026-10-05T10:33:32+00:00",
+      "source": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_201026.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_201026.xlsx",
+      "effective_datetime": "2026-10-20T09:36:13+00:00",
       "selection_method": "sharepoint_lastModifiedDateTime"
     },
     {
       "family": "FCI",
-      "source": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_051026.xlsx",
-      "selected": "data/selected/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_051026.xlsx",
-      "effective_datetime": "2026-10-05T10:33:33+00:00",
+      "source": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_081026.xlsx",
+      "selected": "data/selected/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_081026.xlsx",
+      "effective_datetime": "2026-10-08T15:25:17+00:00",
       "selection_method": "sharepoint_lastModifiedDateTime"
     },
     {

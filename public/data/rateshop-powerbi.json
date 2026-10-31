@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-28T22:22:48+00:00",
+  "generatedAt": "2026-10-31T15:46:06Z",
   "source": "Power BI - Franchisees - Booking (Autounion Partners App), visual Minimum Rental per Pickup Date",
   "companies": [
     "Autounion",
@@ -21,478 +21,933 @@
   "locations": {
     "Lisboa": {
       "small": {
-        "2026-10-29": {
-          "Autounion": 31.6,
-          "Drivalia": 20.09,
-          "Cael": null,
-          "Drive on Holidays": 23.71,
-          "Tangerine": 25.25
-        },
-        "2026-10-30": {
-          "Autounion": 32.98,
-          "Drivalia": 20.09,
-          "Cael": 57.11,
-          "Drive on Holidays": 23.71,
-          "Tangerine": 18.67
-        },
-        "2026-10-31": {
-          "Autounion": 32.98,
-          "Drivalia": 20.09,
-          "Cael": null,
-          "Drive on Holidays": 23.71,
-          "Tangerine": 18.67
-        },
         "2026-11-01": {
-          "Autounion": 30.29,
-          "Drivalia": 20.79,
-          "Cael": null,
-          "Drive on Holidays": 29.66,
-          "Tangerine": 19.58
+          "Autounion": 32.17,
+          "Drivalia": 21.11,
+          "Cael": 52.42,
+          "Drive on Holidays": 22.89,
+          "Tangerine": 20.98
         },
         "2026-11-02": {
-          "Autounion": 35.77,
+          "Autounion": 30.29,
           "Drivalia": 21.11,
-          "Cael": 52.72,
-          "Drive on Holidays": 29.66,
-          "Tangerine": 18.11
+          "Cael": 58.16,
+          "Drive on Holidays": 22.89,
+          "Tangerine": 20.98
         },
         "2026-11-03": {
-          "Autounion": 32.17,
-          "Drivalia": 20.79,
-          "Cael": 52.42,
-          "Drive on Holidays": 29.66,
-          "Tangerine": 18.11
-        },
-        "2026-11-04": {
-          "Autounion": 37.18,
-          "Drivalia": 21.11,
-          "Cael": 53.91,
-          "Drive on Holidays": 29.66,
-          "Tangerine": 19.58
-        },
-        "2026-11-05": {
-          "Autounion": 33.85,
+          "Autounion": 30.95,
           "Drivalia": 21.11,
           "Cael": 52.27,
-          "Drive on Holidays": 29.66,
-          "Tangerine": 19.58
+          "Drive on Holidays": 22.89,
+          "Tangerine": 20.98
         },
-        "2026-11-06": {
+        "2026-11-04": {
+          "Autounion": 33.57,
+          "Drivalia": 21.11,
+          "Cael": 55.27,
+          "Drive on Holidays": 22.89,
+          "Tangerine": 18.88
+        },
+        "2026-11-05": {
           "Autounion": 37.18,
           "Drivalia": 21.11,
           "Cael": 53.91,
-          "Drive on Holidays": 22.66,
-          "Tangerine": 19.58
+          "Drive on Holidays": 22.89,
+          "Tangerine": 18.88
+        },
+        "2026-11-06": {
+          "Autounion": 38.8,
+          "Drivalia": 21.11,
+          "Cael": 55.27,
+          "Drive on Holidays": 22.89,
+          "Tangerine": 17.76
         }
       },
       "medium": {
-        "2026-10-29": {
-          "Autounion": 57.66,
-          "Drivalia": 24.42,
-          "Cael": null,
-          "Drive on Holidays": 26.79,
-          "Tangerine": 27.82
-        },
-        "2026-10-30": {
-          "Autounion": 60.18,
-          "Drivalia": 24.93,
-          "Cael": 83.67,
-          "Drive on Holidays": 38.95,
-          "Tangerine": 22.03
-        },
-        "2026-10-31": {
-          "Autounion": 60.18,
-          "Drivalia": 24.93,
-          "Cael": null,
-          "Drive on Holidays": 26.79,
-          "Tangerine": 22.03
-        },
         "2026-11-01": {
-          "Autounion": 46.07,
+          "Autounion": 41.81,
           "Drivalia": 23.13,
-          "Cael": null,
-          "Drive on Holidays": 39.11,
-          "Tangerine": 23.15
+          "Cael": 72.94,
+          "Drive on Holidays": 37.14,
+          "Tangerine": 19.93
         },
         "2026-11-02": {
-          "Autounion": 49.08,
+          "Autounion": 38.84,
           "Drivalia": 23.13,
-          "Cael": 70.45,
-          "Drive on Holidays": 42.11,
-          "Tangerine": 23.15
+          "Cael": 77.24,
+          "Drive on Holidays": 34.89,
+          "Tangerine": 19.93
         },
         "2026-11-03": {
-          "Autounion": 51.01,
+          "Autounion": 40.22,
           "Drivalia": 23.13,
-          "Cael": 72.19,
-          "Drive on Holidays": 43.52,
-          "Tangerine": 23.15
+          "Cael": 70.45,
+          "Drive on Holidays": 35.95,
+          "Tangerine": 19.93
         },
         "2026-11-04": {
-          "Autounion": 51.01,
+          "Autounion": 43.63,
           "Drivalia": 23.13,
-          "Cael": 72.19,
-          "Drive on Holidays": 42.12,
-          "Tangerine": 23.15
+          "Cael": 74.2,
+          "Drive on Holidays": 38.53,
+          "Tangerine": 19.93
         },
         "2026-11-05": {
-          "Autounion": 45.93,
-          "Drivalia": 23.13,
-          "Cael": 67.61,
-          "Drive on Holidays": 39.11,
-          "Tangerine": 23.15
-        },
-        "2026-11-06": {
-          "Autounion": 51.01,
+          "Autounion": 41.81,
           "Drivalia": 23.13,
           "Cael": 72.19,
-          "Drive on Holidays": 42.12,
-          "Tangerine": 23.08
+          "Drive on Holidays": 37.14,
+          "Tangerine": 19.93
+        },
+        "2026-11-06": {
+          "Autounion": 43.63,
+          "Drivalia": 23.13,
+          "Cael": 74.2,
+          "Drive on Holidays": 38.53,
+          "Tangerine": 19.93
         }
       },
       "large": {
-        "2026-10-29": {
-          "Autounion": 152.68,
-          "Drivalia": 74.51,
-          "Cael": null,
-          "Drive on Holidays": 62.43,
-          "Tangerine": null
-        },
-        "2026-10-30": {
-          "Autounion": 159.33,
-          "Drivalia": 77.75,
-          "Cael": 535.6,
-          "Drive on Holidays": 64.76,
-          "Tangerine": null
-        },
-        "2026-10-31": {
-          "Autounion": 159.33,
-          "Drivalia": 77.75,
-          "Cael": null,
-          "Drive on Holidays": 64.76,
-          "Tangerine": null
-        },
         "2026-11-01": {
-          "Autounion": 77.18,
-          "Drivalia": 63.17,
-          "Cael": null,
-          "Drive on Holidays": 59.15,
-          "Tangerine": null
+          "Autounion": 78.03,
+          "Drivalia": 69.94,
+          "Cael": 124.77,
+          "Drive on Holidays": 45.3,
+          "Tangerine": 42.43
         },
         "2026-11-02": {
-          "Autounion": 82.22,
-          "Drivalia": 67.29,
-          "Cael": 495.9,
-          "Drive on Holidays": 61.67,
-          "Tangerine": 120.46
+          "Autounion": 72.5,
+          "Drivalia": 64.98,
+          "Cael": 118.5,
+          "Drive on Holidays": 42.56,
+          "Tangerine": 39.42
         },
         "2026-11-03": {
-          "Autounion": 85.46,
-          "Drivalia": 69.94,
-          "Cael": 511.06,
-          "Drive on Holidays": 63.74,
-          "Tangerine": 109.32
+          "Autounion": 75.07,
+          "Drivalia": 67.29,
+          "Cael": 121.41,
+          "Drive on Holidays": 43.83,
+          "Tangerine": 40.82
         },
         "2026-11-04": {
-          "Autounion": 85.46,
-          "Drivalia": 69.94,
-          "Cael": 511.06,
-          "Drive on Holidays": 63.74,
-          "Tangerine": 109.32
+          "Autounion": 81.43,
+          "Drivalia": 72.99,
+          "Cael": 128.62,
+          "Drive on Holidays": 47.0,
+          "Tangerine": 44.28
         },
         "2026-11-05": {
-          "Autounion": 76.96,
-          "Drivalia": 62.98,
-          "Cael": 471.24,
-          "Drive on Holidays": 58.31,
-          "Tangerine": 98.44
+          "Autounion": 78.03,
+          "Drivalia": 69.94,
+          "Cael": 124.77,
+          "Drive on Holidays": 45.3,
+          "Tangerine": 42.43
         },
         "2026-11-06": {
-          "Autounion": 85.46,
-          "Drivalia": 69.94,
-          "Cael": 511.06,
-          "Drive on Holidays": 63.74,
-          "Tangerine": 105.47
+          "Autounion": 81.43,
+          "Drivalia": 72.99,
+          "Cael": 128.62,
+          "Drive on Holidays": 47.0,
+          "Tangerine": 53.34
         }
       },
       "premium": {
-        "2026-10-29": {
-          "Autounion": 509.84,
-          "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 246.1,
-          "Tangerine": 838.07
-        },
-        "2026-10-30": {
-          "Autounion": 532.05,
-          "Drivalia": 645.6,
-          "Cael": 393.63,
-          "Drive on Holidays": 451.51,
-          "Tangerine": 598.03
-        },
-        "2026-10-31": {
-          "Autounion": 532.05,
-          "Drivalia": 645.6,
-          "Cael": null,
-          "Drive on Holidays": 451.51,
-          "Tangerine": 598.03
-        },
         "2026-11-01": {
-          "Autounion": 223.49,
+          "Autounion": 247.45,
           "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 429.88,
-          "Tangerine": 522.63
+          "Cael": 348.77,
+          "Drive on Holidays": 187.17,
+          "Tangerine": 120.37
         },
         "2026-11-02": {
+          "Autounion": 229.92,
+          "Drivalia": null,
+          "Cael": 349.5,
+          "Drive on Holidays": 119.19,
+          "Tangerine": 111.84
+        },
+        "2026-11-03": {
           "Autounion": 238.08,
           "Drivalia": null,
           "Cael": 338.57,
-          "Drive on Holidays": 207.73,
-          "Tangerine": null
-        },
-        "2026-11-03": {
-          "Autounion": 247.45,
-          "Drivalia": null,
-          "Cael": 348.77,
-          "Drive on Holidays": 214.7,
-          "Tangerine": null
+          "Drive on Holidays": 122.77,
+          "Tangerine": 115.81
         },
         "2026-11-04": {
-          "Autounion": 247.45,
+          "Autounion": 258.24,
           "Drivalia": null,
-          "Cael": 348.77,
-          "Drive on Holidays": 214.7,
-          "Tangerine": null
+          "Cael": 360.51,
+          "Drive on Holidays": 131.62,
+          "Tangerine": 125.62
         },
         "2026-11-05": {
-          "Autounion": 222.83,
-          "Drivalia": null,
-          "Cael": 321.98,
-          "Drive on Holidays": 196.4,
-          "Tangerine": null
-        },
-        "2026-11-06": {
           "Autounion": 247.45,
           "Drivalia": null,
           "Cael": 348.77,
-          "Drive on Holidays": 214.7,
-          "Tangerine": null
+          "Drive on Holidays": 126.89,
+          "Tangerine": 120.37
+        },
+        "2026-11-06": {
+          "Autounion": 258.24,
+          "Drivalia": null,
+          "Cael": 360.51,
+          "Drive on Holidays": 131.62,
+          "Tangerine": 90.51
         }
       },
       "estate": {
-        "2026-10-29": {
-          "Autounion": 158.32,
-          "Drivalia": 738.02,
-          "Cael": null,
-          "Drive on Holidays": 71.94,
-          "Tangerine": 71.93
-        },
-        "2026-10-30": {
-          "Autounion": 165.22,
-          "Drivalia": 770.18,
-          "Cael": 146.13,
-          "Drive on Holidays": 74.62,
-          "Tangerine": 57.56
-        },
-        "2026-10-31": {
-          "Autounion": 165.22,
-          "Drivalia": 770.18,
-          "Cael": null,
-          "Drive on Holidays": 74.62,
-          "Tangerine": 57.56
-        },
         "2026-11-01": {
-          "Autounion": 105.72,
-          "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 68.32,
-          "Tangerine": 37.16
-        },
-        "2026-11-02": {
-          "Autounion": 396.79,
-          "Drivalia": null,
-          "Cael": 121.41,
-          "Drive on Holidays": 108.28,
-          "Tangerine": 39.58
-        },
-        "2026-11-03": {
           "Autounion": 117.06,
           "Drivalia": null,
           "Cael": 124.77,
-          "Drive on Holidays": 111.91,
-          "Tangerine": 41.14
+          "Drive on Holidays": 49.34,
+          "Tangerine": 42.43
+        },
+        "2026-11-02": {
+          "Autounion": 182.75,
+          "Drivalia": null,
+          "Cael": 118.5,
+          "Drive on Holidays": 46.35,
+          "Tangerine": 39.42
+        },
+        "2026-11-03": {
+          "Autounion": 189.23,
+          "Drivalia": null,
+          "Cael": 121.41,
+          "Drive on Holidays": 47.74,
+          "Tangerine": 40.82
         },
         "2026-11-04": {
-          "Autounion": 412.42,
+          "Autounion": 122.16,
           "Drivalia": null,
-          "Cael": 124.77,
-          "Drive on Holidays": 111.91,
-          "Tangerine": 41.14
+          "Cael": 128.62,
+          "Drive on Holidays": 51.19,
+          "Tangerine": 44.28
         },
         "2026-11-05": {
-          "Autounion": 371.39,
-          "Drivalia": null,
-          "Cael": 115.96,
-          "Drive on Holidays": 102.38,
-          "Tangerine": 37.05
-        },
-        "2026-11-06": {
-          "Autounion": 412.42,
+          "Autounion": 196.68,
           "Drivalia": null,
           "Cael": 124.77,
-          "Drive on Holidays": 111.91,
-          "Tangerine": 41.24
+          "Drive on Holidays": 49.34,
+          "Tangerine": 42.43
+        },
+        "2026-11-06": {
+          "Autounion": 205.25,
+          "Drivalia": null,
+          "Cael": 128.62,
+          "Drive on Holidays": 51.19,
+          "Tangerine": 53.34
         }
       },
       "suvs": {
-        "2026-10-29": {
-          "Autounion": 72.65,
-          "Drivalia": 24.42,
-          "Cael": null,
-          "Drive on Holidays": 37.55,
-          "Tangerine": 32.86
-        },
-        "2026-10-30": {
-          "Autounion": 75.81,
-          "Drivalia": 24.93,
-          "Cael": 108.28,
-          "Drive on Holidays": 38.95,
-          "Tangerine": 22.03
-        },
-        "2026-10-31": {
-          "Autounion": 75.81,
-          "Drivalia": 24.93,
-          "Cael": null,
-          "Drive on Holidays": 30.06,
-          "Tangerine": 22.03
-        },
         "2026-11-01": {
-          "Autounion": 57.91,
+          "Autounion": 53.42,
           "Drivalia": 23.13,
-          "Cael": null,
-          "Drive on Holidays": 40.39,
-          "Tangerine": 23.15
+          "Cael": 95.05,
+          "Drive on Holidays": 37.14,
+          "Tangerine": 19.93
         },
         "2026-11-02": {
-          "Autounion": 61.69,
+          "Autounion": 49.64,
           "Drivalia": 23.13,
-          "Cael": 92.61,
-          "Drive on Holidays": 42.11,
-          "Tangerine": 23.15
+          "Cael": 90.48,
+          "Drive on Holidays": 34.89,
+          "Tangerine": 19.93
         },
         "2026-11-03": {
-          "Autounion": 64.12,
+          "Autounion": 51.4,
           "Drivalia": 23.13,
-          "Cael": 95.05,
-          "Drive on Holidays": 43.52,
-          "Tangerine": 23.15
+          "Cael": 92.61,
+          "Drive on Holidays": 35.95,
+          "Tangerine": 19.93
         },
         "2026-11-04": {
-          "Autounion": 64.12,
+          "Autounion": 55.75,
           "Drivalia": 23.13,
-          "Cael": 95.05,
-          "Drive on Holidays": 43.52,
-          "Tangerine": 23.15
+          "Cael": 97.86,
+          "Drive on Holidays": 38.53,
+          "Tangerine": 19.93
         },
         "2026-11-05": {
-          "Autounion": 57.74,
-          "Drivalia": 23.13,
-          "Cael": 88.63,
-          "Drive on Holidays": 40.16,
-          "Tangerine": 23.15
-        },
-        "2026-11-06": {
-          "Autounion": 64.12,
+          "Autounion": 53.42,
           "Drivalia": 23.13,
           "Cael": 95.05,
-          "Drive on Holidays": 43.52,
-          "Tangerine": 23.08
+          "Drive on Holidays": 37.14,
+          "Tangerine": 19.93
+        },
+        "2026-11-06": {
+          "Autounion": 55.75,
+          "Drivalia": 23.13,
+          "Cael": 97.86,
+          "Drive on Holidays": 38.53,
+          "Tangerine": 19.93
         }
       },
       "carriers": {
-        "2026-10-29": {
-          "Autounion": 238.02,
-          "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 127.48,
-          "Tangerine": null
-        },
-        "2026-10-30": {
-          "Autounion": 248.4,
-          "Drivalia": null,
-          "Cael": 535.6,
-          "Drive on Holidays": 132.23,
-          "Tangerine": null
-        },
-        "2026-10-31": {
-          "Autounion": 248.4,
-          "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 132.23,
-          "Tangerine": 370.27
-        },
         "2026-11-01": {
-          "Autounion": 177.63,
+          "Autounion": 196.68,
           "Drivalia": null,
-          "Cael": null,
-          "Drive on Holidays": 134.56,
-          "Tangerine": 230.08
+          "Cael": 511.06,
+          "Drive on Holidays": 114.77,
+          "Tangerine": 229.3
         },
         "2026-11-02": {
+          "Autounion": 182.75,
+          "Drivalia": null,
+          "Cael": 482.71,
+          "Drive on Holidays": 107.81,
+          "Tangerine": 213.05
+        },
+        "2026-11-03": {
           "Autounion": 189.23,
           "Drivalia": null,
           "Cael": 495.9,
-          "Drive on Holidays": 140.29,
-          "Tangerine": 245.1
-        },
-        "2026-11-03": {
-          "Autounion": 196.68,
-          "Drivalia": null,
-          "Cael": 511.06,
-          "Drive on Holidays": 145.0,
-          "Tangerine": 254.76
+          "Drive on Holidays": 111.04,
+          "Tangerine": 220.61
         },
         "2026-11-04": {
-          "Autounion": 196.68,
+          "Autounion": 205.25,
           "Drivalia": null,
-          "Cael": 511.06,
-          "Drive on Holidays": 145.0,
-          "Tangerine": null
+          "Cael": 528.5,
+          "Drive on Holidays": 119.05,
+          "Tangerine": 239.29
         },
         "2026-11-05": {
-          "Autounion": 177.11,
-          "Drivalia": null,
-          "Cael": 471.24,
-          "Drive on Holidays": 132.64,
-          "Tangerine": 229.41
-        },
-        "2026-11-06": {
           "Autounion": 196.68,
           "Drivalia": null,
           "Cael": 511.06,
-          "Drive on Holidays": 145.0,
+          "Drive on Holidays": 114.77,
+          "Tangerine": 229.3
+        },
+        "2026-11-06": {
+          "Autounion": 205.25,
+          "Drivalia": null,
+          "Cael": 528.5,
+          "Drive on Holidays": 119.05,
           "Tangerine": null
         }
       }
     },
     "Porto": {
-      "small": {},
-      "medium": {},
-      "large": {},
-      "premium": {},
-      "estate": {},
-      "suvs": {},
-      "carriers": {}
+      "suvs": {
+        "2026-11-01": {
+          "Autounion": 107.06,
+          "Drivalia": 71.49,
+          "Cael": 309.75,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 771.93
+        },
+        "2026-11-02": {
+          "Autounion": 78.06,
+          "Drivalia": 23.74,
+          "Cael": 139.47,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-03": {
+          "Autounion": 78.06,
+          "Drivalia": 23.74,
+          "Cael": 123.89,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-04": {
+          "Autounion": 78.06,
+          "Drivalia": 23.74,
+          "Cael": 123.89,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-05": {
+          "Autounion": 78.06,
+          "Drivalia": 23.74,
+          "Cael": 123.34,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-06": {
+          "Autounion": 78.06,
+          "Drivalia": 23.74,
+          "Cael": 97.86,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 25.84
+        }
+      },
+      "carriers": {
+        "2026-11-01": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 672.84,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 272.76
+        },
+        "2026-11-02": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 582.92,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 272.76
+        },
+        "2026-11-03": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 582.92,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 272.76
+        },
+        "2026-11-04": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 582.92,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 272.76
+        },
+        "2026-11-05": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 582.92,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 272.76
+        },
+        "2026-11-06": {
+          "Autounion": 539.69,
+          "Drivalia": 906.1,
+          "Cael": 582.92,
+          "Drive on Holidays": 150.85,
+          "Tangerine": 225.08
+        }
+      },
+      "estate": {
+        "2026-11-01": {
+          "Autounion": 152.7,
+          "Drivalia": 811.08,
+          "Cael": 266.23,
+          "Drive on Holidays": 89.23,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": 122.16,
+          "Drivalia": 811.08,
+          "Cael": 283.79,
+          "Drive on Holidays": 67.29,
+          "Tangerine": null
+        },
+        "2026-11-03": {
+          "Autounion": 122.16,
+          "Drivalia": 811.08,
+          "Cael": 174.35,
+          "Drive on Holidays": 67.29,
+          "Tangerine": 86.08
+        },
+        "2026-11-04": {
+          "Autounion": 122.16,
+          "Drivalia": 811.08,
+          "Cael": 146.51,
+          "Drive on Holidays": 67.29,
+          "Tangerine": 86.08
+        },
+        "2026-11-05": {
+          "Autounion": 122.16,
+          "Drivalia": 811.08,
+          "Cael": 168.46,
+          "Drive on Holidays": 67.29,
+          "Tangerine": 86.08
+        },
+        "2026-11-06": {
+          "Autounion": 122.16,
+          "Drivalia": 811.08,
+          "Cael": 150.07,
+          "Drive on Holidays": 67.29,
+          "Tangerine": 75.47
+        }
+      },
+      "large": {
+        "2026-11-01": {
+          "Autounion": 135.72,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.5,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": 96.93,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.26,
+          "Tangerine": null
+        },
+        "2026-11-03": {
+          "Autounion": 96.93,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.26,
+          "Tangerine": 43.14
+        },
+        "2026-11-04": {
+          "Autounion": 96.93,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.26,
+          "Tangerine": 43.14
+        },
+        "2026-11-05": {
+          "Autounion": 96.93,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.26,
+          "Tangerine": 43.14
+        },
+        "2026-11-06": {
+          "Autounion": 96.93,
+          "Drivalia": 71.49,
+          "Cael": null,
+          "Drive on Holidays": 52.26,
+          "Tangerine": 26.36
+        }
+      },
+      "medium": {
+        "2026-11-01": {
+          "Autounion": 104.72,
+          "Drivalia": 58.37,
+          "Cael": 266.23,
+          "Drive on Holidays": 27.85,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": 75.64,
+          "Drivalia": 23.74,
+          "Cael": 139.47,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-03": {
+          "Autounion": 75.64,
+          "Drivalia": 23.74,
+          "Cael": 84.28,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-04": {
+          "Autounion": 75.64,
+          "Drivalia": 23.74,
+          "Cael": 74.2,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-05": {
+          "Autounion": 75.64,
+          "Drivalia": 23.74,
+          "Cael": 74.2,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 42.22
+        },
+        "2026-11-06": {
+          "Autounion": 75.64,
+          "Drivalia": 23.74,
+          "Cael": 74.2,
+          "Drive on Holidays": 27.85,
+          "Tangerine": 24.71
+        }
+      },
+      "premium": {
+        "2026-11-01": {
+          "Autounion": 413.19,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 771.93
+        },
+        "2026-11-02": {
+          "Autounion": 309.88,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 771.93
+        },
+        "2026-11-03": {
+          "Autounion": 309.88,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 771.93
+        },
+        "2026-11-04": {
+          "Autounion": 309.88,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 771.93
+        },
+        "2026-11-05": {
+          "Autounion": 309.88,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 771.93
+        },
+        "2026-11-06": {
+          "Autounion": 309.88,
+          "Drivalia": 702.23,
+          "Cael": 417.29,
+          "Drive on Holidays": 234.57,
+          "Tangerine": 929.27
+        }
+      },
+      "small": {
+        "2026-11-01": {
+          "Autounion": 59.68,
+          "Drivalia": null,
+          "Cael": null,
+          "Drive on Holidays": 33.77,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": 41.02,
+          "Drivalia": 22.6,
+          "Cael": null,
+          "Drive on Holidays": 32.12,
+          "Tangerine": null
+        },
+        "2026-11-03": {
+          "Autounion": 41.02,
+          "Drivalia": 22.6,
+          "Cael": 88.41,
+          "Drive on Holidays": 32.12,
+          "Tangerine": 23.79
+        },
+        "2026-11-04": {
+          "Autounion": 41.02,
+          "Drivalia": 22.6,
+          "Cael": 64.54,
+          "Drive on Holidays": 32.12,
+          "Tangerine": 23.79
+        },
+        "2026-11-05": {
+          "Autounion": 41.02,
+          "Drivalia": 22.6,
+          "Cael": 62.76,
+          "Drive on Holidays": 32.12,
+          "Tangerine": 23.79
+        },
+        "2026-11-06": {
+          "Autounion": 41.02,
+          "Drivalia": 22.6,
+          "Cael": 62.39,
+          "Drive on Holidays": 32.12,
+          "Tangerine": 22.17
+        }
+      }
     },
     "Faro": {
-      "small": {},
-      "medium": {},
-      "large": {},
-      "premium": {},
-      "estate": {},
-      "suvs": {},
-      "carriers": {}
+      "small": {
+        "2026-11-01": {
+          "Autounion": 32.17,
+          "Drivalia": 29.95,
+          "Cael": 99.44,
+          "Drive on Holidays": 29.31,
+          "Tangerine": 17.76
+        },
+        "2026-11-02": {
+          "Autounion": 32.17,
+          "Drivalia": 24.62,
+          "Cael": 73.85,
+          "Drive on Holidays": 29.31,
+          "Tangerine": 17.76
+        },
+        "2026-11-03": {
+          "Autounion": 33.57,
+          "Drivalia": 25.23,
+          "Cael": 75.57,
+          "Drive on Holidays": 30.4,
+          "Tangerine": 17.76
+        },
+        "2026-11-04": {
+          "Autounion": 33.57,
+          "Drivalia": 25.23,
+          "Cael": 75.57,
+          "Drive on Holidays": 30.4,
+          "Tangerine": 17.76
+        },
+        "2026-11-05": {
+          "Autounion": 33.57,
+          "Drivalia": 25.23,
+          "Cael": 81.5,
+          "Drive on Holidays": 30.4,
+          "Tangerine": 17.76
+        },
+        "2026-11-06": {
+          "Autounion": 31.07,
+          "Drivalia": 25.2,
+          "Cael": 73.91,
+          "Drive on Holidays": 29.11,
+          "Tangerine": 18.1
+        }
+      },
+      "medium": {
+        "2026-11-01": {
+          "Autounion": 41.81,
+          "Drivalia": 27.08,
+          "Cael": 91.8,
+          "Drive on Holidays": 39.21,
+          "Tangerine": 20.77
+        },
+        "2026-11-02": {
+          "Autounion": 41.81,
+          "Drivalia": 27.08,
+          "Cael": 91.8,
+          "Drive on Holidays": 39.21,
+          "Tangerine": 20.77
+        },
+        "2026-11-03": {
+          "Autounion": 43.63,
+          "Drivalia": 28.26,
+          "Cael": 94.5,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-04": {
+          "Autounion": 43.63,
+          "Drivalia": 28.26,
+          "Cael": 94.5,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-05": {
+          "Autounion": 43.63,
+          "Drivalia": 28.26,
+          "Cael": 94.5,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-06": {
+          "Autounion": 39.99,
+          "Drivalia": 27.33,
+          "Cael": 89.56,
+          "Drive on Holidays": 37.91,
+          "Tangerine": 19.55
+        }
+      },
+      "large": {
+        "2026-11-01": {
+          "Autounion": 85.46,
+          "Drivalia": 60.82,
+          "Cael": null,
+          "Drive on Holidays": 46.66,
+          "Tangerine": 99.85
+        },
+        "2026-11-02": {
+          "Autounion": 85.46,
+          "Drivalia": 60.82,
+          "Cael": null,
+          "Drive on Holidays": 46.66,
+          "Tangerine": 99.85
+        },
+        "2026-11-03": {
+          "Autounion": 89.18,
+          "Drivalia": 63.47,
+          "Cael": null,
+          "Drive on Holidays": 48.39,
+          "Tangerine": 104.2
+        },
+        "2026-11-04": {
+          "Autounion": 89.18,
+          "Drivalia": 63.47,
+          "Cael": null,
+          "Drive on Holidays": 48.39,
+          "Tangerine": 104.2
+        },
+        "2026-11-05": {
+          "Autounion": 89.18,
+          "Drivalia": 63.47,
+          "Cael": null,
+          "Drive on Holidays": 48.39,
+          "Tangerine": 104.2
+        },
+        "2026-11-06": {
+          "Autounion": 81.75,
+          "Drivalia": 58.18,
+          "Cael": null,
+          "Drive on Holidays": 45.11,
+          "Tangerine": 94.77
+        }
+      },
+      "premium": {
+        "2026-11-01": {
+          "Autounion": null,
+          "Drivalia": 672.9,
+          "Cael": null,
+          "Drive on Holidays": 195.01,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": null,
+          "Drivalia": 672.9,
+          "Cael": null,
+          "Drive on Holidays": 195.01,
+          "Tangerine": null
+        },
+        "2026-11-03": {
+          "Autounion": null,
+          "Drivalia": 702.23,
+          "Cael": null,
+          "Drive on Holidays": 202.28,
+          "Tangerine": 167.42
+        },
+        "2026-11-04": {
+          "Autounion": null,
+          "Drivalia": 702.23,
+          "Cael": null,
+          "Drive on Holidays": 202.28,
+          "Tangerine": 167.42
+        },
+        "2026-11-05": {
+          "Autounion": null,
+          "Drivalia": 702.23,
+          "Cael": null,
+          "Drive on Holidays": 202.28,
+          "Tangerine": 167.42
+        },
+        "2026-11-06": {
+          "Autounion": null,
+          "Drivalia": 643.7,
+          "Cael": null,
+          "Drive on Holidays": 188.59,
+          "Tangerine": 132.8
+        }
+      },
+      "estate": {
+        "2026-11-01": {
+          "Autounion": 131.69,
+          "Drivalia": null,
+          "Cael": 144.36,
+          "Drive on Holidays": 85.78,
+          "Tangerine": null
+        },
+        "2026-11-02": {
+          "Autounion": 131.69,
+          "Drivalia": null,
+          "Cael": 144.36,
+          "Drive on Holidays": 85.78,
+          "Tangerine": null
+        },
+        "2026-11-03": {
+          "Autounion": 137.43,
+          "Drivalia": null,
+          "Cael": 148.91,
+          "Drive on Holidays": 88.99,
+          "Tangerine": null
+        },
+        "2026-11-04": {
+          "Autounion": 137.43,
+          "Drivalia": null,
+          "Cael": 148.91,
+          "Drive on Holidays": 88.99,
+          "Tangerine": null
+        },
+        "2026-11-05": {
+          "Autounion": 137.43,
+          "Drivalia": null,
+          "Cael": 148.91,
+          "Drive on Holidays": 88.99,
+          "Tangerine": null
+        },
+        "2026-11-06": {
+          "Autounion": 125.98,
+          "Drivalia": null,
+          "Cael": 140.57,
+          "Drive on Holidays": 82.95,
+          "Tangerine": null
+        }
+      },
+      "suvs": {
+        "2026-11-01": {
+          "Autounion": 74.8,
+          "Drivalia": 27.08,
+          "Cael": 114.66,
+          "Drive on Holidays": 39.21,
+          "Tangerine": 20.77
+        },
+        "2026-11-02": {
+          "Autounion": 74.8,
+          "Drivalia": 27.08,
+          "Cael": 114.66,
+          "Drive on Holidays": 39.21,
+          "Tangerine": 20.77
+        },
+        "2026-11-03": {
+          "Autounion": 78.06,
+          "Drivalia": 28.26,
+          "Cael": 118.16,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-04": {
+          "Autounion": 78.06,
+          "Drivalia": 28.26,
+          "Cael": 118.16,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-05": {
+          "Autounion": 78.06,
+          "Drivalia": 28.26,
+          "Cael": 118.16,
+          "Drive on Holidays": 40.67,
+          "Tangerine": 20.77
+        },
+        "2026-11-06": {
+          "Autounion": 71.56,
+          "Drivalia": 27.33,
+          "Cael": 111.74,
+          "Drive on Holidays": 37.91,
+          "Tangerine": 19.55
+        }
+      },
+      "carriers": {
+        "2026-11-01": {
+          "Autounion": 196.68,
+          "Drivalia": null,
+          "Cael": 583.23,
+          "Drive on Holidays": 144.24,
+          "Tangerine": 251.6
+        },
+        "2026-11-02": {
+          "Autounion": 196.68,
+          "Drivalia": null,
+          "Cael": 583.23,
+          "Drive on Holidays": 144.24,
+          "Tangerine": 251.6
+        },
+        "2026-11-03": {
+          "Autounion": 205.25,
+          "Drivalia": null,
+          "Cael": 603.2,
+          "Drive on Holidays": 149.62,
+          "Tangerine": 262.56
+        },
+        "2026-11-04": {
+          "Autounion": 205.25,
+          "Drivalia": null,
+          "Cael": 603.2,
+          "Drive on Holidays": 149.62,
+          "Tangerine": 262.56
+        },
+        "2026-11-05": {
+          "Autounion": 205.25,
+          "Drivalia": null,
+          "Cael": 603.2,
+          "Drive on Holidays": 149.62,
+          "Tangerine": 262.56
+        },
+        "2026-11-06": {
+          "Autounion": 188.16,
+          "Drivalia": null,
+          "Cael": 566.61,
+          "Drive on Holidays": 139.48,
+          "Tangerine": 240.69
+        }
+      }
     }
   }
 }

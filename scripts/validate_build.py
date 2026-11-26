@@ -119,6 +119,11 @@ def main() -> int:
             "syncBulkGroupCheckboxes",
             "group-segment-label",
             '<th>Grupo</th><th>Segmento</th><th>Estação</th>',
+            'id="yearStrip"',
+            'id="rsPeriod"',
+            "function renderYearStrip",
+            "function rsPeriodsWithPrices",
+            "periodPop",
         ):
             if marker not in html:
                 errors.append(f"Marcador funcional ausente no HTML: {marker}")
@@ -130,6 +135,10 @@ def main() -> int:
             errors.append("Opção VAN não encontrada no seletor de tarifa")
     else:
         errors.append("public/index.html não existe")
+
+        if HTML.exists() and (ROOT / "data" / "periods" / "periods.json").exists():
+            if 'const PERIOD_INFO = {"periods":[]' in html:
+                errors.append("PERIOD_INFO não foi injetado no HTML (períodos/eventos em falta)")
 
     if RATE_SHOP_PAGE.exists():
         rate_shop_html = RATE_SHOP_PAGE.read_text(encoding="utf-8")

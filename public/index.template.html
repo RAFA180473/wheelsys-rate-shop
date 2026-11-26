@@ -324,6 +324,81 @@
     .rs-days-field{min-width:0;}
   }
 
+
+  /* ===== Calendário de períodos, eventos especiais e renovação visual (11/2026) ===== */
+  :root{ --evt:#f0b23e; --evt-ink:#6b4a05; --evt-soft:#fff4d9; --deck:#0a1b29; --ring:rgba(0,212,188,.45); }
+  body{background:linear-gradient(180deg,#eef2f6 0,#f6f7f9 260px) no-repeat var(--paper);}
+  .topbar{position:sticky; top:0; z-index:40; box-shadow:0 6px 18px -12px rgba(5,20,31,.7);}
+  .panel{border-radius:10px; box-shadow:0 1px 0 rgba(13,28,41,.04), 0 10px 24px -22px rgba(13,28,41,.55);}
+  .filterbox{margin-left:28px; margin-right:28px;}
+  button, select, .checklist label{transition:background-color .12s ease, border-color .12s ease, color .12s ease, box-shadow .12s ease;}
+  button:focus-visible, select:focus-visible, input:focus-visible, .ys-seg:focus-visible{outline:2px solid var(--teal-500); outline-offset:2px;}
+  .btn.primary{box-shadow:0 6px 14px -8px var(--teal-500);}
+  .btn:active{transform:translateY(1px);}
+  .checklist{scrollbar-width:thin;}
+  .checklist label:hover{background:#dfe7ee;}
+  .checklist label.checked:hover{background:var(--teal-500);}
+  .checklist label .pcode{font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; color:var(--navy-950);}
+  .checklist label.has-event{box-shadow:inset 0 -2px 0 var(--evt);}
+  .evt-star{color:#c98a0a; font-size:11px;}
+  .checklist label.checked .evt-star{color:var(--evt-ink);}
+  #viewPeriodsChecklist, #adjustPeriodsChecklist{max-height:132px;}
+  #viewPeriodsChecklist label{text-transform:none; letter-spacing:0; color:var(--navy-700); font-size:12px; font-weight:500;}
+
+  .yearstrip-wrap{margin-top:16px; padding:14px 16px 10px; border-radius:10px; background:var(--deck); color:var(--mist-100);}
+  .ys-head{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px; font-size:12.5px;}
+  .ys-head b{font-weight:600; letter-spacing:.2px;}
+  #yearStripCount{margin-left:8px; color:var(--teal-400); font-family:'IBM Plex Mono',monospace; font-size:11.5px;}
+  .ys-legend{display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--steel-300);}
+  .ys-legend i{display:inline-block; vertical-align:-1px; margin-right:5px;}
+  .ys-legend .lg-bar{width:8px; height:11px; background:#4d6a82; border-radius:2px 2px 0 0;}
+  .ys-legend .lg-evt{width:8px; height:8px; background:var(--evt); border-radius:50%;}
+  .ys-legend .lg-on{width:8px; height:11px; background:var(--teal-400); border-radius:2px 2px 0 0;}
+  .ys-legend button{font:inherit; font-weight:600; padding:5px 11px; border-radius:14px; border:1px solid rgba(240,178,62,.55); background:transparent; color:var(--evt); cursor:pointer;}
+  .ys-legend button:hover{background:var(--evt); color:var(--navy-950);}
+  .yearstrip{overflow-x:auto; scrollbar-width:thin;}
+  .ys-bars{display:flex; align-items:flex-end; gap:2px; height:84px; min-width:900px; padding-top:12px; border-bottom:1px solid #2a4258;}
+  .ys-seg{position:relative; height:100%; min-width:4px; padding:0; border:0; background:transparent; cursor:pointer; display:flex; align-items:flex-end;}
+  .ys-seg i{display:block; width:100%; background:#4d6a82; border-radius:2px 2px 0 0; transition:background-color .12s ease;}
+  .ys-seg.nokpi i{background:repeating-linear-gradient(135deg,#3b566c 0 3px,#2c4459 3px 6px);}
+  .ys-seg:hover i{background:#8fb0c9;}
+  .ys-seg.on i{background:var(--teal-400);}
+  .ys-seg.on:hover i{background:#7ff8ea;}
+  .ys-seg.evt::before{content:''; position:absolute; top:-10px; left:50%; width:7px; height:7px; margin-left:-3.5px; border-radius:50%; background:var(--evt);}
+  .ys-months{display:flex; gap:2px; min-width:900px; margin-top:5px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--steel-300);}
+  .ys-months span{min-width:0; overflow:hidden; white-space:nowrap; border-left:1px solid #2a4258; padding-left:4px;}
+
+  td.period-cell{line-height:1.35; padding-top:6px; padding-bottom:6px; cursor:help;}
+  td.period-cell .pcode{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; color:var(--navy-800);}
+  td.period-cell.loc-active .pcode{color:var(--teal-500);}
+  td.period-cell .pdates{display:block; font-size:10.5px;}
+  td.period-cell .evt-chip{display:inline-block; margin-top:3px; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:top;
+    padding:1px 7px; border-radius:9px; background:var(--evt-soft); border:1px solid #ecd08a; color:var(--evt-ink); font-family:'IBM Plex Sans',sans-serif; font-size:10px; font-weight:600;}
+  .grid-wrap tbody tr:hover td.clickable-cell{background-color:rgba(0,212,188,.07);}
+  .grid-wrap td.clickable-cell:hover{background:var(--mist-100); box-shadow:inset 0 0 0 1px var(--teal-500);}
+  .grid-wrap thead th{z-index:2;}
+  .changecount{transition:background-color .2s ease;}
+
+  #periodPop{position:fixed; z-index:200; width:340px; max-width:calc(100vw - 16px); max-height:70vh; overflow:auto; padding:0 0 6px;
+    background:var(--deck); color:#e8eef4; border-radius:10px; border:1px solid #2a4258; box-shadow:0 18px 40px -14px rgba(5,20,31,.75); font-size:12px; line-height:1.45; pointer-events:none;}
+  #periodPop[hidden]{display:none;}
+  #periodPop .pp-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:10px 14px; border-bottom:1px solid #2a4258;}
+  #periodPop .pp-head b{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--teal-400);}
+  #periodPop .pp-head span{font-size:11px; color:var(--steel-300); white-space:nowrap;}
+  #periodPop .pp-sec{padding:8px 14px 2px;}
+  #periodPop h4{margin:0 0 3px; font-size:11px; font-weight:600; color:var(--steel-300);}
+  #periodPop .pp-evt h4{color:var(--evt);}
+  #periodPop .pp-evt{background:rgba(240,178,62,.09); padding-bottom:7px;}
+  #periodPop ul{margin:0; padding-left:16px;}
+  #periodPop p{margin:0;}
+  #periodPop .pp-kpi p{font-family:'IBM Plex Mono',monospace; font-size:11px; color:#cfe0ec;}
+
+  .rs-shop-controls-clean{grid-template-columns:minmax(210px,1.5fr) minmax(140px,1fr) minmax(140px,1fr) minmax(140px,1fr) 90px;}
+  .rs-period-note{margin:0 0 12px; padding:8px 12px; border-left:3px solid var(--evt); border-radius:0 6px 6px 0; background:var(--evt-soft); color:var(--evt-ink); font-size:12px; cursor:help;}
+  .rs-period-note span{color:#8a6a1c;}
+  .rs-period-note[hidden]{display:none;}
+  @media(max-width:1100px){ .rs-shop-controls-clean{grid-template-columns:repeat(2,minmax(0,1fr));} .filterbox{margin-left:12px; margin-right:12px;} }
+  @media(prefers-reduced-motion:reduce){ *{transition:none!important;} }
 </style>
 </head>
 <body>
@@ -365,6 +440,18 @@
       <label for="segFilterSel">Segmento</label>
       <select id="segFilterSel"></select>
     </div>
+  </div>
+  <div class="yearstrip-wrap">
+    <div class="ys-head">
+      <div><b>Calendário de períodos</b> <span id="yearStripCount"></span></div>
+      <div class="ys-legend">
+        <span><i class="lg-bar"></i> altura = ocupação do ano anterior</span>
+        <span><i class="lg-evt"></i> evento especial</span>
+        <span><i class="lg-on"></i> selecionado</span>
+        <button type="button" id="yearStripEvents">Selecionar períodos com evento</button>
+      </div>
+    </div>
+    <div id="yearStrip" class="yearstrip" aria-label="Calendário de períodos: clique para selecionar, Shift+clique para um intervalo"></div>
   </div>
 </div>
 
@@ -559,6 +646,11 @@
           </div>
 
           <div>
+            <label for="rsPeriod">Período (só com preços)</label>
+            <select id="rsPeriod"></select>
+          </div>
+
+          <div>
             <label for="rsPickupDate">Check-out</label>
             <select id="rsPickupDate"></select>
           </div>
@@ -573,6 +665,8 @@
             <div class="rs-days-card"><b id="rsDays">7</b><span>dias</span></div>
           </div>
         </div>
+
+        <div class="rs-period-note" id="rsPeriodNote" hidden></div>
 
         <div class="rs-pbi-bar">
           <div>
@@ -661,6 +755,23 @@ function costBreakForDays(n){
   return 'p30';
 }
 const CB_LABELS_PT = {p1:'1 dia', p2:'2 dias', p3:'3 dias', p46:'4-6 dias', p7:'7 dias', p813:'8-13 dias', p1429:'14-29 dias', p30:'30+ dias'};
+// Períodos do ano (semana / P1-P2), feriados, eventos locais e KPIs do ano anterior, por estação.
+// Preenchido no build a partir de data/periods/periods.json (ver scripts/import_periods.py).
+const PERIOD_INFO = {"periods":[],"info":{}};
+const PERIOD_LABELS = {};
+(PERIOD_INFO.periods||[]).forEach(p=>{ PERIOD_LABELS[p.start+'|'+p.end] = p.label; });
+function escHtml(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function periodMeta(key, loc){
+  const byLoc = (PERIOD_INFO.info||{})[loc || primaryLocation()] || {};
+  const i = byLoc[key] || {};
+  return {label:PERIOD_LABELS[key]||'', hol:i.hol||'', evt:i.evt||'', ref:i.ref||'', kpi:i.kpi||''};
+}
+function periodCode(key){ return (PERIOD_LABELS[key]||'').replace(/\s*\/\s*/, ' · '); }
+function periodOcc(key, loc){ const m = /Occ\s*(\d+)%/.exec(periodMeta(key, loc).kpi); return m ? Number(m[1]) : null; }
+function periodEventNames(key, loc){
+  // nomes dos eventos locais do período, sem as datas entre parêntesis
+  return periodMeta(key, loc).evt.split('\n').map(s=>s.replace(/\s*\([^)]*\)\s*$/, '').trim()).filter(Boolean);
+}
 let applyMode = 'cascade'; // 'cascade' | 'only'
 let gridGroupFilter = new Set();
 
@@ -771,7 +882,64 @@ function setSyncedPeriods(keys){
     cbx.checked = on;
     cbx.parentElement.classList.toggle('checked', on);
   });
+  renderYearStrip();
 }
+// ---- Calendário do ano: uma barra por período (altura = ocupação do ano anterior), marcador nos eventos ----
+let STRIP_PERIODS = [];
+function renderYearStrip(){
+  const box = document.getElementById('yearStrip');
+  if(!box) return;
+  const loc = primaryLocation();
+  const list = STRIP_PERIODS;
+  if(!list.length){ box.innerHTML = ''; return; }
+  const dayMs = 86400000;
+  let html = '', months = '', lastMonth = '';
+  const MES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  let monthDays = 0;
+  const flushMonth = ()=>{ if(lastMonth) months += `<span style="flex:${monthDays} ${monthDays} 0">${lastMonth}</span>`; };
+  list.forEach(r=>{
+    const key = r.pickupStart+'|'+r.pickupEnd;
+    const s = parseDMY(r.pickupStart), e = parseDMY(r.pickupEnd);
+    const days = Math.round((e - s)/dayMs) + 1;
+    const occ = periodOcc(key, loc);
+    const evt = periodMeta(key, loc).evt !== '';
+    const on = viewPeriods.has(key);
+    const h = occ===null ? 22 : Math.max(10, Math.round(occ));
+    html += `<button type="button" class="ys-seg${on?' on':''}${evt?' evt':''}${occ===null?' nokpi':''}" style="flex:${days} ${days} 0" data-pkey="${key}" aria-pressed="${on}" aria-label="${escHtml((periodCode(key)||'Período')+' '+r.pickupStart+' a '+r.pickupEnd)}"><i style="height:${h}%"></i></button>`;
+    const m = MES[s.getMonth()] + (s.getFullYear()!==2027 ? ' '+String(s.getFullYear()).slice(2) : '');
+    if(m !== lastMonth){ flushMonth(); lastMonth = m; monthDays = 0; }
+    monthDays += days;
+  });
+  flushMonth();
+  box.innerHTML = `<div class="ys-bars">${html}</div><div class="ys-months">${months}</div>`;
+  const cnt = document.getElementById('yearStripCount');
+  if(cnt) cnt.textContent = viewPeriods.size + (viewPeriods.size===1 ? ' período selecionado' : ' períodos selecionados');
+}
+document.getElementById('yearStrip')?.addEventListener('click', ev=>{
+  const seg = ev.target.closest('.ys-seg');
+  if(!seg) return;
+  const key = seg.dataset.pkey;
+  let keys = new Set(viewPeriods);
+  if(ev.shiftKey && STRIP_LAST_KEY){
+    // Shift+clique: seleciona o intervalo entre o último período clicado e este
+    const order = STRIP_PERIODS.map(r=>r.pickupStart+'|'+r.pickupEnd);
+    const a = order.indexOf(STRIP_LAST_KEY), b = order.indexOf(key);
+    if(a>=0 && b>=0) order.slice(Math.min(a,b), Math.max(a,b)+1).forEach(k=>keys.add(k));
+  } else if(keys.has(key)){ keys.delete(key); if(keys.size===0) keys.add(key); }
+  else keys.add(key);
+  STRIP_LAST_KEY = key;
+  setSyncedPeriods(keys);
+  onAdjustPeriodsChanged();
+  document.querySelector(`#yearStrip .ys-seg[data-pkey="${key}"]`)?.focus();
+});
+let STRIP_LAST_KEY = null;
+document.getElementById('yearStripEvents')?.addEventListener('click', ()=>{
+  const loc = primaryLocation();
+  const keys = STRIP_PERIODS.map(r=>r.pickupStart+'|'+r.pickupEnd).filter(k=>periodMeta(k, loc).evt !== '');
+  if(!keys.length) return;
+  setSyncedPeriods(keys);
+  onAdjustPeriodsChanged();
+});
 function populatePeriodsChecklists(periods){
   const viewBox = document.getElementById('viewPeriodsChecklist');
   const adjustBox = document.getElementById('adjustPeriodsChecklist');
@@ -785,6 +953,7 @@ function populatePeriodsChecklists(periods){
   viewPeriods = stillValid;
   adjustPeriods = new Set(stillValid);
   const sorted = periods.slice().sort((a,b)=>parseDMY(a.pickupStart) - parseDMY(b.pickupStart));
+  STRIP_PERIODS = sorted;
   const onToggle = (key, cbx)=>{
     const keys2 = new Set(viewPeriods);
     if(cbx.checked) keys2.add(key); else keys2.delete(key);
@@ -799,12 +968,17 @@ function populatePeriodsChecklists(periods){
       const lab = document.createElement('label');
       const on = viewPeriods.has(key);
       if(on) lab.className = 'checked';
-      lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${r.pickupStart} a ${r.pickupEnd}`;
+      const code = periodCode(key);
+      const hasEvt = periodMeta(key).evt !== '';
+      lab.dataset.pkey = key;
+      if(hasEvt) lab.classList.add('has-event');
+      lab.innerHTML = `<input type="checkbox" value="${key}" ${on?'checked':''}> ${code?`<b class="pcode">${escHtml(code)}</b> `:''}${r.pickupStart.slice(0,5)} a ${r.pickupEnd}${hasEvt?' <span class="evt-star" aria-label="evento especial">★</span>':''}`;
       box.appendChild(lab);
       const cbx = lab.querySelector('input');
       cbx.addEventListener('change', ()=>onToggle(key, cbx));
     });
   });
+  renderYearStrip();
 }
 document.getElementById('viewPeriodsFirst4').addEventListener('click', ()=>{
   const keys = Array.from(document.querySelectorAll('#viewPeriodsChecklist input')).map(cbx=>cbx.value);
@@ -919,11 +1093,58 @@ function refreshChangeCount(){
   el.textContent = n + ' alteraç' + (n===1?'ão':'ões');
   el.className = 'changecount' + (n===0?' zero':'');
 }
+function refreshPeriodEventMarks(){
+  // os eventos dependem da estação ativa: atualiza a estrela nas duas listas de períodos
+  document.querySelectorAll('#viewPeriodsChecklist label, #adjustPeriodsChecklist label').forEach(lab=>{
+    const has = periodMeta(lab.dataset.pkey).evt !== '';
+    lab.classList.toggle('has-event', has);
+    let star = lab.querySelector('.evt-star');
+    if(has && !star){ star = document.createElement('span'); star.className = 'evt-star'; star.textContent = '★'; lab.appendChild(document.createTextNode(' ')); lab.appendChild(star); }
+    if(!has && star) star.remove();
+  });
+}
+// ---- Janela de detalhe do período (abre ao passar o rato ou ao focar com o teclado) ----
+(function(){
+  const pop = document.createElement('div');
+  pop.id = 'periodPop'; pop.setAttribute('role','tooltip'); pop.hidden = true;
+  document.body.appendChild(pop);
+  let current = null;
+  function lines(s){ return s.split('\n').filter(Boolean).map(l=>`<li>${escHtml(l)}</li>`).join(''); }
+  function show(el){
+    const key = el.dataset.pkey; if(!key) return;
+    const loc = el.dataset.ploc || primaryLocation();
+    const m = periodMeta(key, loc);
+    const [a,b] = key.split('|');
+    let h = `<div class="pp-head"><b>${escHtml(periodCode(key) || 'Período')}</b><span>${a} a ${b} · ${escHtml(loc)}</span></div>`;
+    if(m.evt) h += `<div class="pp-sec pp-evt"><h4>★ Eventos especiais</h4><ul>${lines(m.evt)}</ul></div>`;
+    if(m.hol) h += `<div class="pp-sec"><h4>Feriados e férias</h4><ul>${lines(m.hol)}</ul></div>`;
+    if(m.ref) h += `<div class="pp-sec"><h4>No ano anterior, nas mesmas datas</h4><ul>${lines(m.ref)}</ul></div>`;
+    if(m.kpi) h += `<div class="pp-sec pp-kpi"><h4>KPIs do ano anterior</h4><p>${escHtml(m.kpi).replace(/\n/g,'<br>')}</p></div>`;
+    if(!m.evt && !m.hol && !m.ref && !m.kpi) h += `<div class="pp-sec"><p>Sem feriados, eventos ou KPIs registados para este período.</p></div>`;
+    pop.innerHTML = h; pop.hidden = false; current = el;
+    const r = el.getBoundingClientRect(), pw = pop.offsetWidth, ph = pop.offsetHeight;
+    let left = Math.min(Math.max(8, r.left + r.width/2 - pw/2), window.innerWidth - pw - 8);
+    let top = r.bottom + 8;
+    if(top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    pop.style.left = left + 'px'; pop.style.top = top + 'px';
+  }
+  function hide(){ pop.hidden = true; current = null; }
+  document.addEventListener('mouseover', ev=>{
+    const el = ev.target.closest && ev.target.closest('[data-pkey]');
+    if(el){ if(el !== current) show(el); } else if(current && !ev.target.closest('#periodPop')) hide();
+  });
+  document.addEventListener('focusin', ev=>{ const el = ev.target.closest && ev.target.closest('[data-pkey]'); if(el) show(el); else hide(); });
+  document.addEventListener('keydown', ev=>{ if(ev.key === 'Escape') hide(); });
+  window.addEventListener('scroll', hide, true);
+})();
 function viewPeriodsList(){
   if(viewPeriods.size===0) return [];
   return Array.from(viewPeriods).map(k=>{ const [pStart,pEnd] = k.split('|'); return {pStart, pEnd}; }).sort((a,b)=>parseDMY(a.pStart) - parseDMY(b.pStart));
 }
 function renderGrid(){
+  if(typeof renderYearStrip === 'function' && document.getElementById('yearStrip')?.dataset.loc !== primaryLocation()){
+    const ys = document.getElementById('yearStrip'); if(ys){ ys.dataset.loc = primaryLocation(); renderYearStrip(); refreshPeriodEventMarks(); }
+  }
   const {group, pStart, pEnd, cb} = currentSelection();
   const locs = viewLocations();
   const periodsList = viewPeriodsList();
@@ -975,7 +1196,10 @@ function renderGrid(){
         tds += `<td class="group-cell" rowspan="${rowsForGroup.length}">${groupLabel(g)}</td>`;
       }
       tds += `<td class="loc-cell${loc===primaryLocation()?' loc-active':''}">${loc}</td>`;
-      tds += `<td class="period-cell${(per.pStart===pStart&&per.pEnd===pEnd)?' loc-active':''}">${per.pStart} a ${per.pEnd}</td>`;
+      const pKey = per.pStart + '|' + per.pEnd;
+      const pCode = periodCode(pKey);
+      const pEvts = periodEventNames(pKey, loc);
+      tds += `<td class="period-cell${(per.pStart===pStart&&per.pEnd===pEnd)?' loc-active':''}${pEvts.length?' has-event':''}" data-pkey="${pKey}" data-ploc="${loc}">${pCode?`<span class="pcode">${escHtml(pCode)}</span>`:''}<span class="pdates">${per.pStart} a ${per.pEnd}</span>${pEvts.length?`<span class="evt-chip">★ ${escHtml(pEvts.join(' · '))}</span>`:''}</td>`;
       CB_FIELDS.forEach(f=>{
         const edited = Math.abs(row[f]-orig[f])>0.0001;
         const isSelCell = isSelRow && f===cb && loc===primaryLocation() && per.pStart===pStart && per.pEnd===pEnd;
@@ -1498,6 +1722,7 @@ function syncRateShopDatesFromPeriod(){
   if(end && RS_AVAILABLE_DATES.length) dropoff.value=rsNearestAvailable(RS_AVAILABLE_DATES, end);
 
   if(typeof updateRateShopDays==='function') updateRateShopDays(false);
+  if(typeof rsSyncPeriodFromPickup==='function') rsSyncPeriodFromPickup();
   if(typeof renderRateShop==='function') renderRateShop();
 }
 
@@ -1512,9 +1737,10 @@ function ourBasePriceFor(group, loc){
   const field=rateFieldForDays(days);
 
   // REGRA PRINCIPAL:
-  // usar sempre o período selecionado no painel de tarifas.
+  // usar o período escolhido no Rate Shop (acompanha sempre a data de Check-out); na falta dele,
+  // o período selecionado no painel de tarifas.
   let row=null;
-  const perKey=primaryPeriodKey();
+  const perKey=document.getElementById('rsPeriod')?.value || primaryPeriodKey();
   if(perKey){
     const [pStart,pEnd]=perKey.split('|');
     row=rows.find(r=>r.group===group && r.pickupStart===pStart && r.pickupEnd===pEnd);
@@ -2004,10 +2230,74 @@ function populateRsDateSelects(preserve){
   dropoffSel.value=dropoffVal;
 
   updateRateShopDays(false);
+  populateRsPeriodSelect();
 }
+
+// Períodos de tarifa (os mesmos do painel) que têm pelo menos uma data com preços carregados para a
+// estação escolhida. Períodos sem qualquer preço não são apresentados para seleção.
+let RS_PERIODS=[];
+function rsPeriodsWithPrices(loc){
+  const seen=new Map();
+  (WORK[currentFile][loc]||[]).forEach(r=>{
+    const k=r.pickupStart+'|'+r.pickupEnd;
+    if(!seen.has(k)) seen.set(k,{key:k,startISO:ptDateToInputValue(r.pickupStart),endISO:ptDateToInputValue(r.pickupEnd)});
+  });
+  return [...seen.values()]
+    .map(p=>({...p, dates:RS_AVAILABLE_DATES.filter(d=>d>=p.startISO && d<=p.endISO)}))
+    .filter(p=>p.dates.length>0)
+    .sort((a,b)=>a.startISO<b.startISO?-1:1);
+}
+function populateRsPeriodSelect(){
+  const sel=document.getElementById('rsPeriod');
+  if(!sel) return;
+  const loc=document.getElementById('rsLocation')?.value || primaryLocation();
+  RS_PERIODS=rsPeriodsWithPrices(loc);
+  if(!RS_PERIODS.length){
+    sel.innerHTML='<option value="">Sem períodos com preços</option>';
+    sel.disabled=true;
+    rsUpdatePeriodNote();
+    return;
+  }
+  sel.disabled=false;
+  sel.innerHTML=RS_PERIODS.map(p=>{
+    const [a,b]=p.key.split('|');
+    const code=periodCode(p.key);
+    const evt=periodMeta(p.key, loc).evt!=='';
+    return `<option value="${p.key}">${code?escHtml(code)+' — ':''}${a.slice(0,5)} a ${b}${evt?' ★':''}</option>`;
+  }).join('');
+  rsSyncPeriodFromPickup();
+}
+function rsSyncPeriodFromPickup(){
+  const sel=document.getElementById('rsPeriod');
+  const pickup=document.getElementById('rsPickupDate')?.value;
+  if(!sel || !RS_PERIODS.length) return;
+  const hit=RS_PERIODS.find(p=>pickup && pickup>=p.startISO && pickup<=p.endISO);
+  if(hit) sel.value=hit.key;
+  rsUpdatePeriodNote();
+}
+function rsUpdatePeriodNote(){
+  const note=document.getElementById('rsPeriodNote');
+  const sel=document.getElementById('rsPeriod');
+  if(!note || !sel) return;
+  const loc=document.getElementById('rsLocation')?.value || primaryLocation();
+  const names=sel.value ? periodEventNames(sel.value, loc) : [];
+  note.hidden=!names.length;
+  note.dataset.pkey=sel.value||'';
+  note.dataset.ploc=loc;
+  note.innerHTML=names.length ? `<b>★ Evento especial neste período:</b> ${escHtml(names.join(' · '))} <span>(passe o rato para ver o detalhe)</span>` : '';
+}
+document.getElementById('rsPeriod')?.addEventListener('change', ev=>{
+  const p=RS_PERIODS.find(x=>x.key===ev.target.value);
+  if(!p) return;
+  document.getElementById('rsPickupDate').value=p.dates[0];
+  updateRateShopDays(true);
+  rsUpdatePeriodNote();
+  renderRateShop();
+});
 
 document.getElementById('rsPickupDate')?.addEventListener('change', ()=>{
   updateRateShopDays(true);
+  rsSyncPeriodFromPickup();
   renderRateShop();
 });
 document.getElementById('rsDropoffDate')?.addEventListener('change', ()=>{

@@ -15,6 +15,8 @@ MANIFEST = ROOT / "selection_manifest.json"
 SHAREPOINT_MANIFEST = ROOT / "sharepoint_sync_manifest.json"
 OUTPUT = ROOT / "public" / "index.html"
 RATE_SHOP_OUTPUT = ROOT / "public" / "rate-shop.html"
+PERIODS_JSON = ROOT / "data" / "periods" / "periods.json"
+PERIOD_INFO_RE = re.compile(r"^const PERIOD_INFO = .*$", re.M)
 
 DECL = re.compile(r"\b(const|let|var)\s+RATES\s*=\s*")
 SELECT_RE = re.compile(r'(<select\s+id=["\']fileFilterSel["\'][^>]*>.*?</select>)', re.I | re.S)
@@ -817,6 +819,22 @@ def inject_source_ui(html: str, meta: dict[str, dict[str, str]], updated_at: str
     return html
 
 
+def inject_period_info(html: str) -> str:
+    """Embed the period calendar (labels, holidays, events, KPIs) used by the period tooltips."""
+    if not PERIODS_JSON.exists():
+        return html
+    data = json.loads(PERIODS_JSON.read_text(encoding="utf-8"))
+    payload = json.dumps(
+        {"periods": data.get("periods", []), "info": data.get("info", {})},
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).replace("</", "<\\/")
+    if len(PERIOD_INFO_RE.findall(html)) != 1:
+        print("AVISO: constante PERIOD_INFO não encontrada no template; eventos por período não foram injetados.")
+        return html
+    return PERIOD_INFO_RE.sub(lambda m: "const PERIOD_INFO = " + payload + ";", html, count=1)
+
+
 def main() -> int:
     if not TEMPLATE.exists():
         print(f"Template não encontrado: {TEMPLATE}")
@@ -829,6 +847,7 @@ def main() -> int:
     html = clean_previous_injection(html)
     html = ensure_van_support(html)
     html = ensure_adjustment_panel_updates(html)
+    html = inject_period_info(html)
 
     rates = json.loads(RATES_JSON.read_text(encoding="utf-8"))
     span, error = find_rates_span(html)

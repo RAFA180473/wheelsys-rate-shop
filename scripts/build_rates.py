@@ -28,6 +28,7 @@ SELECTED = ROOT / "data" / "selected"
 OUT_DIR = ROOT / "public" / "data"
 OUT_JSON = OUT_DIR / "rates.json"
 BUILD_MANIFEST = ROOT / "build_manifest.json"
+PERIODS_JSON = ROOT / "data" / "periods" / "periods.json"
 
 ZONE_TO_LOCATION = {"LXA": "Lisboa", "OPT": "Porto", "FAO": "Faro"}
 FAMILIES = ("BK", "FCI", "VAN")
@@ -161,6 +162,61 @@ def parse_workbook(path: Path) -> tuple[str, list[dict[str, Any]], list[str]]:
     return tariff, records, warnings
 
 
+def _dmy(text: str) -> date:
+    return datetime.strptime(text, "%d/%m/%Y").date()
+
+
+def split_by_periods(rates: dict, periods: list[dict[str, str]]) -> int:
+    """Desdobra as tarifas pelos periodos de data/periods/periods.json (ex.: S01 / P1, S01 / P2).
+
+    Dentro do intervalo coberto pelos periodos, cada grupo passa a ter uma linha por periodo. O preco
+    de cada periodo e o da linha original que cobre mais dias desse periodo (em caso de empate, a que
+    comeca primeiro). As linhas anteriores ao primeiro periodo mantem-se; a que o atravessa e cortada
+    na vespera. A operacao e idempotente: ficheiros ja desdobrados ficam iguais.
+    Devolve o numero de linhas criadas.
+    """
+    if not periods:
+        return 0
+    bounds = [(_dmy(p["start"]), _dmy(p["end"]), p["start"], p["end"]) for p in periods]
+    first, last = bounds[0][0], bounds[-1][1]
+    created = 0
+    for tariff in rates.values():
+        for loc, records in tariff.items():
+            by_group: dict[str, list[dict[str, Any]]] = {}
+            for rec in records:
+                by_group.setdefault(rec["group"], []).append(rec)
+            out: list[dict[str, Any]] = []
+            for group, rows in by_group.items():
+                spans = []
+                for rec in rows:
+                    try:
+                        spans.append((_dmy(rec["pickupStart"]), _dmy(rec["pickupEnd"]), rec))
+                    except ValueError:
+                        out.append(rec)
+                spans.sort(key=lambda t: t[0])
+                for s, e, rec in spans:
+                    if e < first or s > last:
+                        out.append(rec)
+                    elif s < first:
+                        cut = dict(rec)
+                        cut["pickupEnd"] = date.fromordinal(first.toordinal() - 1).strftime("%d/%m/%Y")
+                        out.append(cut)
+                for ps, pe, ps_txt, pe_txt in bounds:
+                    best, best_days = None, 0
+                    for s, e, rec in spans:
+                        days = (min(e, pe) - max(s, ps)).days + 1
+                        if days > best_days:
+                            best, best_days = rec, days
+                    if best is None:
+                        continue
+                    new = dict(best)
+                    new["pickupStart"], new["pickupEnd"] = ps_txt, pe_txt
+                    out.append(new)
+                    created += 1
+            records[:] = out
+    return created
+
+
 def main() -> int:
     SELECTED.mkdir(parents=True, exist_ok=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -184,6 +240,13 @@ def main() -> int:
         source_summary.append({"file": path.name, "tariff": tariff, "rows": len(records)})
         all_warnings.extend(warnings)
 
+    split_rows = 0
+    periods_source = ""
+    if PERIODS_JSON.exists():
+        periods_data = json.loads(PERIODS_JSON.read_text(encoding="utf-8"))
+        periods_source = periods_data.get("source", "")
+        split_rows = split_by_periods(rates, periods_data.get("periods", []))
+
     for tariff in rates.values():
         for records in tariff.values():
             records.sort(key=lambda r: (r["group"], r["pickupStart"], r["pickupEnd"]))
@@ -194,6 +257,7 @@ def main() -> int:
         "output": str(OUT_JSON.relative_to(ROOT)),
         "sources": source_summary,
         "families": list(FAMILIES),
+        "period_split": {"source": periods_source, "rows": split_rows},
         "warnings": all_warnings,
     }
     BUILD_MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -201,6 +265,8 @@ def main() -> int:
     print(f"Criado: {OUT_JSON}")
     for item in source_summary:
         print(f"- {item['file']}: {item['tariff']} | {item['rows']} linhas")
+    if split_rows:
+        print(f"Tarifas desdobradas por periodo ({periods_source}): {split_rows} linhas")
     if all_warnings:
         print(f"Avisos: {len(all_warnings)} (ver build_manifest.json)")
     return 0

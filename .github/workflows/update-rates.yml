@@ -12,6 +12,7 @@ on:
       - "public/index.template.html"
       - "public/data/rateshop-history.json"
       - "scripts/**"
+      - "data/periods/**"
       - "requirements.txt"
       - ".github/workflows/update-rates.yml"
 

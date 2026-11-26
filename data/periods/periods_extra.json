@@ -1,0 +1,14 @@
+{
+ "note": "Periodos fora do Excel anual, acrescentados a pedido (26/11/2026): dezembro de 2026 em P1 (segunda a quinta) e P2 (sexta a domingo), semanas ISO 49 a 53.",
+ "periods": [
+  {"start": "30/11/2026", "end": "03/12/2026", "label": "2026-S49 / P1"},
+  {"start": "04/12/2026", "end": "06/12/2026", "label": "2026-S49 / P2"},
+  {"start": "07/12/2026", "end": "10/12/2026", "label": "2026-S50 / P1"},
+  {"start": "11/12/2026", "end": "13/12/2026", "label": "2026-S50 / P2"},
+  {"start": "14/12/2026", "end": "17/12/2026", "label": "2026-S51 / P1"},
+  {"start": "18/12/2026", "end": "20/12/2026", "label": "2026-S51 / P2"},
+  {"start": "21/12/2026", "end": "24/12/2026", "label": "2026-S52 / P1"},
+  {"start": "25/12/2026", "end": "27/12/2026", "label": "2026-S52 / P2"},
+  {"start": "28/12/2026", "end": "31/12/2026", "label": "2026-S53 / P1"}
+ ]
+}

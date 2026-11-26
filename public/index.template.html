@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Painel de Ajuste de Tarifas — ICONIQ</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&display=swap');
 
   :root{
     --navy-950:#05141f;
@@ -399,6 +399,127 @@
   .rs-period-note[hidden]{display:none;}
   @media(max-width:1100px){ .rs-shop-controls-clean{grid-template-columns:repeat(2,minmax(0,1fr));} .filterbox{margin-left:12px; margin-right:12px;} }
   @media(prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  /* ===== Tema techno (11/2026): fundo escuro com grelha, caixas com moldura e barra de topo nova ===== */
+  :root{
+    --paper:#050d15; --ink:#dbe7f0; --ink-soft:#8aa6bb; --box:#0a1825; --box-2:#0e2132; --box-3:#132a3e; --edge:#1b3a51; --edge-hi:#2b5a78;
+    --line:#1b3a51; --mist-100:#112638; --steel-500:#8aa6bb; --navy-900:#dbe7f0; --navy-800:#c9d9e6; --navy-700:#b4c9d9;
+    --display:'Chakra Petch','IBM Plex Sans',sans-serif;
+  }
+  html{background:var(--paper);}
+  body{color:var(--ink); background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(0,242,215,.10), transparent 60%),
+      radial-gradient(900px 480px at 96% 4%, rgba(46,37,103,.38), transparent 62%),
+      linear-gradient(rgba(27,58,81,.34) 1px, transparent 1px) 0 0/100% 34px,
+      linear-gradient(90deg, rgba(27,58,81,.34) 1px, transparent 1px) 0 0/34px 100%,
+      var(--paper);
+    background-attachment:fixed;}
+
+  /* barra de topo */
+  .topbar{display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:auto auto; column-gap:18px; row-gap:1px; align-items:center;
+    padding:12px 28px; background:linear-gradient(180deg, rgba(8,22,34,.96), rgba(5,13,21,.90)); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--edge); box-shadow:0 14px 34px -22px #000;}
+  .topbar::after{content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+    background:linear-gradient(90deg, var(--teal-400) 0, var(--teal-400) 120px, rgba(0,242,215,.25) 38%, transparent 70%);}
+  .topbar .brand-logo{grid-row:1 / span 2; height:46px; padding:5px 10px; border-radius:10px; background:#fff; box-shadow:0 0 0 1px rgba(0,242,215,.35), 0 8px 22px -10px rgba(0,242,215,.55);}
+  .topbar h1{grid-column:2; grid-row:1; align-self:end; font-family:var(--display); font-size:21px; font-weight:600; letter-spacing:.4px; color:#fff; line-height:1.15;}
+  .topbar .tag{grid-column:2; grid-row:2; align-self:start; font-size:10.5px; letter-spacing:1.6px; color:var(--teal-400); opacity:.85;}
+  body .page-nav{grid-column:3; grid-row:1 / span 2; margin-left:0; padding:10px 16px; border-radius:8px; border:1px solid var(--teal-500); background:rgba(0,242,215,.08);
+    color:var(--teal-400); font-family:var(--display); font-size:13px; font-weight:600; letter-spacing:.3px; transition:background-color .15s ease, color .15s ease, box-shadow .15s ease;}
+  body .page-nav:hover{background:var(--teal-400); color:var(--navy-950); box-shadow:0 0 22px -4px var(--teal-400);}
+
+  /* caixas */
+  .panel{position:relative; background:linear-gradient(180deg, var(--box-2), var(--box)); border:1px solid var(--edge); border-radius:12px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 18px 40px -30px #000;}
+  .panel::before{content:''; position:absolute; top:-1px; left:18px; width:64px; height:2px; background:var(--teal-400); border-radius:0 0 2px 2px; box-shadow:0 0 12px rgba(0,242,215,.7);}
+  .panel h2, .gridhead h2{font-family:var(--display); font-size:13px; letter-spacing:.9px; color:#eaf3f9;}
+  label, .filter-row label, .gridfilter label{color:var(--ink-soft);}
+  .desc, .legend, .rs-note{color:var(--ink-soft);}
+  .legend b, .rs-note b{color:var(--ink);}
+
+  select, input[type=number], input[type=text], input[type=date], .filter-row select, .rs-shop-controls select, .rs-shop-controls input, .rs-controls select, .rs-controls input{
+    background:#071320; color:var(--ink); border:1px solid var(--edge); border-radius:7px; color-scheme:dark;}
+  select:hover, input:hover{border-color:var(--edge-hi);}
+  select:focus, input:focus{outline:2px solid var(--teal-500); outline-offset:1px;}
+  .checklist, body .gridfilter .checklist, body #bulkGroups, body .segment-filter-card{background:#071320; border-color:var(--edge);}
+  .checklist label{background:var(--box-3); color:var(--ink); border:1px solid transparent;}
+  .checklist label:hover{background:#1a3850;}
+  .checklist label.checked, #locFilterChecklist label.checked{background:var(--teal-400); color:var(--navy-950);}
+  .checklist label.checked:hover{background:#7ff8ea;}
+  .checklist label .pcode{color:var(--teal-400);}
+  .checklist label.checked .pcode{color:var(--navy-950);}
+  #viewPeriodsChecklist label{color:var(--ink);}
+  #viewPeriodsChecklist label.checked{color:var(--navy-950);}
+  .evt-star{color:var(--evt);}
+  .quickrange button, body .segment-filter-actions button, .comp-links button{background:transparent; color:var(--ink-soft); border:1px solid var(--edge);}
+  .quickrange button:hover, body .segment-filter-actions button:hover, .comp-links button:hover{background:var(--box-3); color:#fff; border-color:var(--edge-hi);}
+  .rate-source-meta{background:#071320; border-color:var(--edge); color:var(--ink);}
+  .rate-source-sub{color:var(--ink-soft);}
+
+  .modetabs, .segbtns{border-color:var(--edge);}
+  .modetab, .segbtns button{background:#071320; color:var(--ink-soft); font-family:var(--display); letter-spacing:.3px;}
+  .modetab.active{background:var(--teal-400); color:var(--navy-950);}
+  .btn{font-family:var(--display); letter-spacing:.4px;}
+  .btn.primary{color:var(--navy-950); background:var(--teal-400); box-shadow:0 0 24px -8px var(--teal-400);}
+  .btn.primary:hover{background:#7ff8ea;}
+  .btn.ghost{background:transparent; color:var(--ink); border-color:var(--edge-hi);}
+  .btn.ghost:hover{background:var(--box-3);}
+  .btn.export{background:transparent; border:1px solid var(--teal-500); color:var(--teal-400);}
+  .btn.export:hover{background:rgba(0,242,215,.12);}
+  .pricebox, .au-box, .rs-days-card{background:#040b12; border:1px solid var(--edge);}
+  .changecount.zero{background:var(--box-3); color:var(--ink-soft);}
+  .banner{background:rgba(240,178,62,.10); border-color:rgba(240,178,62,.4); color:#f3d28f;}
+  .yearstrip-wrap{background:#040b12; border:1px solid var(--edge);}
+
+  /* grelhas */
+  table{color:var(--ink);}
+  thead th{background:#06111b; color:#9fd9d1; font-family:var(--display); font-weight:600; letter-spacing:.6px; border-bottom:1px solid var(--teal-500);}
+  thead th.sortable-th:hover{background:#0f2638; color:#fff;}
+  tbody td{border-bottom:1px solid var(--edge);}
+  tbody tr:hover{background:rgba(0,242,215,.05);}
+  tbody tr.selected-row{background:transparent;}
+  body [class*="segment-tone-"]{--seg-soft:color-mix(in srgb, var(--seg-accent) 9%, #0a1825); --seg-strong:color-mix(in srgb, var(--seg-accent) 24%, #0a1825);}
+  body .grid-wrap table{border:1px solid var(--edge);}
+  body .grid-wrap thead th{border-right:1px solid #14293a; border-bottom:1px solid var(--teal-500);}
+  body .grid-wrap tbody td{border-right:1px solid #14293a; border-bottom:1px solid #14293a;}
+  body tbody tr[class*="segment-tone-"] td.group-cell, body tbody tr[class*="segment-tone-"] td.segment-cell{color:#eef5fa;}
+  body .group-segment-column{border-color:var(--edge);}
+  body .group-segment-label[class*="segment-tone-"]{color:#eef5fa;}
+  td.clickable-cell{color:#e6f0f7;}
+  td.clickable-cell .eur{color:var(--ink-soft); font-size:.86em;}
+  .grid-wrap tbody tr:hover td.clickable-cell{background-color:rgba(0,242,215,.07);}
+  .grid-wrap td.clickable-cell:hover{background:rgba(0,242,215,.16); box-shadow:inset 0 0 0 1px var(--teal-400);}
+  td.selected-cell, td.selected-cell .eur{color:var(--navy-950);}
+  td.edited{color:var(--teal-400);}
+  td.loc-cell{color:var(--ink);}
+  td.period-cell{color:var(--ink-soft);}
+  td.period-cell .pcode{color:var(--ink);}
+  td.period-cell .evt-chip{background:rgba(240,178,62,.14); border-color:rgba(240,178,62,.5); color:var(--evt);}
+  .grid-wrap > div[style*="overflow"]{border-radius:8px; scrollbar-color:var(--edge-hi) transparent;}
+
+  /* Rate Shop */
+  .rateshop-box{background:#071320; border:1px solid var(--edge);}
+  .rateshop-head{font-family:var(--display); color:#eaf3f9; letter-spacing:.8px;}
+  .rs-pbi-updated{color:var(--ink-soft);}
+  .rs-pbi-updated b{color:var(--ink);}
+  .rs-scroll{border-color:var(--edge)!important; background:var(--box);}
+  table.comp-table tbody td{color:var(--ink);}
+  .rs-src, .rs-pbi-cell .rs-pbi-w, .rs-pbi-cell .rs-pbi-date{color:var(--ink-soft);}
+  .rs-low{color:#2fe3b6;} .rs-high{color:#ff8a78;}
+  .rs-badge.nomatch, .rs-flash-tag, .rs-flash-badge, .rs-pct-badge.rs-high{background:rgba(217,97,79,.16); color:#ff9c8c;}
+  .rs-pct-badge.rs-low, .rs-ok-badge{background:rgba(0,168,136,.18); color:#4ff0c8;}
+  .rs-alert-banner{background:rgba(217,97,79,.12); border-color:rgba(217,97,79,.45); color:#ffb3a7;}
+  .rs-period-note{background:rgba(240,178,62,.12); color:#f3d28f;}
+  .rs-period-note span{color:#c9a558;}
+  @keyframes rs-flash-bg{0%,100%{background:rgba(217,97,79,.12);}50%{background:rgba(217,97,79,.28);}}
+  @keyframes rs-flash-row{0%,100%{background:transparent;}50%{background:rgba(217,97,79,.16);}}
+  ::selection{background:var(--teal-400); color:var(--navy-950);}
+  td.clickable-cell{white-space:nowrap;}
+  .ys-head b{color:#eaf3f9; font-family:var(--display); letter-spacing:.6px;}
+  .rs-days-card span{color:var(--ink-soft);}
+  .rate-shop-page .layout>div:nth-child(2)>.comp-panel{margin-top:18px!important;}
+  .comp-head h2{font-family:var(--display);}
+  @media(max-width:760px){ .topbar{grid-template-columns:auto 1fr; } body .page-nav{grid-column:1 / -1; grid-row:3; justify-self:start; margin-top:8px;} }
 </style>
 </head>
 <body>
@@ -1206,7 +1327,7 @@ function renderGrid(){
         let cls = ['clickable-cell'];
         if(edited) cls.push('edited');
         if(isSelCell) cls.push('selected-cell');
-        tds += `<td class="${cls.join(' ')}" data-group="${g}" data-field="${f}" data-loc="${loc}" data-pstart="${per.pStart}" data-pend="${per.pEnd}">${fmt(row[f])}</td>`;
+        tds += `<td class="${cls.join(' ')}" data-group="${g}" data-field="${f}" data-loc="${loc}" data-pstart="${per.pStart}" data-pend="${per.pEnd}">${fmt(row[f])}<span class="eur"> €</span></td>`;
       });
       tr.innerHTML = tds;
       tbody.appendChild(tr);

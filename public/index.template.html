@@ -893,12 +893,37 @@ const PERIOD_INFO = {"periods":[],"info":{}};
 const PERIOD_LABELS = {};
 (PERIOD_INFO.periods||[]).forEach(p=>{ PERIOD_LABELS[p.start+'|'+p.end] = p.label; });
 function escHtml(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// Quando o período da tarifa não coincide com um período do Excel (ex.: semanas inteiras ou fins de semana
+// partidos de outra forma), usa-se o(s) período(s) do Excel que esse intervalo abrange.
+const PERIOD_RESOLVE_CACHE = {};
+function resolvePeriodKeys(key){
+  if(PERIOD_LABELS[key] !== undefined) return [key];
+  if(PERIOD_RESOLVE_CACHE[key]) return PERIOD_RESOLVE_CACHE[key];
+  const toNum = t=>{ const m = /^(\d\d)\/(\d\d)\/(\d{4})$/.exec(t||''); return m ? Date.UTC(+m[3], +m[2]-1, +m[1]) : NaN; };
+  const parts = String(key).split('|'), s = toNum(parts[0]), e = toNum(parts[1]);
+  const out = [];
+  if(!isNaN(s) && !isNaN(e)){
+    (PERIOD_INFO.periods||[]).forEach(p=>{ if(toNum(p.start) <= e && toNum(p.end) >= s) out.push(p.start+'|'+p.end); });
+  }
+  return (PERIOD_RESOLVE_CACHE[key] = out);
+}
+function periodLabel(key){
+  const keys = resolvePeriodKeys(key);
+  if(!keys.length) return '';
+  if(keys.length === 1) return PERIOD_LABELS[keys[0]] || '';
+  const weeks = [];
+  keys.forEach(k=>{ const w = (PERIOD_LABELS[k]||'').split('/')[0].trim(); if(w && weeks.indexOf(w) < 0) weeks.push(w); });
+  const yr = /^(\d{4}-)/.exec(weeks[0]||'');
+  return weeks.map((w,i)=> i && yr && w.indexOf(yr[1]) === 0 ? w.slice(yr[1].length) : w).join('+');
+}
 function periodMeta(key, loc){
   const byLoc = (PERIOD_INFO.info||{})[loc || primaryLocation()] || {};
-  const i = byLoc[key] || {};
-  return {label:PERIOD_LABELS[key]||'', hol:i.hol||'', evt:i.evt||'', ref:i.ref||'', kpi:i.kpi||''};
+  const keys = resolvePeriodKeys(key);
+  const merge = f=>{ const seen = []; keys.forEach(k=>String((byLoc[k]||{})[f]||'').split('\n').forEach(l=>{ l = l.trim(); if(l && seen.indexOf(l) < 0) seen.push(l); })); return seen.join('\n'); };
+  const one = byLoc[keys[0]] || {};
+  return {label:periodLabel(key), hol:merge('hol'), evt:merge('evt'), ref:keys.length === 1 ? (one.ref||'') : merge('ref'), kpi:keys.length === 1 ? (one.kpi||'') : ''};
 }
-function periodCode(key){ return (PERIOD_LABELS[key]||'').replace(/\s*\/\s*/, ' · '); }
+function periodCode(key){ return periodLabel(key).replace(/\s*\/\s*/, ' · '); }
 function periodOcc(key, loc){ const m = /Occ\s*(\d+)%/.exec(periodMeta(key, loc).kpi); return m ? Number(m[1]) : null; }
 function periodEventNames(key, loc){
   // nomes dos eventos locais do período, sem as datas entre parêntesis

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27T17:21:07+00:00",
+  "generated_at": "2026-11-27T17:46:34+00:00",
   "source": "Microsoft SharePoint via Microsoft Graph",
   "drive_id": "b!xwmEBgEH00ujiRgMsJd2Yv53BYWpg_FEgcR3FtNZmn4HGYIuutM5S5XGcFz-a35B",
   "folder_path": "Comercial/Brokers/Rates/Tarifas/files 2027",
@@ -7,21 +7,21 @@
   "selected": [
     {
       "family": "BK",
-      "filename": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_261126.xlsx",
-      "item_id": "01J4GBPX3P57DOHODU2BAL4JCV3FE3VLBX",
-      "lastModifiedDateTime": "2026-11-26T22:38:21Z",
-      "size": 675809,
-      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7BE3C6EF6F-74B8-40D0-BE24-55D949BAAC37%7D&file=RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_261126.xlsx&action=default&mobileredirect=true",
-      "downloaded_to": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_261126.xlsx"
+      "filename": "RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_271126.xlsx",
+      "item_id": "01J4GBPXZAYTYNJNDZB5GZ2FS3FF56ICE3",
+      "lastModifiedDateTime": "2026-11-27T17:45:42Z",
+      "size": 696318,
+      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7BD4F0C420-79B4-4D0F-9D16-5B297BE4089B%7D&file=RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_271126.xlsx&action=default&mobileredirect=true",
+      "downloaded_to": "data/incoming/RateGroup_Export_BK_Lisboa_Porto_Faro_ajustado_271126.xlsx"
     },
     {
       "family": "FCI",
-      "filename": "RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_261126.xlsx",
-      "item_id": "01J4GBPXY3JIUC5A6T2JFZ47OMNZ2JWB4T",
-      "lastModifiedDateTime": "2026-11-26T22:38:23Z",
-      "size": 757305,
-      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7B2E284A1B-D383-4BD2-9E7D-CC6E749B0793%7D&file=RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_261126.xlsx&action=default&mobileredirect=true",
-      "downloaded_to": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_261126.xlsx"
+      "filename": "RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_271126.xlsx",
+      "item_id": "01J4GBPX5XTYVSRIIX3ZCZYFZZIFNT4BMI",
+      "lastModifiedDateTime": "2026-11-27T17:45:42Z",
+      "size": 780404,
+      "webUrl": "https://iconiqfleet.sharepoint.com/_layouts/15/Doc.aspx?sourcedoc=%7B282B9EB7-17A1-45DE-9C17-39415B3E0588%7D&file=RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_271126.xlsx&action=default&mobileredirect=true",
+      "downloaded_to": "data/incoming/RateGroup_Export_BK_FCI_Lisboa_Porto_Faro_ajustado_271126.xlsx"
     },
     {
       "family": "VAN",

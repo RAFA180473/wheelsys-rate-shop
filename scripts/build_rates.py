@@ -217,6 +217,16 @@ def split_by_periods(rates: dict, periods: list[dict[str, str]]) -> int:
     return created
 
 
+def split_on_build() -> bool:
+    extra = PERIODS_JSON.with_name("periods_extra.json")
+    if not extra.exists():
+        return False
+    try:
+        return bool(json.loads(extra.read_text(encoding="utf-8")).get("split_on_build", False))
+    except (ValueError, AttributeError):
+        return False
+
+
 def main() -> int:
     SELECTED.mkdir(parents=True, exist_ok=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -245,7 +255,11 @@ def main() -> int:
     if PERIODS_JSON.exists():
         periods_data = json.loads(PERIODS_JSON.read_text(encoding="utf-8"))
         periods_source = periods_data.get("source", "")
-        split_rows = split_by_periods(rates, periods_data.get("periods", []))
+        # Os ficheiros do SharePoint ja vem desdobrados por periodo e sao os mesmos que se importam no
+        # WheelSys: por omissao a consola mostra-os tal como estao. Para voltar a desdobrar no build,
+        # por "split_on_build": true em data/periods/periods_extra.json.
+        if split_on_build():
+            split_rows = split_by_periods(rates, periods_data.get("periods", []))
 
     for tariff in rates.values():
         for records in tariff.values():
